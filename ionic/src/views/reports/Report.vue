@@ -38,7 +38,7 @@
 
 
                 <section class="ion-padding">
-                    <ion-button expand="block">Finalizar y Enviar Reporte</ion-button>
+                    <ion-button expand="block" @click="createExportPDF">Finalizar y Enviar Reporte</ion-button>
                     <a>Borrar reporte</a>
                 </section>
 
@@ -61,6 +61,7 @@ import { useRoute } from 'vue-router';
 import { IInvoice } from '@/interfaces/InvoiceInterfaces';
 import { DateTime } from 'luxon';
 import { JobsList } from '@/utils/JobsAndProjects/JobsAndProjects';
+import { PDFCreator } from '@/utils/PDFCreator/PDFCreator';
 
 const report = ref<IReport|null>(null);
 const invoicesData = ref<Array<IInvoice>>([]);
@@ -102,6 +103,15 @@ const loadReport = async () => {
 const loadReportInvoices = async () => {
     const invoicesFetched = await RequestAPI.get(`/reports/${reportId.value}/invoices`);
     invoicesData.value = invoicesFetched;
+}
+
+
+const createExportPDF = async () => {
+    const instance = new PDFCreator({
+        report: report.value as IReport,
+        invoices: invoices.value
+    });
+    await instance.create();
 }
 
 const initialize = async () => {
