@@ -1,7 +1,7 @@
+//Serve: ionic serve --address=0.0.0.0
 import { createApp } from 'vue'
 import App from './App.vue'
 import router from './router';
-
 import { IonicVue } from '@ionic/vue';
 
 /* Core CSS required for Ionic components to work properly */

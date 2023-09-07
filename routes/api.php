@@ -2,6 +2,8 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\InvoiceController;
+use App\Http\Controllers\ReportController;
 
 /*
 |--------------------------------------------------------------------------
@@ -19,14 +21,10 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 });
 
 
-Route::group(['prefix' => 'v1', 'namespace' => 'App\Http\Controllers\Api\V1'], function () {
-    Route::apiResource('businesses', BusinessController::class);
-    Route::apiResource('customers', CustomerController::class);
-    Route::apiResource('discount-items', DiscountItemController::class);
-    Route::apiResource('works', WorkController::class);
-    Route::apiResource('deliveries', DeliveryController::class);
-    Route::apiResource('invoices', InvoiceController::class);
-    Route::apiResource('machines', MachineController::class);
-    Route::apiResource('products', ProductController::class);
-    Route::apiResource('orders', OrderController::class);
-});
+Route::apiResource('invoices', InvoiceController::class);
+Route::apiResource('reports', ReportController::class);
+Route::post('/invoices/{invoice}/image-upload', [
+    InvoiceController::class, 'uploadImage' 
+]);
+
+Route::get('/reports/{report}/invoices', ReportController::class . '@invoices');

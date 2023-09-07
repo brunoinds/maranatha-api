@@ -76,7 +76,7 @@ http://ionicframework.com/docs/theming/ */
   --ion-color-light-tint: #f5f6f9;
 }
 
-@media (prefers-color-scheme: dark) {
+@media (prefers-color-scheme: darks) {
   /*
    * Dark Colors
    * -------------------------------------------
@@ -233,4 +233,65 @@ http://ionicframework.com/docs/theming/ */
 
     --ion-card-background: #1e1e1e;
   }
+}
+
+
+@font-face {
+  font-family: "WeblySleekUI";
+  src: url("../../public/assets/fonts/WeblySleekUI/WeblySleekUINormal.ttf") format("truetype");
+  font-weight: normal;
+  font-style: normal
+}
+
+@font-face {
+  font-family: "WeblySleekUI";
+  src: url("../../public/assets/fonts/WeblySleekUI/WeblySleekUISB.ttf") format("truetype");
+  font-weight: 500;
+  font-style: normal
+}
+
+@font-face {
+  font-family: "WeblySleekUI";
+  src: url("../../public/assets/fonts/WeblySleekUI/weblysleekuisbi.ttf") format("truetype");
+  font-weight: 500;
+  font-style: italic
+}
+
+@font-face {
+  font-family: "WeblySleekUI";
+  src: url("../../public/assets/fonts/WeblySleekUI/WeblySleekUIItalic.ttf") format("truetype");
+  font-weight: normal;
+  font-style: italic
+}
+
+@font-face {
+  font-family: "WeblySleekUI";
+  src: url("../../public/assets/fonts/WeblySleekUI/weblysleekuil.ttf") format("truetype");
+  font-weight: 300;
+  font-style: normal
+}
+
+@font-face {
+  font-family: "WeblySleekUI";
+  src: url("../../public/assets/fonts/WeblySleekUI/weblysleekuisl.ttf") format("truetype");
+  font-weight: 400;
+  font-style: normal
+}
+
+@font-face {
+  font-family: "WeblySleekUI";
+  src: url("../../public/assets/fonts/WeblySleekUI/weblysleekuisli.ttf") format("truetype");
+  font-weight: 400;
+  font-style: italic
+}
+
+@font-face {
+  font-family: "WeblySleekUI";
+  src: url("../../public/assets/fonts/WeblySleekUI/weblysleekuili.ttf") format("truetype");
+  font-weight: 300;
+  font-style: italic
+}
+
+.component-content {
+  --background: var(--ion-color-step-50, #f2f2f7);
 }
