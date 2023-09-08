@@ -55,12 +55,12 @@
                     </ion-item>
                     <ion-item>
                         <ion-label position="stacked">Fecha</ion-label>
-                        <input class="native-input sc-ion-input-md" v-maska data-maska="##/##/####" v-model="invoice.date">
+                        <input class="native-input sc-ion-input-ios" v-maska data-maska="##/##/####" v-model="invoice.date">
                     </ion-item>
 
                     <ion-item>
                         <ion-label position="stacked">Precio</ion-label>
-                        <CurrencyInput class="native-input sc-ion-input-md" v-model="invoice.amount" :options="{ currency: 'PEN', autoDecimalDigits: true, currencyDisplay: 'hidden' }"></CurrencyInput>
+                        <CurrencyInput class="native-input sc-ion-input-ios" v-model="invoice.amount" :options="{ currency: 'PEN', autoDecimalDigits: true, currencyDisplay: 'hidden' }"></CurrencyInput>
                     </ion-item>
                     <ion-item>
                         <ion-input label="Código de Factura/Boleta" label-placement="stacked" placeholder="AAXX-XXXXXXXX" v-model="invoice.ticket_number"></ion-input>
@@ -84,7 +84,7 @@
                         </ion-select>                    
                     </ion-item>
                     <ion-item>
-                        <ion-select label="Proyecto" label-placement="stacked" placeholder="Selecciona el Proyecto"  v-model="invoice.expense_code">
+                        <ion-select label="Proyecto" label-placement="stacked" interface="action-sheet" placeholder="Selecciona el Proyecto"  v-model="invoice.expense_code">
                             <ion-select-option v-for="project in jobsAndProjects.projects" :value="project.code">{{ project.name }}</ion-select-option>
                         </ion-select>                  
                     </ion-item>

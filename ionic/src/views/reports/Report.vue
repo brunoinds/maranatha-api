@@ -7,19 +7,32 @@
             </ion-toolbar>
         </ion-header>
         <ion-content>
-            <ion-button expand="block" @click="addInvoice">Añadir Boleta o Factura</ion-button>
-
             <article v-if="report != null">
+
+                
                 <ion-list>
                     <ion-item>
                         <ion-label>
-                            <h1>{{ report.title }}</h1>
-                            <h3>{{ report.status }}</h3>
+                            <h1><b>{{ report.title }}</b></h1>
+                            <h3>Estado: {{ report.status }}</h3>
+                            <p>Tipo de Documentos: Boleta</p>
+                            <p>Rango de Fechas: 10/10/2023 - 11/11/2023</p>
                         </ion-label>
+                        <ion-button>
+                            <ion-icon :icon="pencilOutline"></ion-icon>
+                        </ion-button>
                     </ion-item>
                 </ion-list>
 
-                <ion-list-header>Boletas y Facturas</ion-list-header>
+                <br>
+
+                <ion-list-header>Boletas y Facturas ({{ invoices.length }} / 28)</ion-list-header>
+                <section class="ion-padding">
+                    <ion-button expand="block" fill="outline" @click="addInvoice"> 
+                        <ion-icon slot="start" :icon="add"></ion-icon>
+                        Añadir Boleta o Factura
+                    </ion-button>
+                </section>
                 <ion-list>
                     <ion-item v-for="invoice in invoices" :key="invoice.id">
                         <ion-label>
@@ -32,16 +45,14 @@
                         </ion-label>
                     </ion-item>
                 </ion-list>
-                <ion-list>
-                    <ion-button expand="block" @click="addInvoice">Añadir Boleta o Factura</ion-button>
-                </ion-list>
 
 
                 <section class="ion-padding">
-                    <ion-button expand="block" @click="createExportPDF">Finalizar y Enviar Reporte</ion-button>
-                    <a>Borrar reporte</a>
+                    <ion-button expand="block" color="success" shape="round" size="default" style="height: 50px" @click="createExportPDF">
+                        <ion-icon :icon="sendOutline" slot="end"></ion-icon>
+                        Finalizar y Enviar Reporte
+                    </ion-button>
                 </section>
-
                 
             </article>
             
@@ -50,10 +61,10 @@
 </template>
 
 <script setup lang="ts">
-import { IonPage, IonHeader, IonToolbar, IonTitle, IonContent, IonListHeader, IonButton, IonList, IonItem, IonLabel, IonProgressBar, modalController } from '@ionic/vue';
+import { IonPage, IonHeader, IonToolbar, IonTitle, IonContent, IonIcon, IonListHeader, IonButton, IonList, IonItem, IonLabel, IonProgressBar, modalController } from '@ionic/vue';
 import { RequestAPI } from '../../utils/Requests/RequestAPI';
 import { computed, ref } from 'vue';
-import { addOutline } from 'ionicons/icons';
+import { add, addOutline, pencilOutline, sendOutline, trashBinOutline } from 'ionicons/icons';
 import { IReport } from '../../interfaces/ReportInterfaces';
 import NewInvoiceModal  from '@/dialogs/NewInvoice/NewInvoiceModal.vue';
 
