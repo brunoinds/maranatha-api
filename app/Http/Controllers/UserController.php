@@ -5,6 +5,9 @@ namespace App\Http\Controllers;
 use App\Models\User;
 use Illuminate\Http\Request;
 use App\Http\Requests\StoreUserRequest;
+use App\Http\Requests\ListUsersRequest;
+use Spatie\Permission\Models\Role;
+use Spatie\Permission\Models\Permission;
 
 
 class UserController extends Controller
@@ -12,17 +15,14 @@ class UserController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(ListUsersRequest $request)
     {
         return User::all();
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
+    public function show(User $user)
     {
-        //
+        return response()->json($user->roles());
     }
 
     /**
@@ -31,23 +31,8 @@ class UserController extends Controller
     public function store(StoreUserRequest $request)
     {
         $user = User::create($request->validated());
+
         return response()->json(['message' => 'User created', 'user' => $user->toArray()]);
-    }
-
-    /**
-     * Display the specified resource.
-     */
-    public function show(User $user)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(User $user)
-    {
-        //
     }
 
     /**
@@ -63,6 +48,53 @@ class UserController extends Controller
      */
     public function destroy(User $user)
     {
-        //
+        $user->tokens()->delete();
+        $user->delete();
+        return response()->json(['message' => 'User deleted']);
+    }
+
+
+    public function addRole(Request $request, User $user)
+    {
+        //Check if the authenticated user has the permission to add roles:
+        /*if (!auth()->user()->hasPermissionTo('add roles')) {
+            return response()->json(['message' => 'You do not have permission to add roles'], 403);
+        }*/
+
+
+        $role = Role::findOrCreate('admin', 'sanctum');
+        $permission = Permission::findOrCreate('add roles', 'sanctum');
+        
+        $role->givePermissionTo('add roles');
+        $user->roles()->attach($role);
+        return response()->json(['message' => 'Role added']);
+    }
+    public function removeRole(Request $request, User $user)
+    {
+        //Check if the authenticated user has the permission to remove roles:
+        if (!auth()->user()->hasPermissionTo('add roles')) {
+            return response()->json(['message' => 'You do not have permission to remove roles'], 403);
+        }
+
+        $user->roles()->detach($request->role_id);
+        return response()->json(['message' => 'Role removed']);
+    }
+    public function hasRole(Request $request, User $user)
+    {
+        //Check if the authenticated user has the permission to remove roles:
+        if (!auth()->user()->hasPermissionTo('add roles')) {
+            return response()->json(['message' => 'You do not have permission to see roles'], 403);
+        }
+
+        if ($user->roles()->hasRole($request->role_id)){
+            return response()->json(true, 200);
+        }else{
+            return response()->json(false, 404);
+        }
+    }
+
+    public function roles(User $user)
+    {
+        return response()->json($user->roles()->get());
     }
 }
