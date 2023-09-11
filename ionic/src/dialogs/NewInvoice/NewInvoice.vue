@@ -12,6 +12,7 @@
                         Añadir
                     </ion-button>
                 </ion-buttons>
+                <ion-progress-bar v-if="isLoading" type="indeterminate"></ion-progress-bar>
             </ion-toolbar>
         </ion-header>
         <ion-content>
@@ -99,7 +100,7 @@
                     </ion-accordion>
                 </ion-accordion-group>
                 <section class="ion-padding">
-                    <ion-button expand="block" shape="round" size="default" style="height: 50px" @click="createNewInvoice" :disabled="!(stepsChecks.first && stepsChecks.second && stepsChecks.third)">
+                    <ion-button expand="block" shape="round" size="default" style="height: 50px" @click="createNewInvoice" :disabled="!(stepsChecks.first && stepsChecks.second && stepsChecks.third) || isLoading">
                         <ion-icon :icon="arrowForwardCircleOutline" slot="end"></ion-icon>
                         Añadir {{invoiceType}}
                     </ion-button>
@@ -316,6 +317,7 @@ const createNewInvoice = async () => {
             alert.present();
         })
     }else{
+        isLoading.value = true;
         dynamicData.value.status = "creating-invoice";
         const invoiceResponse = await RequestAPI.post("/invoices", {
             ...invoice.value,
@@ -339,6 +341,7 @@ const createNewInvoice = async () => {
         }).then((toast) => {
             toast.present();
         })
+        isLoading.value = false;
         props.emitter.fire("created");
         props.emitter.fire("close");
     }

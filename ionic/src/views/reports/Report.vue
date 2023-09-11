@@ -16,7 +16,7 @@
             </ion-toolbar>
         </ion-header>
         <ion-content>
-            <article v-if="report != null">
+            <article v-if="reportData != null">
                 <ion-list>
                     <ion-item>
                         <ion-label>
