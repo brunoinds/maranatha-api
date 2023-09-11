@@ -1,4 +1,4 @@
-name: Deploy Laravel Project on push
+name: Deploy Laravel
 on:
   push:
     branches:
@@ -8,20 +8,20 @@ jobs:
     name: Deploy
     runs-on: ubuntu-latest
     steps:
-      - name: Get the latest code
+      - name: 💻 Get the latest code
         uses: actions/checkout@v2.3.2
       - uses: actions/setup-node@master
-      - name: Copy .env
+      - name: ⌨️ Copy .env
         run: php -r "file_exists('.env') || copy('.env.example', '.env');"
-      - name: Install Dependencies
+      - name: 📦 Install Dependencies
         run: composer update --ignore-platform-reqs
-      - name: Generate key
+      - name: 🔑 Generate key
         run: php artisan key:generate
-      - name: Generate storage link
+      - name: 🔗 Generate storage link
         run: php artisan storage:link
-      - name: Directory Permissions
+      - name: 👮🏻 Directory Permissions
         run: chmod -R 777 storage bootstrap/cache
-      - name: 📂 Sync files
+      - name: 🗂️ Sync files
         uses: SamKirkland/FTP-Deploy-Action@4.0.0
         with:
           server: ${{ secrets.FTP_SERVER }}

@@ -25,6 +25,10 @@ Route::get('/app', function () {
     return Response::file($filePath);
 })->where('any', '.*');
 
+Route::get('/', function () {
+    return redirect('/app');
+});
+
 
 
 Route::get('/app/{any}', function ($file) {
