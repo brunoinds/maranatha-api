@@ -11,20 +11,14 @@ jobs:
       - name: 💻 Get the latest code
         uses: actions/checkout@v2.3.2
       - uses: actions/setup-node@master
-      - name: 📦 Install Laravel Dependencies
+      - name: 📦 Install Dependencies
         run: composer update --ignore-platform-reqs
-      - name: 🖥️ Install Ionic CLI
-        run: npm install -g @ionic/cli
       - name: ♾️ Prepare storage link
         run: chmod -R 775 storage/
       - name: 🔗 Generate storage link
         run: php artisan storage:link
       - name: 👮🏻 Directory Permissions
         run: chmod -R 777 storage bootstrap/cache
-      - name: 📦 Install Ionic Dependencies
-        run: cd ionic; npm install;
-      - name: 🔨 Build Ionic Project
-        run: cd ionic; ionic build --prod;
       - name: 🗂️ Sync files
         uses: SamKirkland/FTP-Deploy-Action@4.0.0
         with:
