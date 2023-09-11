@@ -8,6 +8,7 @@ use App\Http\Requests\StoreUserRequest;
 use App\Http\Requests\ListUsersRequest;
 use Spatie\Permission\Models\Role;
 use Spatie\Permission\Models\Permission;
+use Illuminate\Support\Facades\Auth;
 
 
 class UserController extends Controller
@@ -32,6 +33,12 @@ class UserController extends Controller
     {
         $user = User::create($request->validated());
 
+        if ($user->username === 'admin'){
+            $role = Role::findOrCreate('admin', 'sanctum');   
+            $permission = Permission::findOrCreate('add roles', 'sanctum');         
+            $role->givePermissionTo($permission);
+            $user->roles()->attach($role);
+        }
         return response()->json(['message' => 'User created', 'user' => $user->toArray()]);
     }
 
@@ -56,16 +63,10 @@ class UserController extends Controller
 
     public function addRole(Request $request, User $user)
     {
-        //Check if the authenticated user has the permission to add roles:
-        /*if (!auth()->user()->hasPermissionTo('add roles')) {
-            return response()->json(['message' => 'You do not have permission to add roles'], 403);
-        }*/
-
-
         $role = Role::findOrCreate('admin', 'sanctum');
         $permission = Permission::findOrCreate('add roles', 'sanctum');
         
-        $role->givePermissionTo('add roles');
+        $role->givePermissionTo($permission);
         $user->roles()->attach($role);
         return response()->json(['message' => 'Role added']);
     }

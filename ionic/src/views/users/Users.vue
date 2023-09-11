@@ -50,80 +50,7 @@ const loadUsersList = async () => {
     });
 }
 
-const addUser = async (prefiled:any = null) => {
-    const alert = await alertController.create({
-        header: 'Nuevo usuário',
-        inputs: [
-        {
-                type: 'text',
-                placeholder: 'Nombres y apellidos',
-                value: prefiled ? prefiled.name : null
-            },
-            {
-                type: 'email',
-                placeholder: 'Correo electrónico',
-                value: prefiled ? prefiled.email : null
-            },
-            {
-                type: 'text',
-                placeholder: 'Nombre de usuario',
-                value: prefiled ? prefiled.username : null
-            },
-            {
-                type: 'password',
-                placeholder: 'Contraseña',
-                value: prefiled ? prefiled.password : null
-            }
-        ],
-        buttons: [
-            {
-                text: 'Cancelar',
-                role: 'cancel',
-                handler: () => {
-                    
-                },
-            },
-            {
-                text: 'Crear Usuário',
-                role: 'confirm'
-            }
-        ]
-    });
 
-    await alert.present();
-    const { role, data } = await alert.onDidDismiss();
-
-    if (role == "confirm"){
-        const dataParsed = {
-            name: data.values[0],
-            username: data.values[2],
-            email: data.values[1],
-            password: data.values[3]
-        }
-
-        RequestAPI.post('/users', dataParsed).then((response) => {
-            alertController.create({
-                header: '¡Éxito!',
-                message: 'Usuário creado correctamente',
-                buttons: ['OK']
-            }).then(async (alert) => {
-                await alert.present();
-                await alert.onDidDismiss();
-                loadUsersList();
-            });
-        }).catch((error) => {
-            alertController.create({
-                header: 'Oops...',
-                message: error.response.message,
-                buttons: ['OK']
-            }).then(async (alert) => {
-                await alert.present();
-                await alert.onDidDismiss();
-                addUser(dataParsed);
-            });
-        });
-    }
-}
 
 const showUserOptions = async (user: IUser) => {
     const actionSheet = await actionSheetController.create({
@@ -187,7 +114,7 @@ const changeUserPassword = async (user: IUser) => {
     await alert.present();
     const { role, data } = await alert.onDidDismiss();
 
-    
+
 }
 
 loadUsersList();

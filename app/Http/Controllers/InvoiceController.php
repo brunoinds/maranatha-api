@@ -116,6 +116,9 @@ class InvoiceController extends Controller
                 ]
             ], 500);
         }
+
+        $invoice->image = $imageId;
+        $invoice->save();
         return response()->json([
             'message' => 'Image uploaded',
             'image' => [

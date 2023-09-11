@@ -11,9 +11,9 @@
         <ion-content :scrollX="true" :id="cameraAreaId">
             <canvas id="canvasElement" width="412" height="412"></canvas>
 
-            <video id="preview-qr-scanner" style="width: 100%;"></video>
+            <video id="preview-qr-scanner" playsInline webkit-playsInline></video>
         </ion-content>
-        <ion-footer>
+        <ion-footer v-if="false">
             <ion-select v-model="selectedCamera">
                     <ion-select-option v-for="camera in camerasList" :value="camera">{{camera.name}}</ion-select-option>
                 </ion-select>
@@ -76,7 +76,10 @@ export default defineComponent({
             });
             Instascan.Camera.getCameras({
                 video: {
-                    facingMode: undefined
+                    facingMode: (() => {
+                        //If is desktop device, return undefined, else, return environment
+                        return window.innerWidth > 768 ? undefined : 'environment';
+                    })()
                 }
             }).then(function (cameras:any) {
                 camerasList.value = cameras;

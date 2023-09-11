@@ -6,6 +6,7 @@ use App\Http\Controllers\InvoiceController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\ProfileController;
 
 /*
 |--------------------------------------------------------------------------
@@ -29,18 +30,34 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::post('/users/{user}/roles', UserController::class . '@addRole');
     Route::delete('/users/{user}/roles/{role}', UserController::class . '@removeRole');
     Route::get('/users/{user}/roles/{role}', UserController::class . '@hasRole');
+    Route::post("logout", [AuthController::class, 'logout']);
 
+    Route::get('account/me', ProfileController::class . '@showMe');
+
+
+
+    Route::apiResource('invoices', InvoiceController::class);
+    Route::apiResource('reports', ReportController::class);
+    Route::post('/invoices/{invoice}/image-upload', [
+        InvoiceController::class, 'uploadImage' 
+    ]);
+
+    Route::post('/reports/{report}/pdf-upload', [
+        ReportController::class, 'uploadReportPDF' 
+    ]);
+
+    
+    Route::get('/reports/{report}/invoices', ReportController::class . '@invoices');
+    Route::get('/me/reports', ReportController::class . '@myReports');
 });
 
 Route::post("login", [AuthController::class, 'login']);
 Route::post("register", [AuthController::class, 'register']);
-Route::post("logout", [AuthController::class, 'logout']);
+Route::post("users", [UserController::class, 'store']);
 
-
-Route::apiResource('invoices', InvoiceController::class);
-Route::apiResource('reports', ReportController::class);
-Route::post('/invoices/{invoice}/image-upload', [
-    InvoiceController::class, 'uploadImage' 
+Route::get('/reports/{report}/excel-download', [
+    ReportController::class, 'downloadExcel' 
 ]);
-
-Route::get('/reports/{report}/invoices', ReportController::class . '@invoices');
+Route::get('/reports/{report}/pdf-download', [
+    ReportController::class, 'downloadPDF' 
+]);

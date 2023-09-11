@@ -27,9 +27,8 @@ class StoreReportRequest extends FormRequest
             'title' => ['required', 'string', 'max:100'],
             'from_date' => ['required', 'date'],
             'to_date' => ['required', 'date'],
-            'status' => ['required', Rule::in(['Draft', 'Submitted'])], 
-            'project_code' => ['required', 'string', 'max:100'],
-            'exported_pdf' => ['nullable', 'string', 'max:100'],
+            'status' => ['required', Rule::in(['Draft', 'Submitted'])],
+            'type' => ['required', Rule::in(['Bill', 'Facture'])],
         ];
     }
 }

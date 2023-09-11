@@ -4,8 +4,68 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "555abf2f86f43faa66a73b134635ac31",
+    "content-hash": "3563b782b09e6a8eeb6f1ddd38410fea",
     "packages": [
+        {
+            "name": "avadim/fast-excel-writer",
+            "version": "v4.4.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/aVadim483/fast-excel-writer.git",
+                "reference": "f3e11baff231db3938f027cf5b596c4ea69b3f3e"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/aVadim483/fast-excel-writer/zipball/f3e11baff231db3938f027cf5b596c4ea69b3f3e",
+                "reference": "f3e11baff231db3938f027cf5b596c4ea69b3f3e",
+                "shasum": ""
+            },
+            "require": {
+                "ext-intl": "*",
+                "ext-json": "*",
+                "ext-mbstring": "*",
+                "ext-zip": "*",
+                "php": ">=7.4"
+            },
+            "require-dev": {
+                "avadim/fast-excel-reader": "^2.7",
+                "phpunit/phpunit": "^9.0"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "avadim\\FastExcelWriter\\": "./src/FastExcelWriter"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "description": "Lightweight and very fast XLSX Excel Spreadsheet Writer in PHP",
+            "homepage": "https://github.com/aVadim483/fast-excel-writer",
+            "keywords": [
+                "MS Office",
+                "PHPExcel",
+                "excel",
+                "library",
+                "office 2007",
+                "php",
+                "spreadsheet",
+                "xls",
+                "xlsx"
+            ],
+            "support": {
+                "issues": "https://github.com/aVadim483/fast-excel-writer/issues",
+                "source": "https://github.com/aVadim483/fast-excel-writer/tree/v4.4.1"
+            },
+            "funding": [
+                {
+                    "url": "https://www.paypal.me/VShemarov",
+                    "type": "other"
+                }
+            ],
+            "time": "2023-09-01T18:16:29+00:00"
+        },
         {
             "name": "brick/math",
             "version": "0.11.0",

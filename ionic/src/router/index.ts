@@ -9,15 +9,19 @@ const routes: Array<RouteRecordRaw> = [
     children: [
       {
         path: '',
-        redirect: '/reports'
+        redirect: '/login'
       },
       {
-        path: 'reports',
+        path: 'my-reports',
         component: () => import('@/views/reports/Reports.vue')
       },
       {
+        path: 'all-reports',
+        component: () => import('@/views/reports/AllReports.vue')
+      },
+      {
         path: 'account',
-        component: () => import('@/views/Tab2Page.vue')
+        component: () => import('@/views/account/Account.vue')
       }
     ]
   },

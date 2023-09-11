@@ -1,13 +1,18 @@
 import { IInvoice } from "@/interfaces/InvoiceInterfaces";
 import { IReport } from "@/interfaces/ReportInterfaces";
 import { RequestAPI } from "@/utils/Requests/RequestAPI";
+import { Session } from "@/utils/Session/Session";
 import { jsPDF } from "jspdf";
 import 'jspdf-autotable';
 
 
 interface PDFCreatorOptions{
     report: IReport,
-    invoices: Array<IInvoice>;
+    invoices: Array<IInvoice>,
+    textContents: {
+        submittedBy: string,
+        fromDateToDate: string,
+    }
 }
 class PDFCreator{
     private doc: jsPDF;
@@ -15,15 +20,20 @@ class PDFCreator{
         invoice: IInvoice,
         imageBase64: string|null,
         canvas: HTMLCanvasElement,
-        canvasBase64: string|null
+        canvasBase64: string|null,
     }>;
     private report: IReport;
+    private textContents: {
+        submittedBy: string,
+        fromDateToDate: string,
+    }
     private invoices: Array<IInvoice>;
     constructor(options: PDFCreatorOptions){
         this.doc = new jsPDF();
         this.canvasItems = [];
         this.invoices = options.invoices;
         this.report = options.report;
+        this.textContents = options.textContents;
     }
 
 
@@ -33,13 +43,12 @@ class PDFCreator{
         await this.generateTableOnPDF();
         await this.generateImagesPagesOnPDF();
         
-        //Open PDF on new tab:
-        window.open(this.doc.output('bloburl'), '_blank');
+        return this.doc.output('datauristring');
     }
 
 
     private generateTableOnPDF(){
-        return new Promise((resolve, reject) => {
+        return new Promise(async (resolve, reject) => {
 
             const pageWidth = this.doc.internal.pageSize.getWidth() as unknown as number;
             this.doc.setFontSize(13).setFont('helvetica', 'bold');
@@ -55,9 +64,9 @@ class PDFCreator{
             this.doc.text("Job: ", (pageWidth / 2) - 16, 39, { align: 'center' });
 
 
-            this.doc.text("del 7 al 14 de julio de 2023", (pageWidth / 2) - 12, 29, { align: 'left' });
-            this.doc.text("del 7 al 14 de julio de 2023", (pageWidth / 2) - 12, 34, { align: 'left' });
-            this.doc.text("del 7 al 14 de julio de 2023", (pageWidth / 2) - 12, 39, { align: 'left' });
+            this.doc.text(this.textContents.fromDateToDate, (pageWidth / 2) - 12, 29, { align: 'left' });
+            this.doc.text(this.textContents.submittedBy, (pageWidth / 2) - 12, 34, { align: 'left' });
+            this.doc.text("", (pageWidth / 2) - 12, 39, { align: 'left' });
 
 
             (this.doc as any).autoTable({

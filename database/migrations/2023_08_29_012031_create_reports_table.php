@@ -18,7 +18,6 @@ return new class extends Migration
             $table->string('title', 100);
             $table->timestamp('from_date');
             $table->timestamp('to_date');
-            $table->string('project_code', 100);
             $table->enum('status', ['Draft', 'Submitted']);
             $table->string('exported_pdf', 100)->nullable(true)->default(null);
         });

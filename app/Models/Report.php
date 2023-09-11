@@ -9,10 +9,13 @@ class Report extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['user_id', 'title', 'from_date', 'to_date', 'status', 'project_code', 'exported_pdf'];
+    protected $fillable = ['user_id', 'title', 'type', 'from_date', 'to_date', 'status', 'exported_pdf'];
 
 
     public function invoices(){
         return $this->hasMany(Invoice::class);
+    }
+    public function user(){
+        return $this->belongsTo(User::class);
     }
 }

@@ -2,6 +2,10 @@ enum EReportStatus {
     Draft = 'Draft',
     Submitted = 'Submitted'
 }
+enum EReportType {
+    Bill = 'Bill',
+    Facture = 'Facture'
+}
 interface IReport{
     id: number;
     created_at: string;
@@ -13,8 +17,9 @@ interface IReport{
     project_code: string;
     status: EReportStatus;
     exported_pdf: string|null;
+    type: EReportType;
 }
 
-export { EReportStatus };
+export { EReportStatus, EReportType };
 export type { IReport };
 

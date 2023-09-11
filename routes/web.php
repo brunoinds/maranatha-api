@@ -25,6 +25,8 @@ Route::get('/app', function () {
     return Response::file($filePath);
 })->where('any', '.*');
 
+
+
 Route::get('/app/{any}', function ($file) {
     $internalPaths = explode('/', $file);
 

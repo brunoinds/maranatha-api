@@ -98,6 +98,7 @@ class Session{
         if (sessionStorage.data.token != null){
             const sessionData: SessionUserData = {
                 id: sessionStorage.data.userData.id,
+                name: sessionStorage.data.userData.name,
                 username: sessionStorage.data.userData.username,
                 email: sessionStorage.data.userData.email,
                 roles: sessionStorage.data.userData.roles,

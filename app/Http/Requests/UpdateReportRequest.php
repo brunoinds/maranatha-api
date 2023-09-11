@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class UpdateReportRequest extends FormRequest
 {
@@ -22,7 +23,12 @@ class UpdateReportRequest extends FormRequest
     public function rules(): array
     {
         return [
-            //
+            'user_id' => ['integer'],
+            'title' => ['string', 'max:100'],
+            'from_date' => ['date'],
+            'to_date' => ['date'],
+            'status' => [Rule::in(['Draft', 'Submitted'])],
+            'type' => [Rule::in(['Bill', 'Facture'])],
         ];
     }
 }
