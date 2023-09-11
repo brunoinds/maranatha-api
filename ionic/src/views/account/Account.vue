@@ -17,7 +17,7 @@
                         <p>{{ accountData.email }}</p>
                     </ion-label>
                 </ion-item>
-                <ion-item @click="doLogout">, IonAvatar
+                <ion-item @click="doLogout">
                     <ion-icon color="danger" :icon="close" slot="start"></ion-icon>
                     <ion-label color="danger">Terminar sesión</ion-label>
                 </ion-item>
