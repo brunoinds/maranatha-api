@@ -24,7 +24,7 @@ jobs:
       - name: 📦 Install Ionic Dependencies
         run: cd ionic; npm install;
       - name: 🔨 Build Ionic Project
-        run: cd ionic; ionic build --prod; cd ..;
+        run: cd ionic; ionic build --prod;
       - name: 🗂️ Sync files
         uses: SamKirkland/FTP-Deploy-Action@4.0.0
         with:
