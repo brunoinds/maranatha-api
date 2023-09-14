@@ -19,14 +19,9 @@ jobs:
         run: php artisan storage:link
       - name: 👮🏻 Directory Permissions
         run: chmod -R 777 storage bootstrap/cache
-      - name: 🗂️ Sync files
-        uses: SamKirkland/FTP-Deploy-Action@v4.3.4
-        with:
-          server: ${{ secrets.FTP_SERVER }}
-          username: ${{ secrets.FTP_USERNAME }}
-          password: ${{ secrets.FTP_PASSWORD }}
-          server-dir: /
-          exclude: |
-                  .env
-                  storage/app/public
-                  database/database.sqlite
+      - name: 👮🏻 Install Ionic CLI
+        run: npm install -g @ionic/cli
+      - name: 👮🏻 Install Node Packages
+        run: cd ionic && npm install
+      - name: 📦 Build Ionic
+        run: npm run build
