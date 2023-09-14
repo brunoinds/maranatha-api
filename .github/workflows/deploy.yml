@@ -11,6 +11,8 @@ jobs:
       - name: 💻 Get the latest code
         uses: actions/checkout@v2.3.2
       - uses: actions/setup-node@master
+      - name: 🔑 Copy .env
+        run: php -r "file_exists('.env') || copy('.env.example', '.env');"
       - name: 📦 Install Laravel Dependencies
         run: composer update --ignore-platform-reqs
       - name: ♾️ Prepare storage link
