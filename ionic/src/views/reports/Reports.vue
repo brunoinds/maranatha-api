@@ -2,7 +2,7 @@
     <ion-page ref="page">
         <ion-header>
             <ion-toolbar>
-                <ion-title>Mis Reportes</ion-title>
+                <ion-title>Mis Reportes (^)</ion-title>
                 <ion-progress-bar v-if="isLoading" type="indeterminate"></ion-progress-bar>
             </ion-toolbar>
         </ion-header>
