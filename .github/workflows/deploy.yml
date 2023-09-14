@@ -27,6 +27,8 @@ jobs:
         run: npm run build
       - name: 🧹 Clean Ionic Source
         run: rm -rf ionic
+      - name: 🧪 Run Laravel Tests
+        run: php artisan test
       - name: 🗂️ Sync files
         uses: SamKirkland/FTP-Deploy-Action@v4.3.4
         with:
