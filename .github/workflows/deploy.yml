@@ -16,7 +16,7 @@ jobs:
       - name: ♾️ Prepare storage link
         run: chmod -R 775 storage/
       - name: 🔗 Generate Laravel storage link
-        run: php artisan storage:link
+        run: php artisan storage:link && php artisan config:cache
       - name: 👮🏻 Directory Permissions
         run: chmod -R 777 storage bootstrap/cache
       - name: 💻 Install Ionic CLI
