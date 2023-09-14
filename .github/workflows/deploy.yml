@@ -21,7 +21,18 @@ jobs:
         run: chmod -R 777 storage bootstrap/cache
       - name: 👮🏻 Install Ionic CLI
         run: npm install -g @ionic/cli
-      - name: 👮🏻 Install Node Packages
+      - name: 📦 Install Ionic Dependencies
         run: cd ionic && npm install
-      - name: 📦 Build Ionic
+      - name: 🔨 Build Ionic Project
         run: npm run build
+      - name: 🗂️ Sync files
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.4
+        with:
+          server: ${{ secrets.FTP_SERVER }}
+          username: ${{ secrets.FTP_USERNAME }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          server-dir: /
+          exclude: |
+                  .env
+                  storage/app/public
+                  database/database.sqlite
