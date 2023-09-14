@@ -2,8 +2,7 @@
     "private": true,
     "type": "module",
     "scripts": {
-        "dev": "vite",
-        "build": "vue-tsc && vite build"
+        "build": "cd ionic; ionic build"
     },
     "devDependencies": {
         "@inertiajs/vue3": "^1.0.0",
