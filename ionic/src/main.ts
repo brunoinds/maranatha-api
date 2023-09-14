@@ -24,7 +24,6 @@ import '@ionic/vue/css/display.css';
 import './theme/variables.css';
 defineCustomElements(window);
 SslRedirect.listen();
-console.log(SslRedirect)
 
 const app = createApp(App)
   .use(IonicVue, {
