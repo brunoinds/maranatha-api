@@ -30,6 +30,13 @@ class ReportController extends Controller
             $report->user = $report->user()->get()->first()->toArray();
         });
 
+        $allReports->each(function ($report) {
+            $report->invoices = [
+                'count' => $report->invoices()->count(),
+                'total_amount' => $report->invoices()->sum('amount'),
+            ];
+        });
+
         return response()->json($allReports->toArray());
     }
 
@@ -60,7 +67,16 @@ class ReportController extends Controller
 
     public function myReports()
     {
-        return Report::all()->where('user_id', auth()->user()->id);
+        $myReports = Report::all()->where('user_id', auth()->user()->id);
+
+        $myReports->each(function ($report) {
+            $report->invoices = [
+                'count' => $report->invoices()->count(),
+                'total_amount' => $report->invoices()->sum('amount'),
+            ];
+        });
+
+        return response()->json($myReports->toArray());
     }
 
 

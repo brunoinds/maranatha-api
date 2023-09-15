@@ -22,6 +22,8 @@
                                         <h2><b>{{ report.title }}</b></h2>
                                         <p>{{report.reportType}}</p>
                                         <p>{{report.reportDates}}</p>
+                                        <p><b>S./ {{report.invoices.totalAmount}}</b></p>
+
                                     </ion-label>
                                     <ion-chip color="danger" v-if="report.status == 'Draft'">
                                         <ion-icon :icon="alertCircleOutline"></ion-icon>
@@ -75,7 +77,11 @@ const usersReports = computed(() => {
                     ...report,
                     reportType: report.type == 'Bill' ? 'Boletas' : 'Facturas',
                     reportStatus: report.status == 'Draft' ? 'Pendiente' : 'Enviado',
-                    reportDates: `${DateTime.fromISO(report.from_date).toLocaleString(DateTime.DATE_MED)} - ${DateTime.fromISO(report.to_date).toLocaleString(DateTime.DATE_MED)}`
+                    reportDates: `${DateTime.fromISO(report.from_date).toLocaleString(DateTime.DATE_MED)} - ${DateTime.fromISO(report.to_date).toLocaleString(DateTime.DATE_MED)}`,
+                    invoices: {
+                        total: (report as any).invoices.count,
+                        totalAmount: (report as any).invoices.total_amount
+                    }
                 }
             })
         }
