@@ -1,0 +1,31 @@
+name: Integrate
+on:
+  pull_request:
+    branches:
+      - main
+jobs:
+  test_pull_request:
+    name: Test
+    runs-on: ubuntu-latest
+    steps:
+      - name: 💻 Get the latest code
+        uses: actions/checkout@v2.3.2
+      - uses: actions/setup-node@master
+      - name: 🔑 Copy .env
+        run: php -r "file_exists('.env') || copy('.env.example', '.env');"
+      - name: 📦 Install Laravel Dependencies
+        run: composer update --ignore-platform-reqs
+      - name: ♾️ Prepare storage link
+        run: chmod -R 775 storage/
+      - name: 🔗 Generate Laravel storage link
+        run: php artisan storage:link && php artisan config:cache
+      - name: 👮🏻 Directory Permissions
+        run: chmod -R 777 storage bootstrap/cache
+      - name: 💻 Install Ionic CLI
+        run: npm install -g @ionic/cli
+      - name: 📦 Install Ionic Dependencies
+        run: cd ionic && npm install
+      - name: 🔨 Build Ionic Project
+        run: npm run build
+      - name: 🧪 Run Laravel Tests
+        run: php artisan test
