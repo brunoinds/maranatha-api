@@ -127,6 +127,7 @@ import CurrencyInput from '@/components/CurrencyInput/CurrencyInput.vue';
 import { Camera, CameraResultType, CameraSource } from '@capacitor/camera';
 import { RequestAPI } from '@/utils/Requests/RequestAPI';
 import { DialogEventEmitter } from '@/utils/Dialog/Dialog';
+import { BarcodeDetect }  from '@/utils/BarcodeDetect/BarcodeDetect';
 
 const currencyInput = ref<CurrencyInput|null>(null);
 const accordionGroup = ref<any>(null);
@@ -227,6 +228,12 @@ const openCamera = async () => {
     dynamicData.value.uploadedImageBase64 = base64Image;
 
     accordionGroup.value.$el.value = "second";
+
+    return;
+    if (BarcodeDetect.isAvailable()){
+        const bcd = new BarcodeDetect();
+        console.log(bcd.detectFromBase64(base64Image));
+    }
 }
 const deleteImageFromCamera = () => {
     dynamicData.value.uploadedImageBase64 = null;
