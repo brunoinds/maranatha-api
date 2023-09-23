@@ -17,6 +17,21 @@
                         <p>{{ accountData.email }}</p>
                     </ion-label>
                 </ion-item>
+                <ion-item @click="goToJobs" button v-if="isAdmin">
+                    <ion-label color="primary">
+                        <h2>Modificar Jobs</h2>
+                    </ion-label>
+                </ion-item>
+                <ion-item @click="goToProjects" button v-if="isAdmin">
+                    <ion-label color="primary">
+                        <h2>Modificar Proyectos</h2>
+                    </ion-label>
+                </ion-item>
+                <ion-item @click="appendDefaultsJobsAndProjects" button v-if="isAdmin">
+                    <ion-label color="warning">
+                        <h2>Append Default Jobs and Projects</h2>
+                    </ion-label>
+                </ion-item>
                 <ion-item @click="doLogout">
                     <ion-icon color="danger" :icon="close" slot="start"></ion-icon>
                     <ion-label color="danger">Terminar sesión</ion-label>
@@ -36,19 +51,34 @@ import { addOutline, albumsOutline, alertCircleOutline, checkmarkCircleOutline, 
 import { IReport } from '../../interfaces/ReportInterfaces';
 import { useRouter } from 'vue-router';
 import { Session } from '@/utils/Session/Session';
+import { JobsList, ProjectsList } from '@/utils/JobsAndProjects/JobsAndProjects';
 
 const accountData = ref<any>(null);
 const isLoading = ref<boolean>(true);
 const router = useRouter();
 const page = ref<HTMLElement|null>(null);
+const isAdmin = ref<boolean>(false);
 
 const goToLogin = () => {
     router.replace('/login');
+}
+const goToJobs = () => {
+    router.push('/jobs');
+}
+const goToProjects = () => {
+    router.push('/projects');
 }
 
 const loadAccount = async () => {
     accountData.value = await RequestAPI.get('/account/me');
     isLoading.value = false;
+
+    const currentSession = await Session.getCurrentSession();
+    if (!currentSession){
+        return;
+    };
+
+    isAdmin.value = currentSession.roles().includes("admin");
 }
 
 const doLogout = async () => {
@@ -61,6 +91,15 @@ const doLogout = async () => {
         }).catch((error) => {
             console.error(error)
         })
+    });
+}
+
+const appendDefaultsJobsAndProjects = async () => {
+    JobsList.forEach(async (job) => {
+        await RequestAPI.post('/jobers', job);
+    });
+    ProjectsList.forEach(async (project) => {
+        await RequestAPI.post('/projects', project);
     });
 }
 

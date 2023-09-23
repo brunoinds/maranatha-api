@@ -117,7 +117,6 @@ import { EInvoiceType, IInvoice, INewInvoice } from '../../interfaces/InvoiceInt
 import { IJob, IProject } from '../../interfaces/JobsAndProjectsInterfaces';
 import { briefcaseOutline, trashBinOutline, camera, cameraOutline, arrowForward, qrCodeOutline, ticketOutline, checkmarkCircleOutline, arrowForwardCircleOutline, cash } from 'ionicons/icons';
 
-import { JobsList, ProjectsList } from '../../utils/JobsAndProjects/JobsAndProjects';
 import { QRCodeScanner } from '@/dialogs/QRCodeScanner/QRCodeScanner';
 //import { Money3Component } from 'v-money3';
 import { vMaska } from "maska";
@@ -161,8 +160,8 @@ const props = defineProps({
     }
 });
 const jobsAndProjects = ref<{jobs: Array<IJob>, projects: Array<IProject>}>({
-    jobs: JobsList,
-    projects: ProjectsList
+    jobs: [],
+    projects: []
 });
 
 const invoice = ref<INewInvoice>({
@@ -353,6 +352,13 @@ const createNewInvoice = async () => {
         props.emitter.fire("close");
     }
 }
+const loadJobsAndProjects = async () => {
+    const jobs = await RequestAPI.get("/jobers") as unknown as Array<IJob>;
+    jobsAndProjects.value.jobs = jobs;
+
+    const projects = await RequestAPI.get("/projects") as unknown as Array<IProject>;
+    jobsAndProjects.value.projects = projects;
+}
 onMounted(async () => {
     isLoading.value = false;
     setTimeout(() => {
@@ -362,6 +368,7 @@ onMounted(async () => {
     if (props.autoShowCamera){
         openCamera();
     }
+    loadJobsAndProjects();
 })
 </script>
 
