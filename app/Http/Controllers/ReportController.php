@@ -76,9 +76,6 @@ class ReportController extends Controller
         });
 
         //Avoid send {0:{}, 1:{}, 2:{}} but always send array of objects [{}, {}, {}]:
-
-        $myReports = collect($myReports)->toArray();
-
         return response()->json($myReports->toArray());
     }
 
