@@ -22,14 +22,14 @@ jobs:
         run: php artisan storage:link && php artisan config:cache
       - name: 👮🏻 Directory Permissions
         run: chmod -R 777 storage bootstrap/cache
-      #- name: 💻 Install Ionic CLI
-      #  run: npm install -g @ionic/cli
-      #- name: 📦 Install Ionic Dependencies
-      #  run: cd ionic && npm install
-      #- name: 🔨 Build Ionic Project
-      #  run: npm run build
-      #- name: 🧹 Clean Ionic Source
-      #  run: rm -rf ionic
+      - name: 💻 Install Ionic CLI
+        run: npm install -g @ionic/cli
+      - name: 📦 Install Ionic Dependencies
+        run: cd ionic && npm install
+      - name: 🔨 Build Ionic Project
+        run: npm run build
+      - name: 🧹 Clean Ionic Source
+        run: rm -rf ionic
       - name: 🧪 Run Laravel Tests
         run: php artisan test
       - name: 🗂️ Sync files
