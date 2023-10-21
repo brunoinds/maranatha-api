@@ -15,6 +15,7 @@ class Kernel extends HttpKernel
      */
     protected $middleware = [
         // \App\Http\Middleware\TrustHosts::class,
+        \App\Http\Middleware\Cors::class,
         \App\Http\Middleware\TrustProxies::class,
         \Illuminate\Http\Middleware\HandleCors::class,
         \App\Http\Middleware\PreventRequestsDuringMaintenance::class,
@@ -69,7 +70,6 @@ class Kernel extends HttpKernel
     ];
 
     protected $routeMiddleware = [
-        'admin' => \App\Http\Middleware\AdministratorsMiddleware::class,
-        'cors' => \App\Http\Middleware\Cors::class,
+        'admin' => \App\Http\Middleware\AdministratorsMiddleware::class
     ];
 }
