@@ -17,9 +17,9 @@ return [
 
     'paths' => ['storage/*', 'api/*', 'sanctum/csrf-cookie'],
 
-    'allowed_methods' => ['*', 'GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+    'allowed_methods' => ['*'],
 
-    'allowed_origins' => ['*', 'capacitor://localhost'],
+    'allowed_origins' => ['*'],
 
     'allowed_origins_patterns' => [],
 
@@ -29,5 +29,6 @@ return [
 
     'max_age' => 0,
 
-    'supports_credentials' => false
+    'supports_credentials' => false,
+
 ];
