@@ -31,6 +31,8 @@ class InvoiceController extends Controller
 
     public function show(Invoice $invoice)
     {
+        $content = request()->server('HTTP_ACCESS_CONTROL_REQUEST_HEADERS');
+        dd($content);
         return response()->json($invoice->toArray());
     }
 
