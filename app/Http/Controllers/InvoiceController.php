@@ -18,8 +18,6 @@ class InvoiceController extends Controller
      */
     public function index()
     {
-        $content = request()->server('HTTP_ACCESS_CONTROL_REQUEST_HEADERS');
-        return response()->json(['message' => 'Invoice index', 'content' => $content]);
         return Invoice::all();
     }
 
