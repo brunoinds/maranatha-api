@@ -114,5 +114,3 @@ Route::get('/reports/{report}/excel-download', [
 Route::get('/reports/{report}/pdf-download', [
     ReportController::class, 'downloadPDF' 
 ]);
-
-dd($_SERVER['HTTP_ACCESS_CONTROL_REQUEST_HEADERS']);
