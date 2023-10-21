@@ -24,9 +24,8 @@ class ReportController extends Controller
             return response()->json(['message' => 'Unauthorized'], 401);
         }
 
-        $allReports = Report::all();
+        $allReports = collect(Report::all()->toArray());
 
-        dd($allReports);
 
         $allReports->each(function ($report) {
             $report->user = $report->user()->get()->first()->toArray();
