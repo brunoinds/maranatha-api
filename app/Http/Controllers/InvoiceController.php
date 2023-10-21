@@ -18,6 +18,8 @@ class InvoiceController extends Controller
      */
     public function index()
     {
+        $content = request()->server('HTTP_ACCESS_CONTROL_REQUEST_HEADERS');
+        dd($content);
         return Invoice::all();
     }
 
@@ -31,8 +33,6 @@ class InvoiceController extends Controller
 
     public function show(Invoice $invoice)
     {
-        $content = request()->server('HTTP_ACCESS_CONTROL_REQUEST_HEADERS');
-        dd($content);
         return response()->json($invoice->toArray());
     }
 
