@@ -34,3 +34,14 @@ jobs:
         run: rm -rf maranatha-sender-native
       - name: 🧪 Run Laravel Tests
         run: php artisan test
+      - name: 🗂️ Sync files
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.4
+        with:
+          server: ${{ secrets.FTP_SERVER }}
+          username: ${{ secrets.FTP_USERNAME }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          server-dir: /
+          exclude: |
+                  .env
+                  storage/app/public
+                  database/database.sqlite
