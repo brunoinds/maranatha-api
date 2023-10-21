@@ -9,7 +9,8 @@
     "preview": "vite preview",
     "test:e2e": "cypress run",
     "test:unit": "vitest",
-    "lint": "eslint"
+    "lint": "eslint",
+    "build-laravel": "vite build --base=/app/ --outDir=../resources/ionic --emptyOutDir"
   },
   "dependencies": {
     "@billjs/event-emitter": "^1.0.3",
