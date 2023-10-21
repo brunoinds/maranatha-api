@@ -68,6 +68,7 @@ class ReportController extends Controller
     public function myReports()
     {
         $myReports = Report::all()->where('user_id', auth()->user()->id);
+        return response()->json(Report::all());
         $myReports->each(function ($report) {
             $report->invoices = [
                 'count' => $report->invoices()->count(),
@@ -75,6 +76,7 @@ class ReportController extends Controller
             ];
         });
 
+        $myReports = collect($myReports);
         return response()->json($myReports);
 
         //Avoid send {0:{}, 1:{}, 2:{}} but always send array of objects [{}, {}, {}]:
