@@ -26,6 +26,8 @@ class ReportController extends Controller
 
         $allReports = collect(Report::all()->toArray());
 
+        return response()->json($allReports->toArray());
+
 
         $allReports->each(function ($report) {
             $report->user = $report->user()->get()->first()->toArray();
