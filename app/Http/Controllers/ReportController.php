@@ -67,6 +67,9 @@ class ReportController extends Controller
 
     public function myReports()
     {
+
+        return response()->json(Report::all());
+        
         $myReports = Report::all()->where('user_id', auth()->user()->id);
 
         return response()->json($myReports->toArray());
