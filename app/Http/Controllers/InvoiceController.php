@@ -128,4 +128,34 @@ class InvoiceController extends Controller
             ]
         ]);
     }
+
+
+    /**
+     * Show image
+     */
+    public function showImage(Request $request, Invoice $invoice){
+        $imageId = $invoice->image;
+        if (!$imageId){
+            return response()->json([
+                'error' => [
+                    'message' => 'Image missing',
+                ]
+            ], 400);
+        }
+
+        $path = 'invoices/' . $imageId;
+        $imageExists = Storage::disk('public')->exists($path);
+        if (!$imageExists){
+            return response()->json([
+                'error' => [
+                    'message' => 'Image missing',
+                ]
+            ], 400);
+        }
+
+        $image = Storage::disk('public')->get($path);
+
+        //Send back as base64 encoded image:
+        return response()->json(['image' => base64_encode($image)]);
+    }
 }

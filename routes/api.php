@@ -86,6 +86,10 @@ Route::middleware(['auth:sanctum'])->group(function () {
         InvoiceController::class, 'uploadImage' 
     ]);
 
+    Route::get('/invoices/{invoice}/image', [
+        InvoiceController::class, 'showImage' 
+    ]);
+
     Route::post('/reports/{report}/pdf-upload', [
         ReportController::class, 'uploadReportPDF' 
     ]);
