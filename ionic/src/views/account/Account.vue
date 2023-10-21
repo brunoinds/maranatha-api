@@ -27,11 +27,6 @@
                         <h2>Modificar Proyectos</h2>
                     </ion-label>
                 </ion-item>
-                <ion-item @click="appendDefaultsJobsAndProjects" button v-if="isAdmin">
-                    <ion-label color="warning">
-                        <h2>Append Default Jobs and Projects</h2>
-                    </ion-label>
-                </ion-item>
                 <ion-item @click="doLogout">
                     <ion-icon color="danger" :icon="close" slot="start"></ion-icon>
                     <ion-label color="danger">Terminar sesión</ion-label>
@@ -93,15 +88,5 @@ const doLogout = async () => {
         })
     });
 }
-
-const appendDefaultsJobsAndProjects = async () => {
-    JobsList.forEach(async (job) => {
-        await RequestAPI.post('/jobers', job);
-    });
-    ProjectsList.forEach(async (project) => {
-        await RequestAPI.post('/projects', project);
-    });
-}
-
 loadAccount();
 </script>
