@@ -70,5 +70,6 @@ class Kernel extends HttpKernel
 
     protected $routeMiddleware = [
         'admin' => \App\Http\Middleware\AdministratorsMiddleware::class,
+        'cors' => \App\Http\Middleware\Cors::class,
     ];
 }
