@@ -26,6 +26,8 @@ class ReportController extends Controller
 
         $allReports = Report::all();
 
+        dd($allReports);
+
         $allReports->each(function ($report) {
             $report->user = $report->user()->get()->first()->toArray();
         });
