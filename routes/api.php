@@ -108,12 +108,6 @@ Route::post("login", [AuthController::class, 'login']);
 Route::post("register", [AuthController::class, 'register']);
 Route::post("users", [UserController::class, 'store']);
 
-
-Route::get('/test', function(){
-    $content = request()->server('HTTP_ACCESS_CONTROL_REQUEST_HEADERS');
-    return response()->json(['content' => $content]);
-});
-
 Route::get('/reports/{report}/excel-download', [
     ReportController::class, 'downloadExcel' 
 ]);
