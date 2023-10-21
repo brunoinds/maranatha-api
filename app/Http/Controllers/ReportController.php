@@ -68,7 +68,7 @@ class ReportController extends Controller
     public function myReports()
     {
         $myReports = Report::all()->where('user_id', auth()->user()->id);
-        return response()->json(Report::all());
+        return response()->json($myReports);
         $myReports->each(function ($report) {
             $report->invoices = [
                 'count' => $report->invoices()->count(),
