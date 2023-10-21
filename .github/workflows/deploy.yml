@@ -29,19 +29,8 @@ jobs:
       - name: 📦 Install Ionic Dependencies
         run: cd maranatha-sender-native && npm install
       - name: 🔨 Build Ionic Project
-        run: npm run build-laravel
+        run: cd maranatha-sender-native && npm run build-laravel
       - name: 🧹 Clean Ionic Source
         run: rm -rf maranatha-sender-native
       - name: 🧪 Run Laravel Tests
         run: php artisan test
-      - name: 🗂️ Sync files
-        uses: SamKirkland/FTP-Deploy-Action@v4.3.4
-        with:
-          server: ${{ secrets.FTP_SERVER }}
-          username: ${{ secrets.FTP_USERNAME }}
-          password: ${{ secrets.FTP_PASSWORD }}
-          server-dir: /
-          exclude: |
-                  .env
-                  storage/app/public
-                  database/database.sqlite
