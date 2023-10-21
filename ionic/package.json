@@ -13,10 +13,12 @@
   },
   "dependencies": {
     "@billjs/event-emitter": "^1.0.3",
+    "@capacitor/android": "^5.4.1",
     "@capacitor/app": "5.0.6",
     "@capacitor/camera": "^5.0.7",
-    "@capacitor/core": "5.2.2",
+    "@capacitor/core": "^5.2.2",
     "@capacitor/haptics": "5.0.6",
+    "@capacitor/ios": "^5.4.1",
     "@capacitor/keyboard": "5.0.6",
     "@capacitor/status-bar": "5.0.6",
     "@ionic/pwa-elements": "^3.2.2",
@@ -44,7 +46,7 @@
     "vuera": "^0.2.7"
   },
   "devDependencies": {
-    "@capacitor/cli": "5.2.2",
+    "@capacitor/cli": "^5.4.1",
     "@types/luxon": "^3.3.2",
     "@vitejs/plugin-legacy": "^4.0.2",
     "@vitejs/plugin-vue": "^4.0.0",
