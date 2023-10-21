@@ -37,6 +37,10 @@ class ReportController extends Controller
             ];
         });
 
+        //Avoid return and array like: [0 => {...}, 1 => {...}], but only [{...}, {...}]:
+
+        $allReports = collect($allReports)->toArray();
+
         return response()->json($allReports->toArray());
     }
 

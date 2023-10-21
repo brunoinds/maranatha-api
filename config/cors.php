@@ -19,11 +19,11 @@ return [
 
     'allowed_methods' => ['*'],
 
-    'allowed_origins' => ['capacitor://localhost'],
+    'allowed_origins' => ['*', 'capacitor://localhost'],
 
     'allowed_origins_patterns' => [],
 
-    'allowed_headers' => ['Content-Type, Authorization', 'Accept', 'Origin', 'Referer', 'User-Agent', 'Sec-Fetch-Dest', 'Sec-Fetch-Mode', 'Sec-Fetch-Site'],
+    'allowed_headers' => ['*'],
 
     'exposed_headers' => [],
 
