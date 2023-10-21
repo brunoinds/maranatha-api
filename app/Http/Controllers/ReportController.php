@@ -24,10 +24,7 @@ class ReportController extends Controller
             return response()->json(['message' => 'Unauthorized'], 401);
         }
 
-        $allReports = collect(Report::all()->toArray());
-
-        return response()->json($allReports->toArray());
-
+        $allReports = Report::all();
 
         $allReports->each(function ($report) {
             $report->user = $report->user()->get()->first()->toArray();
@@ -39,10 +36,6 @@ class ReportController extends Controller
                 'total_amount' => $report->invoices()->sum('amount'),
             ];
         });
-
-        //Avoid return and array like: [0 => {...}, 1 => {...}], but only [{...}, {...}]:
-
-        $allReports = collect($allReports)->toArray();
 
         return response()->json($allReports->toArray());
     }
@@ -82,6 +75,10 @@ class ReportController extends Controller
                 'total_amount' => $report->invoices()->sum('amount'),
             ];
         });
+
+        //Avoid send {0:{}, 1:{}, 2:{}} but always send array of objects [{}, {}, {}]:
+
+        $myReports = collect($myReports)->toArray();
 
         return response()->json($myReports->toArray());
     }
