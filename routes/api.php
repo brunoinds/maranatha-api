@@ -9,6 +9,8 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\JoberController;
 use App\Http\Controllers\ProjectController;
+use App\Support\Generators\ReportGenerator;
+use App\Support\GoogleSheets\Excel;
 use Illuminate\Support\Facades\Artisan;
 use mikehaertl\shellcommand\Command;
 /*
@@ -118,3 +120,12 @@ Route::get('/reports/{report}/excel-download', [
 Route::get('/reports/{report}/pdf-download', [
     ReportController::class, 'downloadPDF' 
 ]);
+
+
+Route::get('/excel/general-report', function(){
+    $excelOutput = ReportGenerator::generateExcelOutput();
+    $response = Excel::updateDBSheet($excelOutput);
+    return response()->json([
+        'message' => 'Excel generated successfully',
+    ]);
+});

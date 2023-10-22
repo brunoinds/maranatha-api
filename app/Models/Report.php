@@ -11,7 +11,10 @@ class Report extends Model
 
     protected $fillable = ['user_id', 'title', 'type', 'from_date', 'to_date', 'status', 'exported_pdf'];
 
-
+    public function amount(){
+        return $this->invoices()->sum('amount');
+    }
+    
     public function invoices(){
         return $this->hasMany(Invoice::class);
     }
