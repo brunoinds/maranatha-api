@@ -90,7 +90,8 @@ class ReportController extends Controller
 
         $previousStatus = $report->status;
         
-        
+        $report->update($request->validated());
+        $report->save();
 
 
         if ($previousStatus !== $report->status){
@@ -117,8 +118,7 @@ class ReportController extends Controller
 
 
 
-        $report->update($request->validated());
-        $report->save();
+
         return response()->json(['message' => 'Report updated', 'report' => $report->toArray()]);
     }
 
