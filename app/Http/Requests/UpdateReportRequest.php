@@ -27,7 +27,8 @@ class UpdateReportRequest extends FormRequest
             'title' => ['string', 'max:100'],
             'from_date' => ['date'],
             'to_date' => ['date'],
-            'status' => [Rule::in(['Draft', 'Submitted'])],
+            'status' => [Rule::in(['Draft', 'Submitted', 'Approved', 'Rejected'])],
+            'rejection_reason' => ['string', 'max:100', 'nullable'],
             'type' => [Rule::in(['Bill', 'Facture'])],
         ];
     }

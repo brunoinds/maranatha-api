@@ -89,8 +89,30 @@ class ReportController extends Controller
     {
 
         $previousStatus = $report->status;
-        
+
+
         $report->update($request->validated());
+
+        if ($report->status === 'Approved'){
+            $report->approved_at = now();
+        } else {
+            $report->approved_at = null;
+        }
+
+        if ($report->status === 'Rejected'){
+            $report->rejected_at = now();
+        } else {
+            $report->rejected_at = null;
+        }
+
+        if ($report->status === 'Submitted'){
+            $report->submitted_at = now();
+        }
+
+        if ($report->status === 'Draft'){
+            $report->submitted_at = null;
+        }
+
         $report->save();
 
 
@@ -104,15 +126,34 @@ class ReportController extends Controller
             //Send notification
             $user = $report->user()->get()->first();
             $adminUser = User::where('username', 'admin')->first();
-            OneSignal::sendNotificationToExternalUser(message: $user->name . " ha enviado un nuevo reporte.", userId: (string) $adminUser->id, url: null, data: null, buttons: null, schedule: null, headings: "Nuevo reporte enviado");
+
+            OneSignal::sendNotificationToExternalUser(
+                headings: "Nuevo reporte enviado 📤",
+                message: $user->name . " ha enviado un nuevo reporte de S/. " . number_format($report->amount(), 2) . " y está esperando su aprobación.", 
+                userId: (string) $adminUser->id
+            );
         }
 
         if ($previousStatus === 'Submitted' && $report->status === 'Approved'){
             //Send notification
+            $user = $report->user()->get()->first();
+
+            OneSignal::sendNotificationToExternalUser(
+                headings: "Reporte aprobado ✅",
+                message: "El administrador ha aprobado su reporte de  S/. " . number_format($report->amount(), 2) . "", 
+                userId: (string) $user->id
+            );
         }
 
         if ($previousStatus === 'Submitted' && $report->status === 'Rejected'){
             //Send notification
+            $user = $report->user()->get()->first();
+
+            OneSignal::sendNotificationToExternalUser(
+                headings: "Reporte rechazado ❌",
+                message: "El administrador ha rechazado su reporte de  S/. " . number_format($report->amount(), 2) . ". Ingrese a la aplicación para ver el motivo de rechazo.", 
+                userId: (string) $user->id
+            );
         }
 
 
