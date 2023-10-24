@@ -13,8 +13,11 @@ return new class extends Migration
     {
         // Adds new columns to the reports table
         Schema::table('reports', function (Blueprint $table) {
-            $table->enum('status', ['Draft', 'Submitted', 'Approved', 'Rejected'])->change();
-            $table->string('rejection_reason', 100)->nullable(true)->default(null);
+            $table->dropColumn('status');
+        });
+        Schema::table('reports', function (Blueprint $table) {
+            $table->string('status', 100)->default('Draft');
+            $table->string('rejection_reason', 100)->nullable(true)->default(null)->create();
             $table->timestamp('approved_at')->nullable(true)->default(null);
             $table->timestamp('rejected_at')->nullable(true)->default(null);
             $table->timestamp('submitted_at')->nullable(true)->default(null);
@@ -28,7 +31,11 @@ return new class extends Migration
     {
         // Removes the new columns from the reports table
         Schema::table('reports', function (Blueprint $table) {
-            $table->enum('status', ['Draft', 'Submitted'])->change();
+            $table->dropColumn('status');
+        });
+
+        Schema::table('reports', function (Blueprint $table) {
+            $table->enum('status', ['Draft', 'Submitted'])->default('Draft')->create();
             $table->dropColumn('rejection_reason');
             $table->dropColumn('approved_at');
             $table->dropColumn('rejected_at');
