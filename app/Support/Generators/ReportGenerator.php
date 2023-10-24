@@ -13,7 +13,7 @@ class ReportGenerator{
 
 
         Report::all()->where('status', '=', 'Submitted')->each(function(Report $report) use (&$outputList){
-            $reportAmount = $report->amount();
+            $reportAmount = number_format($report->amount(), 2);
             $reportUsername = $report->user()->get()->first()->username;
             $reportDate = Carbon::parse($report->to_date)->format('d/m/Y');
             $report->invoices()->each(function(Invoice $invoice) use (&$outputList, $reportAmount, $reportUsername, $reportDate){
@@ -30,7 +30,7 @@ class ReportGenerator{
                     'user' => $reportUsername,
                     'report' => [
                         'identifier' => $reportUsername . '-' . $invoiceTypeAbbreviationShort . '-' . $reportDate  . '-' . $reportAmount,
-                        'amount' => number_format($reportAmount, 2),
+                        'amount' => $reportAmount,
                         'date' => $reportDate,
                     ],
                     'ticket_number' => $invoice->ticket_number,

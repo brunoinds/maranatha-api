@@ -91,10 +91,11 @@ class ReportController extends Controller
         $report->save();
 
 
-        if ($previousStatus === 'Draft' && $report->status === 'Submitted'){
+        if ($previousStatus !== $report->status){
             $excelOutput = ReportGenerator::generateExcelOutput();
             Excel::updateDBSheet($excelOutput);
-
+        }
+        if ($previousStatus === 'Draft' && $report->status === 'Submitted'){
             //Mail::to('noreply@imedicineapp.com')->send(new NewReportSent($report));
         }
         return response()->json(['message' => 'Report updated', 'report' => $report->toArray()]);
