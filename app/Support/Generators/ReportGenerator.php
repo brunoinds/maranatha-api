@@ -17,17 +17,19 @@ class ReportGenerator{
             $reportUsername = $report->user()->get()->first()->username;
             $reportDate = Carbon::parse($report->to_date)->format('d/m/Y');
             $report->invoices()->each(function(Invoice $invoice) use (&$outputList, $reportAmount, $reportUsername, $reportDate){
-                $invoiceTypeAbbreviation = $invoice->type === 'Facture' ? 'FT' : 'BV';
+                $invoiceTypeAbbreviationShort = $invoice->type === 'Facture' ? 'FT' : 'BV';
+                $invoiceTypeAbbreviation = $invoice->type === 'Facture' ? 'FACTURAS' : 'BOLETAS';
+
                 $invoiceDate = Carbon::parse($invoice->date)->format('d/m/Y');
                 $invoiceData = [
-                    'identifier' => $reportUsername . '-' . $invoiceTypeAbbreviation . '-' . $invoiceDate  . '-' . $invoice->amount,
+                    'identifier' => $reportUsername . '-' . $invoiceTypeAbbreviationShort . '-' . $invoiceDate  . '-' . $invoice->amount,
                     'consumption_date' => $invoiceDate,
                     'creation_date' => Carbon::parse($invoice->created_at)->format('d/m/Y'),
                     'type' => $invoiceTypeAbbreviation,
                     'description' => $invoice->description,
                     'user' => $reportUsername,
                     'report' => [
-                        'identifier' => $reportUsername . '-' . $invoiceTypeAbbreviation . '-' . $reportDate  . '-' . $reportAmount,
+                        'identifier' => $reportUsername . '-' . $invoiceTypeAbbreviationShort . '-' . $reportDate  . '-' . $reportAmount,
                         'amount' => number_format($reportAmount, 2),
                         'date' => $reportDate,
                     ],

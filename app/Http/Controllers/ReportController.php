@@ -11,7 +11,8 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use App\Support\Assistants\ReportAssistant;
 use Illuminate\Support\Facades\Mail;
-
+use App\Support\Generators\ReportGenerator;
+use App\Support\GoogleSheets\Excel;
 class ReportController extends Controller
 {
     /**
@@ -90,9 +91,12 @@ class ReportController extends Controller
         $report->save();
 
 
-        /*if ($previousStatus === 'Draft' && $report->status === 'Submitted'){
-            Mail::to('noreply@imedicineapp.com')->send(new NewReportSent($report));
-        }*/
+        if ($previousStatus === 'Draft' && $report->status === 'Submitted'){
+            $excelOutput = ReportGenerator::generateExcelOutput();
+            Excel::updateDBSheet($excelOutput);
+
+            //Mail::to('noreply@imedicineapp.com')->send(new NewReportSent($report));
+        }
         return response()->json(['message' => 'Report updated', 'report' => $report->toArray()]);
     }
 

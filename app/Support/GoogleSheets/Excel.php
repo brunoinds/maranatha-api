@@ -9,7 +9,7 @@ use Google\Client;
 class Excel{
 
     public static function updateDBSheet($output):void{
-        $sheet = Sheets::spreadsheet('1QW5BaJr8h-TkFUTk_Gg2DcHlhPCA5ImDG3Zxy5xst3A')->sheet('DB');
+        $sheet = Sheets::spreadsheet('1nHQT3pRi3zlt2i5Av2ZogWlj9IqEO3InBi3ASsXcZlU')->sheet('DB');
         $workableRange = $sheet->range('A2:N600');
 
         
