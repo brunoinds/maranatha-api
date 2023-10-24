@@ -22,7 +22,7 @@ class ReportGenerator{
 
                 $invoiceDate = Carbon::parse($invoice->date)->format('d/m/Y');
                 $invoiceData = [
-                    'identifier' => $reportUsername . '-' . $invoiceTypeAbbreviationShort . '-' . $invoiceDate  . '-' . $invoice->amount,
+                    'identifier' => $reportUsername . '-' . $invoiceTypeAbbreviationShort . '-' . $invoiceDate  . '-' . number_format($invoice->amount, 2),
                     'consumption_date' => $invoiceDate,
                     'creation_date' => Carbon::parse($invoice->created_at)->format('d/m/Y'),
                     'type' => $invoiceTypeAbbreviation,
