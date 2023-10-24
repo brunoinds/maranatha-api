@@ -13,6 +13,9 @@ use App\Support\Assistants\ReportAssistant;
 use Illuminate\Support\Facades\Mail;
 use App\Support\Generators\ReportGenerator;
 use App\Support\GoogleSheets\Excel;
+use OneSignal;
+use App\Models\User;
+
 class ReportController extends Controller
 {
     /**
@@ -95,9 +98,22 @@ class ReportController extends Controller
             $excelOutput = ReportGenerator::generateExcelOutput();
             Excel::updateDBSheet($excelOutput);
         }
+
         if ($previousStatus === 'Draft' && $report->status === 'Submitted'){
-            //Mail::to('noreply@imedicineapp.com')->send(new NewReportSent($report));
+            //Send notification
+            $user = $report->user()->get()->first();
+            $adminUser = User::where('username', 'admin')->first();
+            OneSignal::sendNotificationToExternalUser(message: $user->name . " ha enviado un nuevo reporte.", userId: $adminUser->id, url: null, data: null, buttons: null, schedule: null, headings: "Nuevo reporte enviado");
         }
+
+        if ($previousStatus === 'Submitted' && $report->status === 'Approved'){
+            //Send notification
+        }
+
+        if ($previousStatus === 'Submitted' && $report->status === 'Rejected'){
+            //Send notification
+        }
+
         return response()->json(['message' => 'Report updated', 'report' => $report->toArray()]);
     }
 
