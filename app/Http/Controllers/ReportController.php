@@ -90,8 +90,7 @@ class ReportController extends Controller
 
         $previousStatus = $report->status;
         
-        $report->update($request->validated());
-        $report->save();
+        
 
 
         if ($previousStatus !== $report->status){
@@ -99,11 +98,12 @@ class ReportController extends Controller
             Excel::updateDBSheet($excelOutput);
         }
 
+
         if ($previousStatus === 'Draft' && $report->status === 'Submitted'){
             //Send notification
             $user = $report->user()->get()->first();
             $adminUser = User::where('username', 'admin')->first();
-            OneSignal::sendNotificationToExternalUser(message: $user->name . " ha enviado un nuevo reporte.", userId: $adminUser->id, url: null, data: null, buttons: null, schedule: null, headings: "Nuevo reporte enviado");
+            OneSignal::sendNotificationToExternalUser(message: $user->name . " ha enviado un nuevo reporte.", userId: (string) $adminUser->id, url: null, data: null, buttons: null, schedule: null, headings: "Nuevo reporte enviado");
         }
 
         if ($previousStatus === 'Submitted' && $report->status === 'Approved'){
@@ -114,6 +114,11 @@ class ReportController extends Controller
             //Send notification
         }
 
+
+
+
+        $report->update($request->validated());
+        $report->save();
         return response()->json(['message' => 'Report updated', 'report' => $report->toArray()]);
     }
 
