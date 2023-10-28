@@ -18,4 +18,5 @@ class Jober extends Model
         'name',
         'code',
     ];
+    
 }
