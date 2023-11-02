@@ -101,13 +101,8 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::get('/me/reports', ReportController::class . '@myReports');
 
 
-    Route::get('jobers', JoberController::class . '@index');
-    Route::get('projects', ProjectController::class . '@index');
-    
-    Route::middleware('admin')->group(function(){
-        Route::apiResource('jobers', JoberController::class);
-        Route::apiResource('projects', ProjectController::class);
-    });
+    Route::apiResource('jobers', JoberController::class);
+    Route::apiResource('projects', ProjectController::class);
 });
 
 Route::get("check", function(){
