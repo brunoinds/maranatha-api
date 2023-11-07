@@ -21,4 +21,8 @@ class Report extends Model
     public function user(){
         return $this->belongsTo(User::class);
     }
+    public function delete(){
+        $this->invoices()->delete();
+        return parent::delete();
+    }
 }

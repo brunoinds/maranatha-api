@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\User;
 use Illuminate\Http\Request;
 use App\Http\Requests\StoreUserRequest;
-use App\Http\Requests\ListUsersRequest;
+use App\Http\Requests\UpdateUserRequest;
 use Spatie\Permission\Models\Role;
 use Spatie\Permission\Models\Permission;
 use Illuminate\Support\Facades\Auth;
@@ -16,8 +16,9 @@ class UserController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index(ListUsersRequest $request)
+    public function index(Request $request)
     {
+
         return User::all();
     }
 
@@ -45,9 +46,10 @@ class UserController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, User $user)
+    public function update(UpdateUserRequest $request, User $user)
     {
-        //
+        $user->update($request->validated());
+        return response()->json(['message' => 'User updated', 'user' => $user->toArray()]);
     }
 
     /**
@@ -55,6 +57,15 @@ class UserController extends Controller
      */
     public function destroy(User $user)
     {
+        if ($user->username === 'admin'){
+            return response()->json(['message' => 'You can not delete the admin'], 403);
+        }
+        
+        if (!auth()->user()->isAdmin()){
+            return response()->json(['message' => 'You do not have permission to delete users'], 403);
+        }
+
+        $user->reports()->delete();
         $user->tokens()->delete();
         $user->delete();
         return response()->json(['message' => 'User deleted']);

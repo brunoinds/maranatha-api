@@ -156,10 +156,6 @@ class ReportController extends Controller
             );
         }
 
-
-
-
-
         return response()->json(['message' => 'Report updated', 'report' => $report->toArray()]);
     }
 
@@ -169,7 +165,6 @@ class ReportController extends Controller
     public function destroy(Report $report)
     {
         $report->delete();
-        $report->invoices()->delete();
         return response()->json(['message' => 'Report deleted']);
     }
 
