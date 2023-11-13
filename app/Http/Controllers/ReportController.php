@@ -130,7 +130,7 @@ class ReportController extends Controller
             OneSignal::sendNotificationToExternalUser(
                 headings: "Nuevo reporte enviado 📤",
                 message: $user->name . " ha enviado un nuevo reporte de S/. " . number_format($report->amount(), 2) . " y está esperando su aprobación.", 
-                userId: (string) $adminUser->id
+                userId: (string) 'user-id-'.$adminUser->id
             );
         }
 
@@ -141,7 +141,7 @@ class ReportController extends Controller
             OneSignal::sendNotificationToExternalUser(
                 headings: "Reporte aprobado ✅",
                 message: "El administrador ha aprobado su reporte de  S/. " . number_format($report->amount(), 2) . "", 
-                userId: (string) $user->id
+                userId: (string) 'user-id-'.$user->id
             );
         }
 
@@ -152,7 +152,7 @@ class ReportController extends Controller
             OneSignal::sendNotificationToExternalUser(
                 headings: "Reporte rechazado ❌",
                 message: "El administrador ha rechazado su reporte de  S/. " . number_format($report->amount(), 2) . ". Ingrese a la aplicación para ver el motivo de rechazo.", 
-                userId: (string) $user->id
+                userId: (string) 'user-id-'.$user->id
             );
         }
 
