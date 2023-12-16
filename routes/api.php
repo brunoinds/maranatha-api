@@ -61,7 +61,7 @@ Route::get('cd/config-cache', function(){
     ], 200);
 });
 Route::get('cd/migrate', function(){
-    $commandLine = 'cd .. && php artisan migrate';
+    $commandLine = 'cd .. && php artisan migrate --force';
 
 
     $result = [

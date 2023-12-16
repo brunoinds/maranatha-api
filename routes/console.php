@@ -22,7 +22,7 @@ Artisan::command('inspire', function () {
 
 
 Artisan::command('clear:db', function(){
-    $commandLine = 'rm -rf database/database.sqlite && touch database/database.sqlite && php artisan migrate';
+    $commandLine = 'rm -rf database/database.sqlite && touch database/database.sqlite && php artisan migrate --force';
     $command = new Command($commandLine);
     $response = $command->execute();
     if (!$response){
