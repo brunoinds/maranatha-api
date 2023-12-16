@@ -4,7 +4,7 @@ namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class StoreProjectRequest extends FormRequest
+class UpdateJobRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -22,9 +22,9 @@ class StoreProjectRequest extends FormRequest
     public function rules(): array
     {
         return [
+            'id' => ['required', 'integer'],
             'name' => ['required', 'string', 'max:255'],
-            'code' => ['required', 'string', 'max:255', 'unique:projects'],
-            'union' => ['required', 'string', 'max:255'],
+            'code' => ['required', 'string', 'max:255'],
             'details' => ['string', 'max:1000']
         ];
     }

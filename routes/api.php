@@ -7,11 +7,10 @@ use App\Http\Controllers\ReportController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ProfileController;
-use App\Http\Controllers\JoberController;
-use App\Http\Controllers\ProjectController;
+use App\Http\Controllers\JobController;
+use App\Http\Controllers\ExpenseController;
 use App\Support\Generators\ReportGenerator;
 use App\Support\GoogleSheets\Excel;
-use Illuminate\Support\Facades\Artisan;
 use mikehaertl\shellcommand\Command;
 /*
 |--------------------------------------------------------------------------
@@ -101,8 +100,8 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::get('/me/reports', ReportController::class . '@myReports');
 
 
-    Route::apiResource('jobers', JoberController::class);
-    Route::apiResource('projects', ProjectController::class);
+    Route::apiResource('job', JobController::class);
+    Route::apiResource('expense', ExpenseController::class);
 });
 
 Route::get("check", function(){

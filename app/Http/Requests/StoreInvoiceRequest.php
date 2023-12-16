@@ -32,7 +32,7 @@ class StoreInvoiceRequest extends FormRequest
             'expense_code' => ['required', 'string', 'max:100'],
             'amount' => ['required', 'numeric', 'max:999999.99'],
             'qrcode_data' => ['nullable', 'string', 'max:1000'],
-            'image' => ['nullable', 'string', 'max:100'],
+            'image' => ['nullable', 'string'],
         ];
     }
 }

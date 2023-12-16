@@ -39,7 +39,51 @@ class InvoiceController extends Controller
      */
     public function store(StoreInvoiceRequest $request)
     {
-        $invoice = Invoice::create($request->validated());
+        $validatedData = $request->validated();
+        if (!is_null($validatedData['image']) && mb_strlen($validatedData['image']) > 40){
+            //Has image to upload
+            $maxSizeInBytes = 2048 * 1024; // 2MB
+            $base64Image = $validatedData['image'];
+
+            $imageSize = (fn() => strlen(base64_decode($base64Image)))();
+            if ($imageSize > $maxSizeInBytes) {
+                return response()->json([
+                    'error' => [
+                        'message' => "Image exceeds max size (maximum $maxSizeInBytes bytes)",
+                    ]
+                ], 400);
+            }
+
+
+            try{
+                $imageResource = Image::make($base64Image);
+                $imageEncoded = $imageResource->encode('png')->getEncoded();
+            } catch(\Exception $e){
+                return response()->json([
+                    'error' => [
+                        'message' => 'Invalid image data',
+                        'details' => $e->getMessage()
+                    ]
+                ], 400);
+            }
+
+            $imageId = Str::random(40);
+            $validatedData['image'] = $imageId;
+
+            $path = 'invoices/' . $imageId;
+
+            $wasSuccessfull = Storage::disk('public')->put($path, $imageEncoded);
+
+            if (!$wasSuccessfull) {
+                return response()->json([
+                    'error' => [
+                        'message' => 'Image upload failed',
+                    ]
+                ], 500);
+            }
+        }
+
+        $invoice = Invoice::create($validatedData);
         return response()->json(['message' => 'Invoice created', 'invoice' => $invoice->toArray()]);
     }
 
@@ -138,7 +182,7 @@ class InvoiceController extends Controller
         if (!$imageId){
             return response()->json([
                 'error' => [
-                    'message' => 'Image missing',
+                    'message' => 'Image not uploaded yet',
                 ]
             ], 400);
         }

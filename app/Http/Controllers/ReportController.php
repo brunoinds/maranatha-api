@@ -115,8 +115,7 @@ class ReportController extends Controller
 
         $report->save();
 
-
-        if ($previousStatus !== $report->status){
+        if ($previousStatus !== $report->status && env('APP_ENV') !== 'local'){
             $excelOutput = ReportGenerator::generateExcelOutput();
             Excel::updateDBSheet($excelOutput);
         }
@@ -127,33 +126,40 @@ class ReportController extends Controller
             $user = $report->user()->get()->first();
             $adminUser = User::where('username', 'admin')->first();
 
-            OneSignal::sendNotificationToExternalUser(
-                headings: "Nuevo reporte enviado 📤",
-                message: $user->name . " ha enviado un nuevo reporte de S/. " . number_format($report->amount(), 2) . " y está esperando su aprobación.", 
-                userId: (string) 'user-id-'.$adminUser->id
-            );
+            if (env('APP_ENV') !== 'local'){
+                OneSignal::sendNotificationToExternalUser(
+                    headings: "Nuevo reporte enviado 📤",
+                    message: $user->name . " ha enviado un nuevo reporte de S/. " . number_format($report->amount(), 2) . " y está esperando su aprobación.", 
+                    userId: (string) 'user-id-'.$adminUser->id
+                );
+            }
+            
         }
 
         if ($previousStatus === 'Submitted' && $report->status === 'Approved'){
             //Send notification
             $user = $report->user()->get()->first();
 
-            OneSignal::sendNotificationToExternalUser(
-                headings: "Reporte aprobado ✅",
-                message: "El administrador ha aprobado su reporte de  S/. " . number_format($report->amount(), 2) . "", 
-                userId: (string) 'user-id-'.$user->id
-            );
+            if (env('APP_ENV') !== 'local'){
+                OneSignal::sendNotificationToExternalUser(
+                    headings: "Reporte aprobado ✅",
+                    message: "El administrador ha aprobado su reporte de  S/. " . number_format($report->amount(), 2) . "", 
+                    userId: (string) 'user-id-'.$user->id
+                );
+            }
         }
 
         if ($previousStatus === 'Submitted' && $report->status === 'Rejected'){
             //Send notification
             $user = $report->user()->get()->first();
 
-            OneSignal::sendNotificationToExternalUser(
-                headings: "Reporte rechazado ❌",
-                message: "El administrador ha rechazado su reporte de  S/. " . number_format($report->amount(), 2) . ". Ingrese a la aplicación para ver el motivo de rechazo.", 
-                userId: (string) 'user-id-'.$user->id
-            );
+            if (env('APP_ENV') !== 'local'){
+                OneSignal::sendNotificationToExternalUser(
+                    headings: "Reporte rechazado ❌",
+                    message: "El administrador ha rechazado su reporte de  S/. " . number_format($report->amount(), 2) . ". Ingrese a la aplicación para ver el motivo de rechazo.", 
+                    userId: (string) 'user-id-'.$user->id
+                );
+            }
         }
 
         return response()->json(['message' => 'Report updated', 'report' => $report->toArray()]);
