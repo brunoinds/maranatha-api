@@ -30,8 +30,7 @@ class AuthController extends Controller{
                 'username' => $user->username,
                 'email' => $user->email,
                 'name' => $user->name,
-                'roles' => $user->roles->pluck('name')->toArray(),
-                'permissions' => $user->getAllPermissions()
+                'roles' => $user->roles()
             ],
             'token' => $user->createToken('authToken')->plainTextToken
         ], 201);

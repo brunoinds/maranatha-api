@@ -33,13 +33,6 @@ class UserController extends Controller
     public function store(StoreUserRequest $request)
     {
         $user = User::create($request->validated());
-
-        if ($user->username === 'admin'){
-            $role = Role::findOrCreate('admin', 'sanctum');   
-            $permission = Permission::findOrCreate('add roles', 'sanctum');         
-            $role->givePermissionTo($permission);
-            $user->roles()->attach($role);
-        }
         return response()->json(['message' => 'User created', 'user' => $user->toArray()]);
     }
 
@@ -74,31 +67,16 @@ class UserController extends Controller
 
     public function addRole(Request $request, User $user)
     {
-        $role = Role::findOrCreate('admin', 'sanctum');
-        $permission = Permission::findOrCreate('add roles', 'sanctum');
-        
-        $role->givePermissionTo($permission);
-        $user->roles()->attach($role);
         return response()->json(['message' => 'Role added']);
     }
     public function removeRole(Request $request, User $user)
     {
-        //Check if the authenticated user has the permission to remove roles:
-        if (!auth()->user()->hasPermissionTo('add roles')) {
-            return response()->json(['message' => 'You do not have permission to remove roles'], 403);
-        }
-
-        $user->roles()->detach($request->role_id);
+        $user->removeRole($request->role_id);
         return response()->json(['message' => 'Role removed']);
     }
     public function hasRole(Request $request, User $user)
     {
-        //Check if the authenticated user has the permission to remove roles:
-        if (!auth()->user()->hasPermissionTo('add roles')) {
-            return response()->json(['message' => 'You do not have permission to see roles'], 403);
-        }
-
-        if ($user->roles()->hasRole($request->role_id)){
+        if ($user->hasRole($request->role_id)){
             return response()->json(true, 200);
         }else{
             return response()->json(false, 404);
@@ -107,6 +85,6 @@ class UserController extends Controller
 
     public function roles(User $user)
     {
-        return response()->json($user->roles()->get());
+        return response()->json($user->roles());
     }
 }

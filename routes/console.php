@@ -2,6 +2,8 @@
 
 use Illuminate\Foundation\Inspiring;
 use Illuminate\Support\Facades\Artisan;
+use mikehaertl\shellcommand\Command;
+
 
 /*
 |--------------------------------------------------------------------------
@@ -17,3 +19,16 @@ use Illuminate\Support\Facades\Artisan;
 Artisan::command('inspire', function () {
     $this->comment(Inspiring::quote());
 })->purpose('Display an inspiring quote');
+
+
+Artisan::command('clear:db', function(){
+    $commandLine = 'rm -rf database/database.sqlite && touch database/database.sqlite && php artisan migrate';
+    $command = new Command($commandLine);
+    $response = $command->execute();
+    if (!$response){
+        $this->error('Failed to clear database');
+        return;
+    }
+
+    $this->info('Database cleared successfully');
+})->purpose('Clear the database and create a new one');

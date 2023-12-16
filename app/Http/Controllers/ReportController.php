@@ -24,7 +24,7 @@ class ReportController extends Controller
     public function index()
     {
 
-        if (!auth()->user()->hasRole("admin", "sanctum")){
+        if (!auth()->user()->isAdmin()){
             return response()->json(['message' => 'Unauthorized'], 401);
         }
 

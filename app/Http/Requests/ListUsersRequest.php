@@ -11,7 +11,7 @@ class ListUsersRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return auth()->check() && auth()->user()->hasRole("admin", "sanctum");
+        return auth()->check() && auth()->user()->isAdmin();
     }
 
     /**
