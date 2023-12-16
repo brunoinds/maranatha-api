@@ -115,7 +115,7 @@ class ReportController extends Controller
 
         $report->save();
 
-        if ($previousStatus !== $report->status && env('APP_ENV') === '!!'){
+        if ($previousStatus !== $report->status && env('APP_ENV') === 'production'){
             $excelOutput = ReportGenerator::generateExcelOutput();
             Excel::updateDBSheet($excelOutput);
         }
@@ -126,7 +126,7 @@ class ReportController extends Controller
             $user = $report->user()->get()->first();
             $adminUser = User::where('username', 'admin')->first();
 
-            if (env('APP_ENV') === '!!'){
+            if (env('APP_ENV') === 'production'){
                 OneSignal::sendNotificationToExternalUser(
                     headings: "Nuevo reporte enviado 📤",
                     message: $user->name . " ha enviado un nuevo reporte de S/. " . number_format($report->amount(), 2) . " y está esperando su aprobación.", 
@@ -140,7 +140,7 @@ class ReportController extends Controller
             //Send notification
             $user = $report->user()->get()->first();
 
-            if (env('APP_ENV') === '!!'){
+            if (env('APP_ENV') === 'production'){
                 OneSignal::sendNotificationToExternalUser(
                     headings: "Reporte aprobado ✅",
                     message: "El administrador ha aprobado su reporte de  S/. " . number_format($report->amount(), 2) . "", 
@@ -153,7 +153,7 @@ class ReportController extends Controller
             //Send notification
             $user = $report->user()->get()->first();
 
-            if (env('APP_ENV') === '!!'){
+            if (env('APP_ENV') === 'production'){
                 OneSignal::sendNotificationToExternalUser(
                     headings: "Reporte rechazado ❌",
                     message: "El administrador ha rechazado su reporte de  S/. " . number_format($report->amount(), 2) . ". Ingrese a la aplicación para ver el motivo de rechazo.", 
