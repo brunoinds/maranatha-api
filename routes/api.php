@@ -94,14 +94,13 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::post('/reports/{report}/pdf-upload', [
         ReportController::class, 'uploadReportPDF' 
     ]);
-
     
     Route::get('/reports/{report}/invoices', ReportController::class . '@invoices');
     Route::get('/me/reports', ReportController::class . '@myReports');
 
 
-    Route::apiResource('job', JobController::class);
-    Route::apiResource('expense', ExpenseController::class);
+    Route::apiResource('jobs', JobController::class);
+    Route::apiResource('expenses', ExpenseController::class);
 });
 
 Route::get("check", function(){
