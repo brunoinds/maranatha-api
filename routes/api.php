@@ -22,7 +22,44 @@ use mikehaertl\shellcommand\Command;
 | be assigned to the "api" middleware group. Make something great!
 |
 */
+Route::get('cd/config-cache', function(){
+    $commandLine = 'cd .. && php artisan config:cache';
 
+    $result = [
+        'message' => null,
+        'exitCode' => null,
+        'wasSuccessful' => false,
+    ];
+    $command = new Command($commandLine);
+    if ($command->execute()) {
+        $result['message'] = $command->getOutput();
+        $result['wasSuccessful'] = true;
+        $result['exitCode'] = $command->getExitCode();
+    } else {
+        $result['message'] = $command->getError();
+        $result['exitCode'] = $command->getExitCode();
+    }
+
+    if (!$result['wasSuccessful']){
+        return response()->json([
+            'message' => 'Failed to resolve config cache',
+            'command' => [
+                'instruction' => $commandLine,
+                'output' => $result['message'],
+                'exitCode' => $result['exitCode'],
+            ]
+        ], 500);
+    }
+
+    return response()->json([
+        'message' => 'Cache updated successfully',
+        'command' => [
+            'instruction' => $commandLine,
+            'output' => $result['message'],
+            'exitCode' => $result['exitCode'],
+        ]
+    ], 200);
+});
 Route::get('cd/migrate', function(){
     $commandLine = 'cd .. && php artisan migrate';
 

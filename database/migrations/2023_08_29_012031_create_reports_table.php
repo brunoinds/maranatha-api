@@ -18,8 +18,13 @@ return new class extends Migration
             $table->string('title', 100);
             $table->timestamp('from_date');
             $table->timestamp('to_date');
-            $table->enum('status', ['Draft', 'Submitted']);
+            $table->enum('type', ['Facture', 'Bill'])->defaut("Bill");
             $table->string('exported_pdf', 100)->nullable(true)->default(null);
+            $table->string('status', 100)->default('Draft');
+            $table->string('rejection_reason', 100)->nullable(true)->default(null)->create();
+            $table->timestamp('approved_at')->nullable(true)->default(null);
+            $table->timestamp('rejected_at')->nullable(true)->default(null);
+            $table->timestamp('submitted_at')->nullable(true)->default(null);
         });
     }
 
