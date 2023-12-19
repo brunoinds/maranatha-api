@@ -23,7 +23,7 @@ use mikehaertl\shellcommand\Command;
 |
 */
 Route::get('cd/config-cache', function(){
-    $commandLine = 'cd .. && php artisan config:cache';
+    $commandLine = 'cd .. && php artisan config:clear && php artisan cache:clear';
 
     $result = [
         'message' => null,
