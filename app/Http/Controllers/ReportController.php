@@ -15,6 +15,7 @@ use App\Support\Generators\ReportGenerator;
 use App\Support\GoogleSheets\Excel;
 use OneSignal;
 use App\Models\User;
+use Spatie\TemporaryDirectory\TemporaryDirectory;
 
 class ReportController extends Controller
 {
@@ -225,6 +226,13 @@ class ReportController extends Controller
     public function downloadExcel(Report $report){
         $excel = ReportAssistant::generateExcelDocument($report);
         $documentName = $report->title . '.xlsx';
-        $excel->download($documentName);
+        //Generate a temp directory and save the file there:
+        
+        $temporaryDirectory = (new TemporaryDirectory())->create();
+        $tempPath = $temporaryDirectory->path($documentName);
+
+        $excel->save($tempPath, true);
+
+        return response()->download($tempPath, $documentName)->deleteFileAfterSend(true);
     }
 }
