@@ -29,6 +29,10 @@ Artisan::command('clear:db', function(){
         $this->error('Failed to clear database');
         return;
     }
-
     $this->info('Database cleared successfully');
 })->purpose('Clear the database and create a new one');
+
+Artisan::command('check:environment', function () {
+    $appEnvirontment = env('APP_ENV');
+    $this->info('App environment: ' . $appEnvirontment);
+})->purpose('Display an inspiring quote');
