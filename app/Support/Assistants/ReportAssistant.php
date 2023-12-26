@@ -24,6 +24,7 @@ class ReportAssistant{
 
             return 'del ' . date('d/m/y', $firstInvoiceDate) . ' hasta el ' . date('d/m/y', $lastInvoiceDate);
         })();
+        $currency = $report->money_type;
 
 
         $sheet->writeRow(['MARANATHA'], [
@@ -68,7 +69,7 @@ class ReportAssistant{
             'vertical-align' => 'center',
             'height' => 24,
         ]);
-        $sheet->writeRow(['Job:'], [
+        $sheet->writeRow(['Currency: ' . $currency], [
             'font' => [
                 'size' => 12,
             ],

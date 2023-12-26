@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Helpers\Toolbox;
 use App\Http\Requests\StoreReportRequest;
 use App\Http\Requests\UpdateReportRequest;
 use App\Mail\NewReportSent;
@@ -130,7 +131,7 @@ class ReportController extends Controller
             if (env('APP_ENV') === 'production'){
                 OneSignal::sendNotificationToExternalUser(
                     headings: "Nuevo reporte enviado 📤",
-                    message: $user->name . " ha enviado un nuevo reporte de S/. " . number_format($report->amount(), 2) . " y está esperando su aprobación.", 
+                    message: $user->name . " ha enviado un nuevo reporte de " . Toolbox::moneyPrefix($report->money_type) . number_format($report->amount(), 2) . " y está esperando su aprobación.", 
                     userId: (string) 'user-id-'.$adminUser->id
                 );
             }
@@ -144,7 +145,7 @@ class ReportController extends Controller
             if (env('APP_ENV') === 'production'){
                 OneSignal::sendNotificationToExternalUser(
                     headings: "Reporte aprobado ✅",
-                    message: "El administrador ha aprobado su reporte de  S/. " . number_format($report->amount(), 2) . "", 
+                    message: "El administrador ha aprobado su reporte de " . Toolbox::moneyPrefix($report->money_type) . number_format($report->amount(), 2) . "", 
                     userId: (string) 'user-id-'.$user->id
                 );
             }
@@ -157,7 +158,7 @@ class ReportController extends Controller
             if (env('APP_ENV') === 'production'){
                 OneSignal::sendNotificationToExternalUser(
                     headings: "Reporte rechazado ❌",
-                    message: "El administrador ha rechazado su reporte de  S/. " . number_format($report->amount(), 2) . ". Ingrese a la aplicación para ver el motivo de rechazo.", 
+                    message: "El administrador ha rechazado su reporte de " . Toolbox::moneyPrefix($report->money_type) . number_format($report->amount(), 2) . ". Ingrese a la aplicación para ver el motivo de rechazo.", 
                     userId: (string) 'user-id-'.$user->id
                 );
             }
