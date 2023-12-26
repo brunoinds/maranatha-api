@@ -30,6 +30,7 @@ class ReportGenerator{
                     'report' => [
                         'identifier' => $reportUsername . '-' . $invoiceTypeAbbreviationShort . '-' . $reportDate  . '-' . $reportAmount,
                         'amount' => $reportAmount,
+                        'money_type' => $report->money_type,
                         'date' => $reportDate,
                     ],
                     'ticket_number' => $invoice->ticket_number,
