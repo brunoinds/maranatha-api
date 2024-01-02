@@ -7,9 +7,8 @@ use Revolution\Google\Sheets\Facades\Sheets;
 use Google\Client;
 
 class Excel{
-
     public static function updateDBSheet($output):void{
-        $sheet = Sheets::spreadsheet('1nHQT3pRi3zlt2i5Av2ZogWlj9IqEO3InBi3ASsXcZlU')->sheet('DB');
+        $sheet = Sheets::spreadsheet(env('GOOGLE_SHEETS_DB_ID'))->sheet('DB');
         $workableRange = $sheet->range('A2:N600');
 
         
@@ -48,5 +47,37 @@ class Excel{
 
 
         $sheet->append($output->toArray());
+    }
+    public static function getWorkersSheet():array{
+        $sheet = Sheets::spreadsheet(env('GOOGLE_SHEETS_DB_ID'))->sheet('👷 Workers');
+        $workers = $sheet->range('A4:Z600')->all();
+        $paymentsMonths = $sheet->range('D3:Z3')->all()[0];
+
+        $data = collect($workers)->filter(function($item){
+            return $item[0] !== "";
+        })->map(function($item) use ($paymentsMonths){
+            return [
+                'dni' => $item[0],
+                'name' => isset($item[1]) ? $item[1] : "",
+                'team' => isset($item[2]) ? intval($item[2]) : 0,
+                'payments' => (function() use ($paymentsMonths, $item){
+                    $payments = [];
+                    foreach($paymentsMonths as $index => $paymentMonth){
+                        $amount = isset($item[$index + 3]) ? $item[$index + 3] : "S/.0.00";
+                        $amount = str_replace('S/.', '', $amount);
+                        $amount = floatval($amount);
+
+                        $payments[] = [
+                            'month' => intval(explode('/', $paymentMonth)[0]),
+                            'year' => intval(explode('/', $paymentMonth)[1]),
+                            'amount' => $amount,
+                        ];
+                    }
+                    return $payments;
+                })()
+            ];
+        })->toArray();
+
+        return $data;
     }
 }

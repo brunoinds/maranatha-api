@@ -13,4 +13,7 @@ class Toolbox{
                 return "S/.";
         }
     }
+    public static function toObject(array $array): object{
+        return json_decode(json_encode($array));
+    }
 }

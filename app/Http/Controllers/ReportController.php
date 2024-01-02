@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Helpers\Enums\ReportStatus;
 use App\Helpers\Toolbox;
 use App\Http\Requests\StoreReportRequest;
 use App\Http\Requests\UpdateReportRequest;
@@ -16,7 +17,9 @@ use App\Support\Generators\ReportGenerator;
 use App\Support\GoogleSheets\Excel;
 use OneSignal;
 use App\Models\User;
+use App\Support\Assistants\BalanceAssistant;
 use Spatie\TemporaryDirectory\TemporaryDirectory;
+use DateTime;
 
 class ReportController extends Controller
 {
@@ -95,24 +98,29 @@ class ReportController extends Controller
 
         $report->update($request->validated());
 
-        if ($report->status === 'Approved'){
-            $report->approved_at = now();
+
+        if ($report->status === ReportStatus::Approved){
+            $report->approved_at = (new DateTime())->format('c');
+            BalanceAssistant::createBalanceExpenseFromReport($report);
         } else {
             $report->approved_at = null;
         }
 
-        if ($report->status === 'Rejected'){
-            $report->rejected_at = now();
+        if ($report->status === ReportStatus::Rejected){
+            $report->rejected_at = (new DateTime())->format('c');
+            BalanceAssistant::deleteBalancesFromReport($report);
         } else {
             $report->rejected_at = null;
         }
 
-        if ($report->status === 'Submitted'){
-            $report->submitted_at = now();
+        if ($report->status === ReportStatus::Submitted){
+            $report->submitted_at = (new DateTime())->format('c');
+            BalanceAssistant::deleteBalancesFromReport($report);
         }
 
-        if ($report->status === 'Draft'){
+        if ($report->status === ReportStatus::Draft){
             $report->submitted_at = null;
+            BalanceAssistant::deleteBalancesFromReport($report);
         }
 
         $report->save();
@@ -123,7 +131,7 @@ class ReportController extends Controller
         }
 
 
-        if ($previousStatus === 'Draft' && $report->status === 'Submitted'){
+        if ($previousStatus === ReportStatus::Draft && $report->status === ReportStatus::Submitted){
             //Send notification
             $user = $report->user()->get()->first();
             $adminUser = User::where('username', 'admin')->first();
@@ -138,7 +146,7 @@ class ReportController extends Controller
             
         }
 
-        if ($previousStatus === 'Submitted' && $report->status === 'Approved'){
+        if ($previousStatus === ReportStatus::Submitted && $report->status === ReportStatus::Approved){
             //Send notification
             $user = $report->user()->get()->first();
 
@@ -151,7 +159,7 @@ class ReportController extends Controller
             }
         }
 
-        if ($previousStatus === 'Submitted' && $report->status === 'Rejected'){
+        if ($previousStatus === ReportStatus::Submitted && $report->status === ReportStatus::Rejected){
             //Send notification
             $user = $report->user()->get()->first();
 
