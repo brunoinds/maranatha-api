@@ -106,6 +106,13 @@ class ReportController extends Controller
             $report->approved_at = null;
         }
 
+        if ($report->status === ReportStatus::Restituted){
+            $report->restituted_at = (new DateTime())->format('c');
+            BalanceAssistant::createBalanceRestitutionFromReport($report);
+        } else {
+            $report->restituted_at = null;
+        }
+
         if ($report->status === ReportStatus::Rejected){
             $report->rejected_at = (new DateTime())->format('c');
             BalanceAssistant::deleteBalancesFromReport($report);
@@ -153,7 +160,20 @@ class ReportController extends Controller
             if (env('APP_ENV') === 'production'){
                 OneSignal::sendNotificationToExternalUser(
                     headings: "Reporte aprobado ✅",
-                    message: "El administrador ha aprobado su reporte de " . Toolbox::moneyPrefix($report->money_type) . number_format($report->amount(), 2) . "", 
+                    message: "El administrador ha aprobado su reporte de " . Toolbox::moneyPrefix($report->money_type) . number_format($report->amount(), 2) . ". Pronto recibirá su reembolso.", 
+                    userId: (string) 'user-id-'.$user->id
+                );
+            }
+        }
+
+        if ($previousStatus === ReportStatus::Approved && $report->status === ReportStatus::Restituted){
+            //Send notification
+            $user = $report->user()->get()->first();
+
+            if (env('APP_ENV') === 'production'){
+                OneSignal::sendNotificationToExternalUser(
+                    headings: "Reporte reembolsado 💰",
+                    message: "El administrador ha reembolsado " . Toolbox::moneyPrefix($report->money_type) . number_format($report->amount(), 2) . " por su reporte.", 
                     userId: (string) 'user-id-'.$user->id
                 );
             }

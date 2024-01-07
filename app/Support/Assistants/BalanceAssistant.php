@@ -67,6 +67,7 @@ class BalanceAssistant{
                 'model' => $balance->model,
                 'amount' => $balance->amount,
                 'balance_here' => $totalCredit - $totalDebit,
+                'receipt_image_url' => $balance->getReceiptImageUrl(),
             ];
         }
         $total = $totalCredit - $totalDebit;
@@ -77,6 +78,7 @@ class BalanceAssistant{
 
 
             $totalInSoles = 0;
+            $totalInDollars = 0;
             $itemsInDollar = [];
             $itemsInSoles = [];
 
@@ -86,7 +88,7 @@ class BalanceAssistant{
                 $item = [
                     'id' => $report->id,
                     'title' => $report->title,
-                    'date' => $report->firstInvoiceDate(),
+                    'date' => $report->firstInvoiceDate() || $report->submitted_at,
                     'amount' => $report->amount(),
                     'money_type' => $report->money_type,
                 ];
@@ -98,6 +100,7 @@ class BalanceAssistant{
                 }
 
                 $totalInSoles += $report->amountInSoles();
+                $totalInDollars += $report->amountInDollars();
 
                 $items[] = $item;
             }
@@ -115,6 +118,10 @@ class BalanceAssistant{
                 ],
                 'items' => $items,
                 'amount' => $totalInSoles,
+                'amount_in' => [
+                    'soles' => $totalInSoles,
+                    'dollars' => $totalInDollars,
+                ]
             ];
         })();
 
@@ -123,6 +130,7 @@ class BalanceAssistant{
             $reports = Report::query()->where('user_id', $user->id)->where('status', '=', ReportStatus::Approved)->where('from_date', '>=', $timeBounds['start'])->where('to_date', '<=', $timeBounds['end'])->orderBy('from_date', 'asc')->get();
 
             $totalInSoles = 0;
+            $totalInDollars = 0;
             $itemsInDollar = [];
             $itemsInSoles = [];
 
@@ -132,7 +140,7 @@ class BalanceAssistant{
                 $item = [
                     'id' => $report->id,
                     'title' => $report->title,
-                    'date' => $report->firstInvoiceDate(),
+                    'date' => $report->firstInvoiceDate() || $report->submitted_at,
                     'amount' => $report->amount(),
                     'money_type' => $report->money_type,
                 ];
@@ -144,6 +152,7 @@ class BalanceAssistant{
                 }
 
                 $totalInSoles += $report->amountInSoles();
+                $totalInDollars += $report->amountInDollars();
 
                 $items[] = $item;
             }
@@ -161,54 +170,58 @@ class BalanceAssistant{
                 ],
                 'items' => $items,
                 'amount' => $totalInSoles,
+                'amount_in' => [
+                    'soles' => $totalInSoles,
+                    'dollars' => $totalInDollars,
+                ]
             ];
         })();
 
+        $pittyCashGivenAmount = (function() use ($user, $yearBounds){
+            $directCredits = Balance::all()->where('model', BalanceModel::Direct)->where('type', BalanceType::Credit)->where('user_id', $user->id)->where('date', '>=', $yearBounds['start'])->where('date', '<=', $yearBounds['end']);
+            $directDebits = Balance::all()->where('model', BalanceModel::Direct)->where('type', BalanceType::Debit)->where('user_id', $user->id)->where('date', '>=', $yearBounds['start'])->where('date', '<=', $yearBounds['end']);
+            
+            $total = 0;
+            foreach($directCredits as $directCredit){
+                $total += $directCredit->amount;
+            }
+            foreach($directDebits as $directDebit){
+                $total -= $directDebit->amount;
+            }
+            return $total;
+        })();
 
         $pettyCash = [
-            'given_amount' => (function() use ($user, $yearBounds){
-                $directCredits = Balance::all()->where('model', BalanceModel::Direct)->where('type', BalanceType::Credit)->where('user_id', $user->id)->where('date', '>=', $yearBounds['start'])->where('date', '<=', $yearBounds['end']);
-                $directDebits = Balance::all()->where('model', BalanceModel::Direct)->where('type', BalanceType::Debit)->where('user_id', $user->id)->where('date', '>=', $yearBounds['start'])->where('date', '<=', $yearBounds['end']);
-                
-                $total = 0;
-                foreach($directCredits as $directCredit){
-                    $total += $directCredit->amount;
+            'given_amount' => $pittyCashGivenAmount,
+            'usage_percentage' => (function() use ($total, $pittyCashGivenAmount){
+                $currentBalance = $total;
+                if ($pittyCashGivenAmount == 0){
+                    return 100;
                 }
-                foreach($directDebits as $directDebit){
-                    $total -= $directDebit->amount;
-                }
-                return $total;
-            })(),
-            'usage_percentage' => (function() use ($user, $timeBounds, $yearBounds){
-                $directCredits = Balance::all()->where('model', BalanceModel::Direct)->where('type', BalanceType::Credit)->where('user_id', $user->id)->where('date', '>=', $yearBounds['start'])->where('date', '<=', $yearBounds['end']);
-                $directDebits = Balance::all()->where('model', BalanceModel::Direct)->where('type', BalanceType::Debit)->where('user_id', $user->id)->where('date', '>=', $yearBounds['start'])->where('date', '<=', $yearBounds['end']);
-                
-                $totalDirects = 0;
-                foreach($directCredits as $directCredit){
-                    $totalDirects += $directCredit->amount;
-                }
-                foreach($directDebits as $directDebit){
-                    $totalDirects -= $directDebit->amount;
-                }
+                if ($currentBalance < 0){
+                    $limit = $pittyCashGivenAmount;
+                    $used = $pittyCashGivenAmount - $currentBalance;
 
-
-                $expensesDebits = Balance::all()->where('model', BalanceModel::Expense)->where('type', BalanceType::Debit)->where('user_id', $user->id)->where('date', '>=', $timeBounds['start'])->where('date', '<=', $timeBounds['end']);
-                $restitutionsCredits = Balance::all()->where('model', BalanceModel::Restitution)->where('type', BalanceType::Credit)->where('user_id', $user->id)->where('date', '>=', $timeBounds['start'])->where('date', '<=', $timeBounds['end']);
-                
-                $totalExpensesAndRestitutions = 0;
-                foreach($expensesDebits as $expensesDebit){
-                    $totalExpensesAndRestitutions -= $expensesDebit->amount;
+                    if($used <= $limit) {
+                        $limit_usage_percentage = $used / $limit * 100;
+                    } else {
+                        $over_limit = $used - $limit;
+                        $limit_usage_percentage = 100 + ($over_limit / $limit * 100);  
+                    }
+                    return $limit_usage_percentage;
+                }elseif ($currentBalance === 0){
+                    return 100;
+                }elseif ($currentBalance > 0){
+                    $limit = $pittyCashGivenAmount;
+                    $used = $pittyCashGivenAmount - $currentBalance;
+                    if($used <= $limit) {
+                        $limit_usage_percentage = $used / $limit * 100;
+                    } else {
+                        $over_limit = $used - $limit;
+                        $limit_usage_percentage = 100 + ($over_limit / $limit * 100);  
+                    }
+                    return $limit_usage_percentage;
                 }
-                foreach($restitutionsCredits as $restitutionsCredit){
-                    $totalExpensesAndRestitutions += $restitutionsCredit->amount;
-                }
-
-                if ($totalDirects === 0){
-                    return 0;
-                }
-
-                $percentage = $totalExpensesAndRestitutions * 100 / $totalDirects;
-                return $percentage;
             })(),
         ];
         
@@ -265,14 +278,14 @@ class BalanceAssistant{
 
     public static function createBalanceExpenseFromReport(Report $report, float|null $amountOverride = null):Balance{
         $balance = Balance::create([
-            'description' => 'Reporte "' . $report->title . '"',
+            'description' => 'Gastos del reporte "' . $report->title . '"',
             'user_id' => $report->user_id,
             'ticket_number' => null,
             'report_id' => $report->id,
-            'date' => $report->submitted_at,
+            'date' => $report->firstInvoiceDate(),
             'type' => BalanceType::Debit,
             'model' => BalanceModel::Expense,
-            'amount' => $amountOverride ?? $report->amount(),
+            'amount' => $report->amountInSoles(),
         ]);
         return $balance;
     }
@@ -283,16 +296,18 @@ class BalanceAssistant{
             throw new Exception('There is already a balance with this report_id and model = Restitution');
         }
 
-        $balance = new Balance();
-        $balance->description = 'Reposición de reporte "' . $report->title . '"';
-        $balance->user_id = $report->user_id;
-        $balance->ticket_number = null;
-        $balance->report_id = $report->id;
-        $balance->date = $report->approved_at;
-        $balance->type = BalanceType::Credit;
-        $balance->model = BalanceModel::Restitution;
-        $balance->amount = $report->amount();
-        $balance->save();
+
+        $balance = Balance::create([
+            'description' => 'Reembolso de reporte "' . $report->title . '"',
+            'user_id' => $report->user_id,
+            'ticket_number' => null,
+            'report_id' => $report->id,
+            'date' => Carbon::now()->timezone('America/Lima')->toISOString(true),
+            'type' => BalanceType::Credit,
+            'model' => BalanceModel::Restitution,
+            'amount' => $report->amountInSoles(),
+        ]);
+
         return $balance;
     }
     public static function deleteBalancesFromReport(Report $report):void{

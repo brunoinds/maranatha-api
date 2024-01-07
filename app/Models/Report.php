@@ -39,6 +39,20 @@ class Report extends Model
             return $totalInSoles;
         }
     }
+
+    public function amountInDollars(){
+        if ($this->money_type === MoneyType::USD){
+            return $this->amount();
+        }elseif ($this->money_type === MoneyType::PEN){
+            $totalInDollars = 0;
+            $this->invoices()->each(function($invoice) use (&$totalInDollars){
+                $date = new DateTime($invoice->date);
+                $amountInDollars = Exchange::on($date)->convert(\Brunoinds\SunatDolarLaravel\Enums\Currency::PEN, $invoice->amount)->to(\Brunoinds\SunatDolarLaravel\Enums\Currency::USD);
+                $totalInDollars += $amountInDollars;
+            });
+            return $totalInDollars;
+        }
+    }
     
     public function invoices(){
         return $this->hasMany(Invoice::class);
@@ -55,9 +69,18 @@ class Report extends Model
         return parent::delete();
     }
     public function firstInvoiceDate(){
-        return $this->invoices()->orderBy('date', 'asc')->first()->date;
+        $firstInvoice = $this->invoices()->orderBy('date', 'asc')->first();
+        if ($firstInvoice === null){
+            return null;
+        }
+        return $firstInvoice->date;
     }
     public function lastInvoiceDate(){
-        return $this->invoices()->orderBy('date', 'desc')->first()->date;
+        $lastInvoice = $this->invoices()->orderBy('date', 'desc')->first();
+
+        if ($lastInvoice === null){
+            return null;
+        }
+        return $lastInvoice->date;
     }
 }

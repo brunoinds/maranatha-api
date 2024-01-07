@@ -16,7 +16,16 @@ class AttendanceController extends Controller
      */
     public function index()
     {
-        //
+        if (!auth()->user()->isAdmin()) {
+            return response()->json(['message' => 'Unauthorized'], 401);
+        }
+
+        $allAttendances = Attendance::all();
+        $allAttendances->each(function ($attendance) {
+            $attendance->user = $attendance->user()->get()->first()->toArray();
+        });
+
+        return response()->json($allAttendances->toArray());
     }
 
     public function myAttendances()

@@ -7,12 +7,15 @@ use App\Http\Requests\StoreBalanceRequest;
 use App\Http\Requests\UpdateBalanceRequest;
 use App\Models\Balance;
 use App\Models\User;
+use App\Models\Report;
 use App\Support\Assistants\BalanceAssistant;
 use App\Helpers\Enums\BalanceType;
+use App\Helpers\Toolbox;
 use DateTime;
 use App\Http\Requests\Balances\AddDirectCreditBalanceRequest;
 use Intervention\Image\Facades\Image;
 use Illuminate\Support\Facades\Storage;
+
 
 
 class BalanceController extends Controller
@@ -39,7 +42,38 @@ class BalanceController extends Controller
      */
     public function update(UpdateBalanceRequest $request, Balance $balance)
     {
-        //
+        $validatedData = $request->validated();
+
+        $imageValidation = Toolbox::validateImageBase64($validatedData['receipt_base64']);
+
+        if ($imageValidation->isImage){
+            if (!$imageValidation->isValid){
+                return response()->json([
+                    'error' => [
+                        'message' => $imageValidation->message,
+                    ]
+                ], 400);
+            }
+
+            $wasSuccessfull = $balance->setReceiptImageFromBase64($validatedData['receipt_base64']);
+
+            if (!$wasSuccessfull) {
+                return response()->json([
+                    'error' => [
+                        'message' => 'Image upload failed',
+                    ]
+                ], 500);
+            }
+        }
+    
+        unset($validatedData['receipt_base64']);
+
+        $balance->update($validatedData);
+
+        return response()->json([
+            'message' => 'Balance updated',
+            'balance' => $balance,
+        ]);
     }
 
     /**
@@ -47,19 +81,38 @@ class BalanceController extends Controller
      */
     public function destroy(Balance $balance)
     {
-        //
+        if (!auth()->user()->isAdmin()){
+            return response()->json([
+                'error' => [
+                    'message' => 'Only admins can delete balances',
+                ]
+            ], 403);
+        }
+
+        if ($balance->model !== BalanceModel::Direct){
+            return response()->json([
+                'error' => [
+                    'message' => 'Only direct balances can be deleted',
+                ]
+            ], 403);
+        }
+
+        $balance->delete();
+        return response()->json(['message' => 'Balance deleted']);
     }
 
 
-    public function userBalance(User $user)
+    public function userBalanceYear(User $user, string $year)
     {
-        $report = BalanceAssistant::generateUserBalanceByYear($user, 2024);
-        return response()->json($report);
-    }
-    public function meBalance()
-    {
-        $user = auth()->user();
-        $report = BalanceAssistant::generateUserBalanceByYear($user, 2024);
+        if (!auth()->user()->isAdmin()){
+            return response()->json([
+                'error' => [
+                    'message' => 'Only admins can see balances',
+                ]
+            ], 403);
+        }
+
+        $report = BalanceAssistant::generateUserBalanceByYear($user, (int) $year);
         return response()->json($report);
     }
     public function meBalanceYear(string $year)
@@ -90,42 +143,20 @@ class BalanceController extends Controller
         ]);
 
         //Validate receipt_base64:
-        if (!is_null($validatedData['receipt_base64']) && mb_strlen($validatedData['receipt_base64']) > 40){
-            //Has image to upload
-            $maxSizeInBytes = 2048 * 1024; // 2MB
-            $base64Image = $validatedData['receipt_base64'];
-
-            $imageSize = (fn() => strlen(base64_decode($base64Image)))();
-            if ($imageSize > $maxSizeInBytes) {
+        $imageValidation = Toolbox::validateImageBase64($validatedData['receipt_base64']);
+        if ($imageValidation->isImage){
+            if (!$imageValidation->isValid){
                 $balance->delete();
                 return response()->json([
                     'error' => [
-                        'message' => "Image exceeds max size (maximum $maxSizeInBytes bytes)",
+                        'message' => $imageValidation->message,
                     ]
                 ], 400);
             }
-
-
-            try{
-                $imageResource = Image::make($base64Image);
-                $imageEncoded = $imageResource->encode('png')->getEncoded();
-            } catch(\Exception $e){
-                $balance->delete();
-                return response()->json([
-                    'error' => [
-                        'message' => 'Invalid image data',
-                        'details' => $e->getMessage()
-                    ]
-                ], 400);
-            }
-
-            $imageId = $balance->id;
-
-            $path = 'balances/' . $imageId;
-
-            $wasSuccessfull = Storage::disk('public')->put($path, $imageEncoded);
+            $wasSuccessfull = $balance->setReceiptImageFromBase64($validatedData['receipt_base64']);
 
             if (!$wasSuccessfull) {
+                $balance->delete();
                 return response()->json([
                     'error' => [
                         'message' => 'Image upload failed',
@@ -136,7 +167,6 @@ class BalanceController extends Controller
 
 
 
-        
         return response()->json($balance);
     }
 
@@ -165,5 +195,141 @@ class BalanceController extends Controller
     {
         $balance->delete();
         return response()->json($balance);
+    }
+
+    public function getBalancesFromReport(Report $report)
+    {   
+        $balances = Balance::where('report_id', $report->id);
+
+        if ($balances->count() === 0) {
+            return response()->json([
+                'error' => [
+                    'message' => 'No balance found for this report',
+                ]
+            ], 404);
+        }
+
+        return response()->json($balances->get());
+    }
+
+    public function getBalanceReceiptImageFromReport(Report $report)
+    {
+        $balance = Balance::where('report_id', $report->id)->first();
+
+        if (!$balance) {
+            return response()->json([
+                'error' => [
+                    'message' => 'No balance found for this report',
+                ]
+            ], 404);
+        }
+
+        if (!$balance->hasReceiptImage()) {
+            return response()->json([
+                'error' => [
+                    'message' => 'No receipt image found for this balance',
+                ]
+            ], 404);
+        }
+
+        $image = $balance->getReceiptImageInBase64();
+
+        return response()->json([
+            'image' => $image,
+        ]);
+    }
+
+    public function setBalanceReceiptImageFromReport(Report $report, Request $request)
+    {
+        if (!auth()->user()->isAdmin()){
+            return response()->json([
+                'error' => [
+                    'message' => 'Only admins can upload images',
+                ]
+            ], 403);
+        }
+        $balance = Balance::where('report_id', $report->id)->first();
+
+        if (!$balance) {
+            return response()->json([
+                'error' => [
+                    'message' => 'No balance found for this report',
+                ]
+            ], 404);
+        }
+
+        $validatedData = $request->validate([
+            'image_base64' => 'required|string',
+        ]);
+
+        $imageValidation = Toolbox::validateImageBase64($validatedData['image_base64']);
+        if ($imageValidation->isImage){
+            if (!$imageValidation->isValid){
+                return response()->json([
+                    'error' => [
+                        'message' => $imageValidation->message,
+                    ]
+                ], 400);
+            }
+
+            $wasSuccessfull = $balance->setReceiptImageFromBase64($validatedData['image_base64']);
+
+            if (!$wasSuccessfull) {
+                return response()->json([
+                    'error' => [
+                        'message' => 'Image upload failed',
+                    ]
+                ], 500);
+            }
+        }
+
+        return response()->json([
+            'image' => [
+                'id' => $balance->id,
+                'url' => $balance->getReceiptImageUrl(),
+            ],
+            'message' => 'Image uploaded',
+        ]);
+    }
+
+    public function deleteBalanceReceiptImageFromReport(Report $report)
+    {
+        if (!auth()->user()->isAdmin()){
+            return response()->json([
+                'error' => [
+                    'message' => 'Only admins can delete images',
+                ]
+            ], 403);
+        }
+
+        $balance = Balance::where('report_id', $report->id)->first();
+
+        if (!$balance) {
+            return response()->json([
+                'error' => [
+                    'message' => 'No balance found for this report',
+                ]
+            ], 404);
+        }
+
+        if (!$balance->hasReceiptImage()) {
+            return response()->json([
+                'error' => [
+                    'message' => 'No receipt image found for this balance',
+                ]
+            ], 404);
+        }
+
+        $balance->deleteReceiptImage();
+
+        return response()->json([
+            'message' => 'Image deleted',
+        ]);
+    }
+    public function getReceiptImage(Balance $balance){
+        $image = $balance->getReceiptImageInBase64();
+        return response()->json([
+            'image' => $image,
+        ]);
     }
 }

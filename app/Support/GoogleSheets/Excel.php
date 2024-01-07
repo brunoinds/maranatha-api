@@ -5,6 +5,10 @@ namespace App\Support\GoogleSheets;
 use Revolution\Google\Sheets\Facades\Sheets;
 
 use Google\Client;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
+use Illuminate\Support\Carbon;
 
 class Excel{
     public static function updateDBSheet($output):void{
@@ -41,6 +45,7 @@ class Excel{
                 $item['report']['date'],
                 $item['report']['amount'],
                 $item['report']['identifier'],
+                $ITEM['payment_status']
             ];
         });
 
@@ -49,9 +54,17 @@ class Excel{
         $sheet->append($output->toArray());
     }
     public static function getWorkersSheet():array{
+        $cachedValue = Cache::store('file')->get('Maranatha/Spreadsheets/Workers');
+
+        if ($cachedValue !== null){
+            return $cachedValue;
+        }
+
+
+
         $sheet = Sheets::spreadsheet(env('GOOGLE_SHEETS_DB_ID'))->sheet('👷 Workers');
         $workers = $sheet->range('A4:Z600')->all();
-        $paymentsMonths = $sheet->range('D3:Z3')->all()[0];
+        $paymentsMonths = $sheet->range('F3:Z3')->all()[0];
 
         $data = collect($workers)->filter(function($item){
             return $item[0] !== "";
@@ -59,24 +72,34 @@ class Excel{
             return [
                 'dni' => $item[0],
                 'name' => isset($item[1]) ? $item[1] : "",
-                'team' => isset($item[2]) ? intval($item[2]) : 0,
+                'team' => isset($item[2]) ? $item[2] : "0",
+                'supervisor' => isset($item[3]) ? $item[3] : "",
+                'function' => isset($item[4]) ? $item[4] : "",
                 'payments' => (function() use ($paymentsMonths, $item){
                     $payments = [];
                     foreach($paymentsMonths as $index => $paymentMonth){
-                        $amount = isset($item[$index + 3]) ? $item[$index + 3] : "S/.0.00";
-                        $amount = str_replace('S/.', '', $amount);
+                        $amount = isset($item[$index + 5]) ? $item[$index + 5] : "S/.0.00";
+                        $amount = str_replace('S/.', '', str_replace(',', '', $amount));
                         $amount = floatval($amount);
 
                         $payments[] = [
+                            'month_year' => $paymentMonth,
                             'month' => intval(explode('/', $paymentMonth)[0]),
                             'year' => intval(explode('/', $paymentMonth)[1]),
                             'amount' => $amount,
+                            'timespan' => [
+                                'start' => Carbon::createFromFormat('m/Y', $paymentMonth)->timezone('America/Lima')->startOfMonth()->format('c'),
+                                'end' => Carbon::createFromFormat('m/Y', $paymentMonth)->timezone('America/Lima')->endOfMonth()->endOfDay()->format('c'),
+                            ]
                         ];
                     }
                     return $payments;
                 })()
             ];
         })->toArray();
+
+        //Store for 10 minutes:
+        Cache::store('file')->put('Maranatha/Spreadsheets/Workers', $data, 10 * 60);
 
         return $data;
     }

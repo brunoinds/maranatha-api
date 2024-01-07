@@ -69,7 +69,7 @@ class ReportAssistant{
             'vertical-align' => 'center',
             'height' => 24,
         ]);
-        $sheet->writeRow(['Currency: ' . $currency], [
+        $sheet->writeRow(['Currency: ' . $currency->value], [
             'font' => [
                 'size' => 12,
             ],

@@ -7,6 +7,8 @@ use App\Helpers\Enums\BalanceType;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use App\Models\Report;
+use Illuminate\Support\Facades\Storage;
+use Intervention\Image\Facades\Image;
 
 class Balance extends Model
 {
@@ -32,13 +34,41 @@ class Balance extends Model
         return $this->belongsTo(Report::class)->first();
     }
 
+    public function setReceiptImageFromBase64(string $base64Image):bool{
+        $imageResource = Image::make($base64Image);
+        $imageEncoded = $imageResource->encode('png')->getEncoded();
+
+        $imageId = $this->id;
+        $path = 'balances/' . $imageId;
+
+        $wasSuccessfull = Storage::disk('public')->put($path, $imageEncoded);
+        return $wasSuccessfull;
+    }
+    public function deleteReceiptImage():void{
+        $path = 'balances/' . $this->id;
+        Storage::disk('public')->delete($path);
+    }
+    public function getReceiptImageUrl():string|null{
+        if (!$this->hasReceiptImage()) {
+            return null;
+        }
+        $path = 'balances/' . $this->id;
+
+
+        $image = Storage::disk('public')->url($path);
+        return $image;
+    }
+
     public function hasReceiptImage():bool{
         $path = 'balances/' . $this->id;
         $imageExists = Storage::disk('public')->exists($path);
         return $imageExists;
     }
 
-    public function getReceiptImageInBase64():string{
+    public function getReceiptImageInBase64():string|null{
+        if (!$this->hasReceiptImage()) {
+            return null;
+        }
         $path = 'balances/' . $this->id;
         $image = Storage::disk('public')->get($path);
         $image = base64_encode($image);

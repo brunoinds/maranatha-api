@@ -15,6 +15,8 @@ use App\Support\Assistants\WorkersAssistant;
 use App\Support\Generators\ReportGenerator;
 use App\Support\GoogleSheets\Excel;
 use mikehaertl\shellcommand\Command;
+use App\Http\Controllers\ManagementRecordsController;
+use App\Http\Controllers\ManagementBalancesController;
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -127,17 +129,20 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::get('attendances/{attendance}/with-workers-attendances', AttendanceController::class . '@showWithWorkersAttendances');
     Route::put('attendances/{attendance}/workers-attendances', AttendanceController::class . '@storeWorkersAttendances');
     Route::apiResource('balances', BalanceController::class);
+    Route::get('balances/{balance}/receipt-image', BalanceController::class . '@getReceiptImage');
 
     Route::group(['prefix' => 'balance'], function () {
-        Route::get('me', BalanceController::class . '@meBalance');
         Route::get('me/years/{year}', BalanceController::class . '@meBalanceYear');
-
-        Route::get('users/{user}', BalanceController::class . '@userBalance');
 
         Route::post('users/{user}/credits', BalanceController::class . '@userBalanceAddCredit');
         Route::delete('users/{user}/credits/{balance}', BalanceController::class . '@userBalanceRemoveCredit');
         Route::post('users/{user}/debits', BalanceController::class . '@userBalanceAddDebit');
         Route::delete('users/{user}/debits/{balance}', BalanceController::class . '@userBalanceRemoveDebit');
+
+        Route::get('reports/{report}/balances', BalanceController::class . '@getBalancesFromReport');
+        Route::get('reports/{report}/receipt-image', BalanceController::class . '@getBalanceReceiptImageFromReport');
+        Route::post('reports/{report}/receipt-image', BalanceController::class . '@setBalanceReceiptImageFromReport');
+        Route::delete('reports/{report}/receipt-image', BalanceController::class . '@deleteBalanceReceiptImageFromReport');
     });
 
     Route::post('/invoices/{invoice}/image-upload', [
@@ -159,6 +164,25 @@ Route::middleware(['auth:sanctum'])->group(function () {
 
     Route::apiResource('jobs', JobController::class);
     Route::apiResource('expenses', ExpenseController::class);
+
+
+
+
+
+    Route::group(['prefix' => 'management'], function () {
+        Route::group(['prefix' => 'records'], function () {
+            Route::get('attendances/by-worker', ManagementRecordsController::class . '@attendancesByWorker');
+            Route::get('attendances/by-jobs', ManagementRecordsController::class . '@attendancesByJobs');
+            Route::get('jobs/by-costs', ManagementRecordsController::class . '@jobsByCosts');
+            Route::get('users/by-costs', ManagementRecordsController::class . '@usersByCosts');
+        });
+        Route::group(['prefix' => 'balances'], function () {
+            Route::get('users', ManagementBalancesController::class . '@usersBalances');
+            Route::get('users/{user}/years/{year}', BalanceController::class . '@userBalanceYear');
+        });
+    });
+
+
 });
 
 Route::get("check", function(){

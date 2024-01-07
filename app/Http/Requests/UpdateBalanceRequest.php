@@ -22,7 +22,11 @@ class UpdateBalanceRequest extends FormRequest
     public function rules(): array
     {
         return [
-            //
+            'description' => ['string', 'max:100'],
+            'amount' => ['numeric', 'max:999999.99'],
+            'date' => ['date'],
+            'ticket_number' => ['nullable', 'string', 'max:100'],
+            'receipt_base64' => ['nullable', 'string'],
         ];
     }
 }
