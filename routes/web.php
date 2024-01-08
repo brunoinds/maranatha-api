@@ -48,4 +48,22 @@ Route::get('/app/{any}', function ($file) {
     }
 })->where('any', '.*');
 
+Route::get('/resources/public/{any}', function ($file) {
+    $internalPaths = explode('/', $file);
+
+
+    //Add headers for cors:
+    header('Access-Control-Allow-Origin: *');
+    header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS');
+    
+
+    $filePath = resource_path('public/' . $file);
+    $mime = MimeType::from($filePath);
+    $headers = ['Content-Type' => $mime];
+
+    File::exists($filePath) or abort(404, 'File not found!');
+
+    return Response::file($filePath, $headers);
+})->where('any', '.*');
+
 require __DIR__.'/auth.php';
