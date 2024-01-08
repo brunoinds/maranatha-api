@@ -161,7 +161,6 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::get('/me/reports', ReportController::class . '@myReports');
     Route::get('/me/attendances', AttendanceController::class . '@myAttendances');
 
-
     Route::apiResource('jobs', JobController::class);
     Route::apiResource('expenses', ExpenseController::class);
 
