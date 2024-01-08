@@ -11,7 +11,7 @@ class ReportGenerator{
     public static function generateExcelOutput(){
         $outputList = collect([]);
 
-        Report::all()->where('status', '=', 'Approved')->orWhere('status', '=', 'Restituted')->each(function(Report $report) use (&$outputList){
+        Report::where('status', '=', 'Approved')->orWhere('status', '=', 'Restituted')->get()->each(function(Report $report) use (&$outputList){
             $reportAmount = number_format($report->amount(), 2);
             $reportUsername = $report->user()->get()->first()->username;
             $reportDate = Carbon::parse($report->to_date)->format('d/m/Y');
