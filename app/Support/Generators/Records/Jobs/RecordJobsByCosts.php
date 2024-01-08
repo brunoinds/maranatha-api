@@ -48,8 +48,17 @@ class RecordJobsByCosts
 
         $invoicesInSpan = Invoice::query()
             ->where('date', '>=', $this->startDate)
-            ->where('date', '<=', $this->endDate)
-            ->get();
+            ->where('date', '<=', $this->endDate);
+
+        if ($this->jobRegion !== null){
+            $invoicesInSpan = $invoicesInSpan->where('zone', '=', $this->jobRegion);
+        }
+
+        if ($this->expenseCode !== null){
+            $invoicesInSpan = $invoicesInSpan->where('expense_code', '=', $this->expenseCode);
+        }
+
+        $invoicesInSpan = $invoicesInSpan->get();
         
         //Group by invoice->job()->code:
 
@@ -74,6 +83,15 @@ class RecordJobsByCosts
         })->flatten(1);
 
         $spendingsInSpan = $workersSpendings->where('date', '>=', $this->startDate->format('c'))->where('date', '<=', $this->endDate->format('c'));
+
+        if ($this->jobRegion !== null){
+            $spendingsInSpan = $spendingsInSpan->where('job.zone', '=', $this->jobRegion);
+        }
+
+        if ($this->expenseCode !== null){
+            $spendingsInSpan = $spendingsInSpan->where('expense.code', '=', $this->expenseCode);
+        }
+
 
         $spendingsInSpan = collect($spendingsInSpan)->groupBy(function($spending){
             return $spending['job']['code'];

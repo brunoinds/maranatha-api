@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class StoreJobRequest extends FormRequest
 {
@@ -24,6 +25,7 @@ class StoreJobRequest extends FormRequest
         return [
             'name' => ['required', 'string', 'max:255'],
             'code' => ['required', 'string', 'max:255', 'unique:jobs'],
+            'zone' => ['required', Rule::in(['North', 'South', 'NoZone'])],
             'details' => ['string', 'max:1000']
         ];
     }

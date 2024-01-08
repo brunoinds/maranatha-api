@@ -109,7 +109,8 @@ class WorkersAssistant{
                             ],
                             'date' => $item['date'],
                             'job' => [
-                                'code' => null
+                                'code' => null,
+                                'zone' => null,
                             ],
                             'expense' => [
                                 'code' => null
@@ -173,6 +174,7 @@ class WorkersAssistant{
                         $spending['attendance']['user_id'] = (int) $attendance->user_id;
                         $spending['attendance']['created_at'] = $attendance->created_at;
                         $spending['job']['code'] = $attendance->job()->code;
+                        $spending['job']['zone'] = $attendance->job()->zone->value;
                         $spending['expense']['code'] = $attendance->expense()->code;
                     }
                 }

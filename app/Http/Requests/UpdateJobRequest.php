@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class UpdateJobRequest extends FormRequest
 {
@@ -25,6 +26,7 @@ class UpdateJobRequest extends FormRequest
             'id' => ['required', 'integer'],
             'name' => ['required', 'string', 'max:255'],
             'code' => ['required', 'string', 'max:255'],
+            'zone' => ['required', Rule::in(['North', 'South', 'NoZone'])],
             'details' => ['string', 'max:1000']
         ];
     }
