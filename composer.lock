@@ -352,16 +352,16 @@
         },
         {
             "name": "brunoinds/sunat-dolar-laravel",
-            "version": "v1.0.2",
+            "version": "v1.0.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/brunoinds/sunat-dolar-laravel.git",
-                "reference": "2bda96d72e7ac0534f2397594e32b85c7ab69bed"
+                "reference": "fc2d810d13f29356cfa5c65a3885d7b0d7fca1e3"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/brunoinds/sunat-dolar-laravel/zipball/2bda96d72e7ac0534f2397594e32b85c7ab69bed",
-                "reference": "2bda96d72e7ac0534f2397594e32b85c7ab69bed",
+                "url": "https://api.github.com/repos/brunoinds/sunat-dolar-laravel/zipball/fc2d810d13f29356cfa5c65a3885d7b0d7fca1e3",
+                "reference": "fc2d810d13f29356cfa5c65a3885d7b0d7fca1e3",
                 "shasum": ""
             },
             "type": "library",
@@ -382,9 +382,9 @@
             ],
             "support": {
                 "issues": "https://github.com/brunoinds/sunat-dolar-laravel/issues",
-                "source": "https://github.com/brunoinds/sunat-dolar-laravel/tree/v1.0.2"
+                "source": "https://github.com/brunoinds/sunat-dolar-laravel/tree/v1.0.3"
             },
-            "time": "2024-01-05T01:36:36+00:00"
+            "time": "2024-01-08T21:09:49+00:00"
         },
         {
             "name": "carbonphp/carbon-doctrine-types",
