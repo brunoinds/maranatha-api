@@ -165,10 +165,6 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::apiResource('jobs', JobController::class);
     Route::apiResource('expenses', ExpenseController::class);
 
-
-
-
-
     Route::group(['prefix' => 'management'], function () {
         Route::group(['prefix' => 'records'], function () {
             Route::get('attendances/by-worker', ManagementRecordsController::class . '@attendancesByWorker');
