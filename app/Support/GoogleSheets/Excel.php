@@ -45,11 +45,9 @@ class Excel{
                 $item['report']['date'],
                 $item['report']['amount'],
                 $item['report']['identifier'],
-                $ITEM['payment_status']
+                $item['payment_status']
             ];
         });
-
-
 
         $sheet->append($output->toArray());
     }
