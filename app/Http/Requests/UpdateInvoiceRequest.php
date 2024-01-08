@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class UpdateInvoiceRequest extends FormRequest
 {
@@ -22,7 +23,16 @@ class UpdateInvoiceRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'image' => ['nullable', 'string', 'max:100'],
+            'type' => ['required', Rule::in(['Facture', 'Bill'])], 
+            'description' => ['required', 'string', 'max:100'], 
+            'ticket_number' => ['required', 'string', 'max:100'],
+            'commerce_number' => ['required', 'string', 'max:100'], 
+            'date' => ['required', 'date'],
+            'job_code' => ['required', 'string', 'max:100'], 
+            'expense_code' => ['required', 'string', 'max:100'],
+            'amount' => ['required', 'numeric', 'max:999999.99'],
+            'qrcode_data' => ['nullable', 'string', 'max:1000'],
+            'image_base64' => ['nullable', 'string'],
         ];
     }
 }

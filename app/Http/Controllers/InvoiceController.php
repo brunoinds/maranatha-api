@@ -11,6 +11,7 @@ use Illuminate\Support\Str;
 use Intervention\Image\Facades\Image;
 use App\Support\Toolbox\TString;
 
+
 class InvoiceController extends Controller
 {
     /**
@@ -93,11 +94,45 @@ class InvoiceController extends Controller
      */
     public function update(UpdateInvoiceRequest $request, Invoice $invoice)
     {
-        $validateStatus = $request->validated();
+        $validatedData = $request->validated();
 
-        $invoice->image = $request->input('image');
+
+        if (!is_null($validatedData['image_base64']) && mb_strlen($validatedData['image_base64']) > 40){
+            //Has image to upload
+            $maxSizeInBytes = 2048 * 1024; // 2MB
+            $base64Image = $validatedData['image_base64'];
+
+            $imageSize = (fn() => strlen(base64_decode($base64Image)))();
+            if ($imageSize > $maxSizeInBytes) {
+                return response()->json([
+                    'error' => [
+                        'message' => "Image exceeds max size (maximum $maxSizeInBytes bytes)",
+                    ]
+                ], 400);
+            }
+
+
+            try{
+                $wasSuccessfull = $invoice->setImageFromBase64($base64Image);
+                if (!$wasSuccessfull) {
+                    return response()->json([
+                        'error' => [
+                            'message' => 'Image upload failed',
+                        ]
+                    ], 500);
+                }
+            } catch(\Exception $e){
+                return response()->json([
+                    'error' => [
+                        'message' => 'Invalid image data',
+                        'details' => $e->getMessage()
+                    ]
+                ], 400);
+            }
+        }
+
+        $invoice->update($validatedData);
         $invoice->save();
-
         return response()->json(['message' => 'Invoice updated', 'invoice' => $invoice->toArray()]);
     }
 
