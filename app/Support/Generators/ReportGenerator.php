@@ -15,7 +15,7 @@ class ReportGenerator{
             $reportAmount = number_format($report->amount(), 2);
             $reportUsername = $report->user()->get()->first()->username;
             $reportDate = Carbon::parse($report->to_date)->format('d/m/Y');
-            $reportPaymentStatus = $report->status === 'Approved' ? 'PEND. PAGO' : 'PAGO';
+            $reportPaymentStatus = $report->status === 'Approved' ? 'APROBADO' : 'APROBADO Y REEMBOLSADO';
             $report->invoices()->each(function(Invoice $invoice) use (&$outputList, $report, $reportAmount, $reportUsername, $reportDate, $reportPaymentStatus){
                 $invoiceTypeAbbreviationShort = $invoice->type === 'Facture' ? 'FT' : 'BV';
                 $invoiceTypeAbbreviation = $invoice->type === 'Facture' ? 'FACTURAS' : 'BOLETAS';
