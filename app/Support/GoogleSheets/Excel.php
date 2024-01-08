@@ -12,14 +12,14 @@ use Illuminate\Support\Carbon;
 
 class Excel{
     public static function updateDBSheet($output):void{
-        $sheet = Sheets::spreadsheet(env('GOOGLE_SHEETS_DB_ID'))->sheet('DB');
-        $workableRange = $sheet->range('A2:N600');
+        $sheet = Sheets::spreadsheet(env('GOOGLE_SHEETS_DB_ID'))->sheet('🕋 BlackBox - Invoices');
+        $workableRange = $sheet->range('A2:P600');
 
         
         //Clear database:
         $rows = array_fill(0, 599, "");
         collect($rows)->each(function($item, $index) use (&$rows){
-            $rows[$index] = array_fill(0, 14, "");
+            $rows[$index] = array_fill(0, 16, "");
         });
         $workableRange->update($rows);
 
