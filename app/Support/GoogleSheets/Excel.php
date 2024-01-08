@@ -56,7 +56,6 @@ class Excel{
     public static function getWorkersSheet():array{
         $cachedValue = Cache::store('file')->get('Maranatha/Spreadsheets/Workers');
 
-        $cachedValue = null; //TODO: Remove this line
         if ($cachedValue !== null){
             return $cachedValue;
         }
