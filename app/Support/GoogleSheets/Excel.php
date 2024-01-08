@@ -56,6 +56,7 @@ class Excel{
     public static function getWorkersSheet():array{
         $cachedValue = Cache::store('file')->get('Maranatha/Spreadsheets/Workers');
 
+        $cachedValue = null; //TODO: Remove this line
         if ($cachedValue !== null){
             return $cachedValue;
         }
@@ -64,7 +65,7 @@ class Excel{
 
         $sheet = Sheets::spreadsheet(env('GOOGLE_SHEETS_DB_ID'))->sheet('👷 Workers');
         $workers = $sheet->range('A4:Z600')->all();
-        $paymentsMonths = $sheet->range('F3:Z3')->all()[0];
+        $paymentsMonths = $sheet->range('G3:Z3')->all()[0];
 
         $data = collect($workers)->filter(function($item){
             return $item[0] !== "";
@@ -75,10 +76,11 @@ class Excel{
                 'team' => isset($item[2]) ? $item[2] : "0",
                 'supervisor' => isset($item[3]) ? $item[3] : "",
                 'function' => isset($item[4]) ? $item[4] : "",
+                'is_active' => isset($item[5]) ? ($item[5] == 'Sí' ? true : false) : true,
                 'payments' => (function() use ($paymentsMonths, $item){
                     $payments = [];
                     foreach($paymentsMonths as $index => $paymentMonth){
-                        $amount = isset($item[$index + 5]) ? $item[$index + 5] : "S/.0.00";
+                        $amount = isset($item[$index + 6]) ? $item[$index + 6] : "S/.0.00";
                         $amount = str_replace('S/.', '', str_replace(',', '', $amount));
                         $amount = floatval($amount);
 

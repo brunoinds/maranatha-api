@@ -21,6 +21,7 @@ class WorkersAssistant{
                 'team' => $item['team'],
                 'supervisor' => $item['supervisor'],
                 'function' => $item['function'],
+                'is_active' => $item['is_active'],
             ];
         });
         return $workers->toArray();
@@ -33,7 +34,8 @@ class WorkersAssistant{
                 'team' => $item['team'],
                 'supervisor' => $item['supervisor'],
                 'function' => $item['function'],
-                'payments' => $item['payments']
+                'payments' => $item['payments'],
+                'is_active' => $item['is_active'],
             ];
         });
         return $workers->toArray();
