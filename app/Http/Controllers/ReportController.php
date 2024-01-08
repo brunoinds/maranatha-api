@@ -145,8 +145,8 @@ class ReportController extends Controller
 
             if (env('APP_ENV') === 'production'){
                 OneSignal::sendNotificationToExternalUser(
-                    headings: "Nuevo reporte enviado 📤",
-                    message: $user->name . " ha enviado un nuevo reporte de " . Toolbox::moneyPrefix($report->money_type->value) . number_format($report->amount(), 2) . " y está esperando su aprobación.", 
+                    headings: "Nuevo reporte recibido 📥",
+                    message: $user->name . " ha enviado un nuevo reporte de " . Toolbox::moneyPrefix($report->money_type->value) . number_format($report->amount(), 2) . " y está esperando por su aprobación.", 
                     userId: (string) 'user-id-'.$adminUser->id
                 );
             }
@@ -173,7 +173,7 @@ class ReportController extends Controller
             if (env('APP_ENV') === 'production'){
                 OneSignal::sendNotificationToExternalUser(
                     headings: "Reporte reembolsado 💰",
-                    message: "El administrador ha reembolsado " . Toolbox::moneyPrefix($report->money_type->value) . number_format($report->amount(), 2) . " por su reporte.", 
+                    message: "El administrador ha reembolsado " . Toolbox::moneyPrefix($report->money_type->value) . number_format($report->amount(), 2) . " vía depósito en su cuenta bancária por su reporte aprobado.", 
                     userId: (string) 'user-id-'.$user->id
                 );
             }
