@@ -66,4 +66,17 @@ Route::get('/resources/public/{any}', function ($file) {
     return Response::file($filePath, $headers);
 })->where('any', '.*');
 
+Route::get('/resources/service-workers/one-signal-sw.js', function () {
+    header('Access-Control-Allow-Origin: *');
+    header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS');
+    header('Service-Worker-Allowed: /');
+    $filePath = resource_path('public/assets/service-workers/OneSignalSDKWorker.js');
+    $mime = MimeType::from($filePath);
+    $headers = ['Content-Type' => $mime];
+
+    File::exists($filePath) or abort(404, 'File not found!');
+
+    return Response::file($filePath, $headers);
+});
+
 require __DIR__.'/auth.php';
