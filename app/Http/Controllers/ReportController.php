@@ -143,53 +143,44 @@ class ReportController extends Controller
             $user = $report->user()->get()->first();
             $adminUser = User::where('username', 'admin')->first();
 
-            if (env('APP_ENV') === 'production'){
-                OneSignal::sendNotificationToExternalUser(
-                    headings: "Nuevo reporte recibido 📥",
-                    message: $user->name . " ha enviado un nuevo reporte de " . Toolbox::moneyPrefix($report->money_type->value) . number_format($report->amount(), 2) . " y está esperando por su aprobación.", 
-                    userId: (string) 'user-id-'.$adminUser->id
-                );
-            }
-            
+            OneSignal::sendNotificationToExternalUser(
+                headings: "Nuevo reporte recibido 📥",
+                message: $user->name . " ha enviado un nuevo reporte de " . Toolbox::moneyPrefix($report->money_type->value) . number_format($report->amount(), 2) . " y está esperando por su aprobación.", 
+                userId: Toolbox::getOneSignalUserId($adminUser->id)
+            );
         }
 
         if ($previousStatus === ReportStatus::Submitted && $report->status === ReportStatus::Approved){
             //Send notification
             $user = $report->user()->get()->first();
 
-            if (env('APP_ENV') === 'production'){
-                OneSignal::sendNotificationToExternalUser(
-                    headings: "Reporte aprobado ✅",
-                    message: "El administrador ha aprobado su reporte de " . Toolbox::moneyPrefix($report->money_type->value) . number_format($report->amount(), 2) . ". Pronto recibirás su reembolso.", 
-                    userId: (string) 'user-id-'.$user->id
-                );
-            }
+            OneSignal::sendNotificationToExternalUser(
+                headings: "Reporte aprobado ✅",
+                message: "El administrador ha aprobado su reporte de " . Toolbox::moneyPrefix($report->money_type->value) . number_format($report->amount(), 2) . ". Pronto recibirás su reembolso.", 
+                userId: Toolbox::getOneSignalUserId($user->id)
+            );
         }
 
         if ($previousStatus === ReportStatus::Approved && $report->status === ReportStatus::Restituted){
             //Send notification
             $user = $report->user()->get()->first();
 
-            if (env('APP_ENV') === 'production'){
-                OneSignal::sendNotificationToExternalUser(
-                    headings: "Reporte reembolsado 💰",
-                    message: "El administrador ha reembolsado " . Toolbox::moneyPrefix($report->money_type->value) . number_format($report->amount(), 2) . " vía depósito en su cuenta bancária por su reporte aprobado.", 
-                    userId: (string) 'user-id-'.$user->id
-                );
-            }
+            OneSignal::sendNotificationToExternalUser(
+                headings: "Reporte reembolsado 💰",
+                message: "El administrador ha reembolsado " . Toolbox::moneyPrefix($report->money_type->value) . number_format($report->amount(), 2) . " vía depósito en su cuenta bancária por su reporte aprobado.", 
+                userId: Toolbox::getOneSignalUserId($user->id)
+            );
         }
 
         if ($previousStatus === ReportStatus::Submitted && $report->status === ReportStatus::Rejected){
             //Send notification
             $user = $report->user()->get()->first();
 
-            if (env('APP_ENV') === 'production'){
-                OneSignal::sendNotificationToExternalUser(
-                    headings: "Reporte rechazado ❌",
-                    message: "El administrador ha rechazado su reporte de " . Toolbox::moneyPrefix($report->money_type->value) . number_format($report->amount(), 2) . ". Ingrese a la aplicación para ver el motivo de rechazo.", 
-                    userId: (string) 'user-id-'.$user->id
-                );
-            }
+            OneSignal::sendNotificationToExternalUser(
+                headings: "Reporte rechazado ❌",
+                message: "El administrador ha rechazado su reporte de " . Toolbox::moneyPrefix($report->money_type->value) . number_format($report->amount(), 2) . ". Ingrese a la aplicación para ver el motivo de rechazo.", 
+                userId: Toolbox::getOneSignalUserId($user->id)
+            );
         }
 
         return response()->json(['message' => 'Report updated', 'report' => $report->toArray()]);

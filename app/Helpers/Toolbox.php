@@ -42,4 +42,13 @@ class Toolbox{
             ]);
         }
     }
+
+
+    public static function getOneSignalUserId(int $userId): string{
+        if (env('APP_ENV') === 'production'){
+            return (string) 'user-id-'.$userId;
+        }else{
+            return (string) 'dev-user-id-'.$userId;
+        }
+    }
 }
