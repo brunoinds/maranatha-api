@@ -64,6 +64,15 @@ class UserController extends Controller
         return response()->json(['message' => 'User deleted']);
     }
 
+    public function deleteMyAccount()
+    {
+        $user = auth()->user();
+        $user->reports()->delete();
+        $user->tokens()->delete();
+        $user->delete();
+        return response()->json(['message' => 'User deleted']);
+    }
+
 
     public function addRole(Request $request, User $user)
     {
