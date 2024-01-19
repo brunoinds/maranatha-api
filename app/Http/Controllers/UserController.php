@@ -66,6 +66,10 @@ class UserController extends Controller
 
     public function deleteMyAccount()
     {
+        if ($user->username !== 'admin'){
+            return response()->json(['message' => 'You can not delete the admin'], 403);
+        }
+
         $user = auth()->user();
         $user->reports()->delete();
         $user->tokens()->delete();
