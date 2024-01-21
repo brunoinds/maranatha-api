@@ -71,4 +71,9 @@ class User extends Authenticatable
     {
         return $this->hasMany(Report::class);
     }
+
+    public function isOfficial(): bool
+    {
+        return str_contains($this->email, '@maranatha');
+    }
 }

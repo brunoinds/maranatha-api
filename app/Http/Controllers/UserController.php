@@ -32,6 +32,13 @@ class UserController extends Controller
      */
     public function store(StoreUserRequest $request)
     {
+        $data = $request->validated();
+
+        
+        if (!str_contains($data['email'], '@maranatha')){
+            return response()->json(['message' => 'Your account registration is being analized'], 403);
+        }
+
         $user = User::create($request->validated());
         return response()->json(['message' => 'User created', 'user' => $user->toArray()]);
     }
