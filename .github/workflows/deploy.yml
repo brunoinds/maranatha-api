@@ -15,7 +15,7 @@ jobs:
       - name: 🔑 Copy .env
         run: php -r "file_exists('.env') || copy('.env.example', '.env');"
       - name: 📦 Install Laravel Dependencies
-        run: composer install --no-interaction --no-suggest
+        run: composer update --ignore-platform-reqs
       - name: ♾️ Prepare storage link
         run: chmod -R 775 storage/
       - name: 🔗 Generate Laravel storage link
