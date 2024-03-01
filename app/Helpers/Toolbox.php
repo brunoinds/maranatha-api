@@ -16,8 +16,9 @@ class Toolbox{
     public static function toObject(array $array): object{
         return json_decode(json_encode($array));
     }
-    public static function validateImageBase64(string|null $base64Image, int|null $maxSizeInBytes = 2048 * 1024) // 2MB
+    public static function validateImageBase64(string|null $base64Image, int|null $maxSizeInBytes = null)
     { 
+        $maxSizeInBytes = $maxSizeInBytes ?? env('APP_MAXIMUM_UPLOAD_SIZE') ?? 2048 * 1024;
         if (!is_null($base64Image) && mb_strlen($base64Image) > 40){
             $imageSize = (fn() => strlen(base64_decode($base64Image)))();
             if ($imageSize > $maxSizeInBytes) {

@@ -92,6 +92,8 @@ class ReportController extends Controller
      */
     public function update(UpdateReportRequest $request, Report $report)
     {
+        $notificationUrlOnManagmentReports = env('APP_WEB_URL') . '/management?showReportId=' . $report->id;
+        $notificationUrlOnUserReports = env('APP_WEB_URL') . '/reports/' . $report->id;
 
         $previousStatus = $report->status;
 
@@ -146,7 +148,10 @@ class ReportController extends Controller
             OneSignal::sendNotificationToExternalUser(
                 headings: "Nuevo reporte recibido 📥",
                 message: $user->name . " ha enviado un nuevo reporte de " . Toolbox::moneyPrefix($report->money_type->value) . number_format($report->amount(), 2) . " y está esperando por su aprobación.", 
-                userId: Toolbox::getOneSignalUserId($adminUser->id)
+                userId: Toolbox::getOneSignalUserId($adminUser->id),
+                data: [
+                    'deepLink' => $notificationUrlOnUserReports
+                ]
             );
         }
 
@@ -157,7 +162,10 @@ class ReportController extends Controller
             OneSignal::sendNotificationToExternalUser(
                 headings: "Reporte aprobado ✅",
                 message: "El administrador ha aprobado su reporte de " . Toolbox::moneyPrefix($report->money_type->value) . number_format($report->amount(), 2) . ". Pronto recibirás su reembolso.", 
-                userId: Toolbox::getOneSignalUserId($user->id)
+                userId: Toolbox::getOneSignalUserId($user->id),
+                data: [
+                    'deepLink' => $notificationUrlOnUserReports
+                ]
             );
         }
 
@@ -168,7 +176,10 @@ class ReportController extends Controller
             OneSignal::sendNotificationToExternalUser(
                 headings: "Reporte reembolsado 💰",
                 message: "El administrador ha reembolsado " . Toolbox::moneyPrefix($report->money_type->value) . number_format($report->amount(), 2) . " vía depósito en su cuenta bancária por su reporte aprobado.", 
-                userId: Toolbox::getOneSignalUserId($user->id)
+                userId: Toolbox::getOneSignalUserId($user->id),
+                data: [
+                    'deepLink' => $notificationUrlOnUserReports
+                ]
             );
         }
 
@@ -179,7 +190,10 @@ class ReportController extends Controller
             OneSignal::sendNotificationToExternalUser(
                 headings: "Reporte rechazado ❌",
                 message: "El administrador ha rechazado su reporte de " . Toolbox::moneyPrefix($report->money_type->value) . number_format($report->amount(), 2) . ". Ingrese a la aplicación para ver el motivo de rechazo.", 
-                userId: Toolbox::getOneSignalUserId($user->id)
+                userId: Toolbox::getOneSignalUserId($user->id),
+                data: [
+                    'deepLink' => $notificationUrlOnUserReports
+                ]
             );
         }
 

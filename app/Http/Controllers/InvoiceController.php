@@ -43,7 +43,7 @@ class InvoiceController extends Controller
         $validatedData = $request->validated();
         if (!is_null($validatedData['image']) && mb_strlen($validatedData['image']) > 40){
             //Has image to upload
-            $maxSizeInBytes = 2048 * 1024; // 2MB
+            $maxSizeInBytes = $maxSizeInBytes ?? env('APP_MAXIMUM_UPLOAD_SIZE') ?? 2048 * 1024;
             $base64Image = $validatedData['image'];
 
             $imageSize = (fn() => strlen(base64_decode($base64Image)))();
@@ -99,7 +99,7 @@ class InvoiceController extends Controller
 
         if (!is_null($validatedData['image_base64']) && mb_strlen($validatedData['image_base64']) > 40){
             //Has image to upload
-            $maxSizeInBytes = 2048 * 1024; // 2MB
+            $maxSizeInBytes = $maxSizeInBytes ?? env('APP_MAXIMUM_UPLOAD_SIZE') ?? 2048 * 1024;
             $base64Image = $validatedData['image_base64'];
 
             $imageSize = (fn() => strlen(base64_decode($base64Image)))();
@@ -150,7 +150,7 @@ class InvoiceController extends Controller
      */
     public function uploadImage(Request $request, Invoice $invoice)
     {
-        $maxSizeInBytes = 2048 * 1024; // 2MB
+        $maxSizeInBytes = $maxSizeInBytes ?? env('APP_MAXIMUM_UPLOAD_SIZE') ?? 2048 * 1024;
         $base64Image = $request->input('image');
 
         if (!$base64Image) {
