@@ -21,8 +21,11 @@
         "laravel/tinker": "^2.8",
         "mikehaertl/php-shellcommand": "^1.7",
         "revolution/laravel-google-sheets": "^6.2",
+        "spatie/laravel-backup": "^8.6",
+        "spatie/laravel-google-cloud-storage": "^2.2",
         "spatie/temporary-directory": "^2.2",
-        "tightenco/ziggy": "^1.0"
+        "tightenco/ziggy": "^1.0",
+        "yaza/laravel-google-drive-storage": "^2.0"
     },
     "require-dev": {
         "fakerphp/faker": "^1.9.1",
