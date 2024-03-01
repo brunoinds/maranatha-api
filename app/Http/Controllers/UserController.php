@@ -34,7 +34,7 @@ class UserController extends Controller
     {
         $data = $request->validated();
 
-        if (env('APP_ALLOW_NO_MARANATHA_ACCOUNS') === 'false'){
+        if (env('APP_ALLOW_NO_MARANATHA_ACCOUNTS') === 'false'){
             if (!str_contains($data['email'], '@maranatha')){
                 return response()->json(['message' => 'Your account registration is being analized'], 403);
             }
