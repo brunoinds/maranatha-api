@@ -37,10 +37,3 @@ Artisan::command('check:environment', function () {
     $appEnvirontment = env('APP_ENV');
     $this->info('App environment: ' . $appEnvirontment);
 })->purpose('Display an inspiring quote');
-
-
-Artisan::command('check:scheduler', function () {
-    //Create a file on the storage folder:
-    $file = 'scheduler.txt';
-    Storage::disk('local')->put($file, 'Scheduler is working, triggered at: ' . now());
-})->purpose('Check scheduler on production');
