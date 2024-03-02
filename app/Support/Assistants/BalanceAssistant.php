@@ -261,7 +261,7 @@ class BalanceAssistant{
             'usage_percentage' => (function() use ($total, $pittyCashGivenAmount){
                 $currentBalance = $total;
                 if ($pittyCashGivenAmount == 0){
-                    return 100;
+                    return 0;
                 }
                 if ($currentBalance < 0){
                     $limit = $pittyCashGivenAmount;
