@@ -177,6 +177,71 @@ class BalanceAssistant{
             ];
         })();
 
+
+        $byReportStatus = (function() use ($user, $timeBounds){
+            $parseByStatus = function($reports){
+                $totalInSoles = 0;
+                $totalInDollars = 0;
+                $itemsInDollar = [];
+                $itemsInSoles = [];
+
+                $items = [];
+
+                foreach($reports as $report){
+                    $item = [
+                        'id' => $report->id,
+                        'title' => $report->title,
+                        'date' => $report->firstInvoiceDate() || $report->submitted_at,
+                        'amount' => $report->amount(),
+                        'money_type' => $report->money_type,
+                    ];
+
+                    if ($report->money_type === MoneyType::USD){
+                        $itemsInDollar[] = $item;
+                    }elseif ($report->money_type === MoneyType::PEN){
+                        $itemsInSoles[] = $item;
+                    }
+
+                    $totalInSoles += $report->amountInSoles();
+                    $totalInDollars += $report->amountInDollars();
+
+                    $items[] = $item;
+                }
+
+                return [
+                    'currencies' => [
+                        'dollars' => [
+                            'amount' => array_sum(array_column($itemsInDollar, 'amount')),
+                            'count' => count($itemsInDollar),
+                        ],
+                        'soles' => [
+                            'amount' => array_sum(array_column($itemsInSoles, 'amount')),
+                            'count' => count($itemsInSoles),
+                        ],
+                    ],
+                    'items' => $items,
+                    'amount' => $totalInSoles,
+                    'amount_in' => [
+                        'soles' => $totalInSoles,
+                        'dollars' => $totalInDollars,
+                    ]
+                ];
+            };
+
+            //Get list of ReportStatus enums, returning an array with: [ReportStatus::Approved, ReportStatus::Restituted, ReportStatus::Rejected, ReportStatus::Submitted, ReportStatus::Draft]:
+            $reportStatuses = ReportStatus::cases();
+            foreach ($reportStatuses as $reportStatus){
+                $reports = Report::query()->where('user_id', $user->id)->where('status', '=', $reportStatus)->where('from_date', '>=', $timeBounds['start'])->where('to_date', '<=', $timeBounds['end'])->orderBy('from_date', 'asc')->get();
+                
+                $byStatus[] = [
+                    'status' => $reportStatus->name,
+                    'data' => $parseByStatus($reports)
+                ];
+            }
+            return $byStatus;
+        })();
+
+
         $pittyCashGivenAmount = (function() use ($user, $yearBounds){
             $directCredits = Balance::all()->where('model', BalanceModel::Direct)->where('type', BalanceType::Credit)->where('user_id', $user->id)->where('date', '>=', $yearBounds['start'])->where('date', '<=', $yearBounds['end']);
             $directDebits = Balance::all()->where('model', BalanceModel::Direct)->where('type', BalanceType::Debit)->where('user_id', $user->id)->where('date', '>=', $yearBounds['start'])->where('date', '<=', $yearBounds['end']);
@@ -271,6 +336,7 @@ class BalanceAssistant{
                 'reports' => [
                     'not_approved' => $notApprovedReports,
                     'pending_reposition' => $pendingRestitution,
+                    'by_status' => $byReportStatus,
                 ],
             ]
         ];
