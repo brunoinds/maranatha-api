@@ -179,8 +179,6 @@ Route::middleware(['auth:sanctum'])->group(function () {
             Route::get('users/{user}/years/{year}', BalanceController::class . '@userBalanceYear');
         });
     });
-
-
 });
 
 Route::get("check", function(){
