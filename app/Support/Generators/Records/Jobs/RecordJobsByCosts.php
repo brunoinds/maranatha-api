@@ -46,23 +46,15 @@ class RecordJobsByCosts
         //Carbon create array of dates between $this->startDate and $this->endDate
         //For each date, get the invoices:
 
-        /*$invoicesInSpan = Invoice::query()
-            ->where('date', '>=', $this->startDate)
-            ->where('date', '<=', $this->endDate)
-            ->whereHas('report', function($query){
-                $query->where('status', '=', 'Approved')->orWhere('status', '=', 'Restituted');
-            });*/
-
         $invoicesInSpan = Invoice::query()
                     ->join('reports', 'invoices.report_id', '=', 'reports.id')
+                    ->join('jobs', 'invoices.job_code', '=', 'jobs.code')
                     ->where('invoices.date', '>=', $this->startDate)
                     ->where('invoices.date', '<=', $this->endDate)
                     ->where(function($query){
                         $query->where('reports.status', '=', 'Approved')
                                 ->orWhere('reports.status', '=', 'Restituted');
                     });
-
-
 
 
         if ($this->jobRegion !== null){
@@ -74,6 +66,9 @@ class RecordJobsByCosts
         }
 
         $invoicesInSpan = $invoicesInSpan->get();
+
+
+
         
         //Group by invoice->job()->code:
 

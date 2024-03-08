@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\StoreExpenseRequest;
 use App\Http\Requests\UpdateExpenseRequest;
 use App\Models\Expense;
+use App\Models\Invoice;
 
 class ExpenseController extends Controller
 {
@@ -48,6 +49,12 @@ class ExpenseController extends Controller
      */
     public function destroy(Expense $expense)
     {
+        $count = Invoice::where('expense_code', $expense->code)->count();
+        if ($count > 0) {
+            return response()->json(['message' => 'Expense has invoices, cannot be deleted'], 400);
+        }
+
+
         $expense->delete();
         return response()->json(['message' => 'Expense deleted']);
     }

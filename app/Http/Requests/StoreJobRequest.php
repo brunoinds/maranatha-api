@@ -25,7 +25,7 @@ class StoreJobRequest extends FormRequest
         return [
             'name' => ['required', 'string', 'max:255'],
             'code' => ['required', 'string', 'max:255', 'unique:jobs'],
-            'zone' => ['required', Rule::in(['North', 'South', 'NoZone'])],
+            'zone' => ['required', 'string', 'max:255'],
             'details' => ['string', 'max:1000']
         ];
     }

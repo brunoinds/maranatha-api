@@ -2,7 +2,6 @@
 
 namespace App\Models;
 
-use App\Helpers\Enums\JobZone;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -22,6 +21,5 @@ class Job extends Model
     ];
 
     protected $casts = [
-        'zone' => JobZone::class
     ];
 }
