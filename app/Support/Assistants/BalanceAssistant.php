@@ -13,6 +13,7 @@ use Carbon\Carbon;
 use DateTime;
 use DateTimeInterface;
 
+
 class BalanceAssistant{
     public static function generateUserBalanceByYear(User $user, int $year):array{
         $timeSpan = [
