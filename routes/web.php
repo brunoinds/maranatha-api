@@ -30,7 +30,6 @@ Route::get('/', function () {
 });
 
 
-
 Route::get('/app/{any}', function ($file) {
     $internalPaths = explode('/', $file);
 
