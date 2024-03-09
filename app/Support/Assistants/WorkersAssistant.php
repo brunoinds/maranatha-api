@@ -174,7 +174,7 @@ class WorkersAssistant{
                         $spending['attendance']['user_id'] = (int) $attendance->user_id;
                         $spending['attendance']['created_at'] = $attendance->created_at;
                         $spending['job']['code'] = $attendance->job()->code;
-                        $spending['job']['zone'] = $attendance->job()->zone->value;
+                        $spending['job']['zone'] = $attendance->job()->zone;
                         $spending['expense']['code'] = $attendance->expense()->code;
                     }
                 }
