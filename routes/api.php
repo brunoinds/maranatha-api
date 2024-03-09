@@ -163,7 +163,6 @@ Route::middleware(['auth:sanctum'])->group(function () {
 
     Route::delete('/me/account', UserController::class . '@deleteMyAccount');
 
-
     Route::apiResource('jobs', JobController::class);
     Route::apiResource('expenses', ExpenseController::class);
 
