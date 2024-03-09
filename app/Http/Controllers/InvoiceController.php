@@ -88,6 +88,21 @@ class InvoiceController extends Controller
         return response()->json(['message' => 'Invoice created', 'invoice' => $invoice->toArray()]);
     }
 
+    public function checkTicketNumber(Request $request)
+    {
+        $request->validate([
+            'ticket_number' => 'required|string'
+        ]);
+        
+        $ticket = $request->input('ticket_number');
+        $invoice = Invoice::where('ticket_number', '=', $ticket)->first();
+        if ($invoice){
+            //Send response with error code:
+            return response()->json(['exists' => true, 'message' => 'Ticket number already exists', 'invoice' => $invoice->toArray()]);
+        }else{
+            return response()->json(['exists' => false, 'message' => 'Ticket number is available']);
+        }
+    }
 
     /**
      * Update the specified resource in storage.

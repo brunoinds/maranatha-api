@@ -123,6 +123,10 @@ Route::middleware(['auth:sanctum'])->group(function () {
 
 
     Route::apiResource('invoices', InvoiceController::class);
+    Route::get('invoices/ticket-number/check', InvoiceController::class . '@checkTicketNumber');
+
+
+
     Route::apiResource('reports', ReportController::class);
     Route::apiResource('attendances', AttendanceController::class);
     Route::post('attendances-with-workers', AttendanceController::class . '@storeWithWorkers');
