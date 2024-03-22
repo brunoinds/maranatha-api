@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "3678a813b9fb38155d9827165127f7c6",
+    "content-hash": "56f637843a50478c6048e3964f9506f1",
     "packages": [
         {
             "name": "avadim/fast-excel-helper",
@@ -312,6 +312,78 @@
                 }
             ],
             "time": "2023-01-15T23:15:59+00:00"
+        },
+        {
+            "name": "brunoinds/frankfurter-laravel",
+            "version": "v1.0.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/brunoinds/frankfurter-laravel.git",
+                "reference": "d8413253238945fd8ce72b66b247d931d523da24"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/brunoinds/frankfurter-laravel/zipball/d8413253238945fd8ce72b66b247d931d523da24",
+                "reference": "d8413253238945fd8ce72b66b247d931d523da24",
+                "shasum": ""
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Brunoinds\\FrankfurterLaravel\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Bruno Freire",
+                    "email": "brunoqm99@gmail.com"
+                }
+            ],
+            "support": {
+                "issues": "https://github.com/brunoinds/frankfurter-laravel/issues",
+                "source": "https://github.com/brunoinds/frankfurter-laravel/tree/v1.0.0"
+            },
+            "time": "2024-03-21T11:32:35+00:00"
+        },
+        {
+            "name": "brunoinds/paraguay-dolar-laravel",
+            "version": "v1.0.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/brunoinds/paraguay-dolar-laravel.git",
+                "reference": "7b4c10800964ab7d3cbfc493b757c4d5e75e74e3"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/brunoinds/paraguay-dolar-laravel/zipball/7b4c10800964ab7d3cbfc493b757c4d5e75e74e3",
+                "reference": "7b4c10800964ab7d3cbfc493b757c4d5e75e74e3",
+                "shasum": ""
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Brunoinds\\ParaguayDolarLaravel\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Bruno Freire",
+                    "email": "brunoqm99@gmail.com"
+                }
+            ],
+            "support": {
+                "issues": "https://github.com/brunoinds/paraguay-dolar-laravel/issues",
+                "source": "https://github.com/brunoinds/paraguay-dolar-laravel/tree/v1.0.0"
+            },
+            "time": "2024-03-21T12:28:41+00:00"
         },
         {
             "name": "brunoinds/sunat-dolar",

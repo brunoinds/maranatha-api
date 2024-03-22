@@ -9,6 +9,10 @@ class Toolbox{
                 return "S/.";
             case 'USD':
                 return "$";
+            case 'BRL':
+                return "R$";
+            case 'PYG':
+                return "₲";
             default:
                 return "S/.";
         }

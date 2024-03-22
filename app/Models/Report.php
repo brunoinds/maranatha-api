@@ -7,8 +7,8 @@ use App\Helpers\Toolbox;
 use Brunoinds\SunatDolarLaravel\Enums\Currency;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Brunoinds\SunatDolarLaravel\Exchange;
 use App\Helpers\Enums\ReportStatus;
+use App\Support\Exchange\Exchanger;
 use DateTime;
 
 
@@ -26,32 +26,29 @@ class Report extends Model
         return $this->invoices()->sum('amount');
     }
 
-    public function amountInSoles(){
-        if ($this->money_type === MoneyType::PEN){
+    public function amountIn(MoneyType $currency){
+        $moneyType = MoneyType::from($this->money_type->value);
+        if ($this->money_type === $currency){
             return $this->amount();
-        }elseif ($this->money_type === MoneyType::USD){
-            $totalInSoles = 0;
-            $this->invoices()->each(function($invoice) use (&$totalInSoles){
+        }else {
+            $total = 0;
+            $this->invoices()->each(function($invoice) use (&$total, $currency, $moneyType){
                 $date = new DateTime($invoice->date);
-                $amountInSoles = Exchange::on($date)->convert(\Brunoinds\SunatDolarLaravel\Enums\Currency::USD, $invoice->amount)->to(\Brunoinds\SunatDolarLaravel\Enums\Currency::PEN);
-                $totalInSoles += $amountInSoles;
+                $amountInCurrency = Exchanger::on($date)->convert($invoice->amount,$moneyType, $currency);
+                $total += $amountInCurrency;
             });
-            return $totalInSoles;
+            return $total;
         }
     }
 
+    //! This method should be removed soon
+    public function amountInSoles(){
+        return $this->amountIn(MoneyType::PEN);
+    }
+
+    //! This method should be removed soon
     public function amountInDollars(){
-        if ($this->money_type === MoneyType::USD){
-            return $this->amount();
-        }elseif ($this->money_type === MoneyType::PEN){
-            $totalInDollars = 0;
-            $this->invoices()->each(function($invoice) use (&$totalInDollars){
-                $date = new DateTime($invoice->date);
-                $amountInDollars = Exchange::on($date)->convert(\Brunoinds\SunatDolarLaravel\Enums\Currency::PEN, $invoice->amount)->to(\Brunoinds\SunatDolarLaravel\Enums\Currency::USD);
-                $totalInDollars += $amountInDollars;
-            });
-            return $totalInDollars;
-        }
+        return $this->amountIn(MoneyType::USD);
     }
     
     public function invoices(){

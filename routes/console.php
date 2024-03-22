@@ -4,6 +4,8 @@ use Illuminate\Foundation\Inspiring;
 use Illuminate\Support\Facades\Artisan;
 use mikehaertl\shellcommand\Command;
 use Illuminate\Support\Facades\Storage;
+use App\Support\Exchange\Exchanger;
+use App\Support\Exchange\MoneyType;
 
 
 /*

@@ -84,6 +84,7 @@ class BalanceAssistant{
             $itemsInSoles = [];
 
             $items = [];
+            $itemsIn = MoneyType::toAssociativeArray([]);
 
             foreach($reports as $report){
                 $item = [
@@ -100,23 +101,33 @@ class BalanceAssistant{
                     $itemsInSoles[] = $item;
                 }
 
+                $itemsIn[$report->money_type->value][] = $item;
+
                 $totalInSoles += $report->amountInSoles();
                 $totalInDollars += $report->amountInDollars();
 
                 $items[] = $item;
             }
 
+            $currencies = MoneyType::toAssociativeArray();
+            foreach($currencies as $currency => $value){
+                $currencies[$currency] = [
+                    'amount' => array_sum(array_column($itemsIn[$currency], 'amount')),
+                    'count' => count($itemsIn[$currency]),
+                ];
+            }
+
+            $currencies['soles'] = [
+                'amount' => array_sum(array_column($itemsInSoles, 'amount')),
+                'count' => count($itemsInSoles),
+            ];
+            $currencies['dollars'] = [
+                'amount' => array_sum(array_column($itemsInDollar, 'amount')),
+                'count' => count($itemsInDollar),
+            ];
+
             return [
-                'currencies' => [
-                    'dollars' => [
-                        'amount' => array_sum(array_column($itemsInDollar, 'amount')),
-                        'count' => count($itemsInDollar),
-                    ],
-                    'soles' => [
-                        'amount' => array_sum(array_column($itemsInSoles, 'amount')),
-                        'count' => count($itemsInSoles),
-                    ],
-                ],
+                'currencies' => $currencies,
                 'items' => $items,
                 'amount' => $totalInSoles,
                 'amount_in' => [
@@ -136,6 +147,7 @@ class BalanceAssistant{
             $itemsInSoles = [];
 
             $items = [];
+            $itemsIn = MoneyType::toAssociativeArray([]);
 
             foreach($reports as $report){
                 $item = [
@@ -152,23 +164,34 @@ class BalanceAssistant{
                     $itemsInSoles[] = $item;
                 }
 
+                $itemsIn[$report->money_type->value][] = $item;
+
                 $totalInSoles += $report->amountInSoles();
                 $totalInDollars += $report->amountInDollars();
 
                 $items[] = $item;
             }
 
+            $currencies = MoneyType::toAssociativeArray();
+            foreach($currencies as $currency => $value){
+                $currencies[$currency] = [
+                    'amount' => array_sum(array_column($itemsIn[$currency], 'amount')),
+                    'count' => count($itemsIn[$currency]),
+                ];
+            }
+
+            $currencies['soles'] = [
+                'amount' => array_sum(array_column($itemsInSoles, 'amount')),
+                'count' => count($itemsInSoles),
+            ];
+            $currencies['dollars'] = [
+                'amount' => array_sum(array_column($itemsInDollar, 'amount')),
+                'count' => count($itemsInDollar),
+            ];
+
+
             return [
-                'currencies' => [
-                    'dollars' => [
-                        'amount' => array_sum(array_column($itemsInDollar, 'amount')),
-                        'count' => count($itemsInDollar),
-                    ],
-                    'soles' => [
-                        'amount' => array_sum(array_column($itemsInSoles, 'amount')),
-                        'count' => count($itemsInSoles),
-                    ],
-                ],
+                'currencies' => $currencies,
                 'items' => $items,
                 'amount' => $totalInSoles,
                 'amount_in' => [
@@ -188,6 +211,8 @@ class BalanceAssistant{
 
                 $items = [];
 
+                $itemsIn = MoneyType::toAssociativeArray([]);
+
                 foreach($reports as $report){
                     $item = [
                         'id' => $report->id,
@@ -203,23 +228,33 @@ class BalanceAssistant{
                         $itemsInSoles[] = $item;
                     }
 
+                    $itemsIn[$report->money_type->value][] = $item;
+
                     $totalInSoles += $report->amountInSoles();
                     $totalInDollars += $report->amountInDollars();
 
                     $items[] = $item;
                 }
 
+                $currencies = MoneyType::toAssociativeArray();
+                foreach($currencies as $currency => $value){
+                    $currencies[$currency] = [
+                        'amount' => array_sum(array_column($itemsIn[$currency], 'amount')),
+                        'count' => count($itemsIn[$currency]),
+                    ];
+                }
+
+                $currencies['soles'] = [
+                    'amount' => array_sum(array_column($itemsInSoles, 'amount')),
+                    'count' => count($itemsInSoles),
+                ];
+                $currencies['dollars'] = [
+                    'amount' => array_sum(array_column($itemsInDollar, 'amount')),
+                    'count' => count($itemsInDollar),
+                ];
+
                 return [
-                    'currencies' => [
-                        'dollars' => [
-                            'amount' => array_sum(array_column($itemsInDollar, 'amount')),
-                            'count' => count($itemsInDollar),
-                        ],
-                        'soles' => [
-                            'amount' => array_sum(array_column($itemsInSoles, 'amount')),
-                            'count' => count($itemsInSoles),
-                        ],
-                    ],
+                    'currencies' => $currencies,
                     'items' => $items,
                     'amount' => $totalInSoles,
                     'amount_in' => [

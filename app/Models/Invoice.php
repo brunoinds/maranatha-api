@@ -6,9 +6,8 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use App\Models\Report;
 use DateTime;
-use Brunoinds\SunatDolarLaravel\Exchange;
-use Brunoinds\SunatDolarLaravel\Enums\Currency;
 use App\Helpers\Enums\MoneyType;
+use App\Support\Exchange\Exchanger;
 use Illuminate\Support\Facades\Storage;
 use Intervention\Image\Facades\Image;
 use Illuminate\Support\Str;
@@ -22,26 +21,36 @@ class Invoice extends Model
     protected $fillable = ['type', 'description', 'report_id', 'ticket_number', 'commerce_number', 'date', 'job_code', 'expense_code', 'amount', 'qrcode_data', 'image'];
 
 
-    public function amountInSoles(){
-        $moneyType = $this->report()?->money_type;
 
-        if ($moneyType === MoneyType::PEN){
+    public function amountIn(MoneyType $currency)
+    {
+        $moneyType = $this->report()?->money_type;
+        if ($moneyType === $currency){
             return $this->amount;
-        }elseif ($moneyType === MoneyType::USD){
+        }else {
             $date = new DateTime($this->date);
-            return Exchange::on($date)->convert(\Brunoinds\SunatDolarLaravel\Enums\Currency::USD, $this->amount)->to(\Brunoinds\SunatDolarLaravel\Enums\Currency::PEN);
+            return Exchanger::on($date)->convert($this->amount, $moneyType, $currency);
         }
     }
+    public function amountInAll()
+    {
+        $instance = $this;
+        $results = MoneyType::toAssociativeArray(0);
+        collect(MoneyType::toAssociativeArray(0))->each(function($value, $key) use ($instance, &$results){
+            $results[$key] = $instance->amountIn($key);
+        });
 
+        return $results;
+    }
+
+    //! This method should be removed soon
+    public function amountInSoles(){
+        return $this->amountIn(MoneyType::PEN);
+    }
+
+    //! This method should be removed soon
     public function amountInDollars(){
-        $moneyType = $this->report()?->money_type;
-
-        if ($moneyType === MoneyType::USD){
-            return $this->amount;
-        }elseif ($moneyType === MoneyType::PEN){
-            $date = new DateTime($this->date);
-            return Exchange::on($date)->convert(\Brunoinds\SunatDolarLaravel\Enums\Currency::PEN, $this->amount)->to(\Brunoinds\SunatDolarLaravel\Enums\Currency::USD);
-        }
+        return $this->amountIn(MoneyType::USD);
     }
 
     public function report(){
