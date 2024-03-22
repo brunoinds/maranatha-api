@@ -25,7 +25,7 @@ class UpdateJobRequest extends FormRequest
         return [
             'id' => ['required', 'integer'],
             'name' => ['required', 'string', 'max:255'],
-            'code' => ['required', 'string', 'max:255'],
+            'code' => ['required', 'string', 'max:255', 'unique:jobs'],
             'zone' => ['required', 'string', 'max:255'],
             'details' => ['string', 'max:1000']
         ];

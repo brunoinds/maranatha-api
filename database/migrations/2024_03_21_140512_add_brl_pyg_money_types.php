@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('reports', function (Blueprint $table) {
-            $table->enum('money_type', ['PEN', 'USD', 'PYG', 'BRL'])->change();
+            $table->string('money_type', 100)->default('PEN')->change();
         });
     }
 
@@ -22,7 +22,7 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('reports', function (Blueprint $table) {
-            $table->enum('money_type', ['PEN', 'USD'])->change();
+            $table->string('money_type', 100)->change();
         });
     }
 };
