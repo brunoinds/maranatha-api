@@ -13,7 +13,7 @@ return new class extends Migration
     {
         //On reports table, add column called: money_type:
         Schema::table('reports', function (Blueprint $table) {
-            $table->enum('money_type', ['PEN', 'USD'])->after('type')->default('PEN');
+            $table->string('money_type', 100)->after('type')->default('PEN');
         });
     }
 
