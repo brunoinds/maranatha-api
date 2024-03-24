@@ -49,3 +49,5 @@ jobs:
         run: curl -X GET https://maranatha.imedicineapp.com/api/cd/config-cache
       - name: ⏰ Migrate on server
         run: curl -X GET https://maranatha.imedicineapp.com/api/cd/migrate
+      - name: 🧼  Config cache on server
+        run: curl -X GET https://maranatha.imedicineapp.com/api/cd/config-cache
