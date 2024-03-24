@@ -91,11 +91,13 @@ class InvoiceController extends Controller
     public function checkTicketNumber(Request $request)
     {
         $request->validate([
-            'ticket_number' => 'required|string'
+            'ticket_number' => 'required|string',
+            'commerce_number' => 'required|string'
         ]);
         
         $ticket = $request->input('ticket_number');
-        $invoice = Invoice::where('ticket_number', '=', $ticket)->first();
+        $commerceNumber = $request->input('commerce_number');
+        $invoice = Invoice::where('ticket_number', '=', $ticket)->where('commerce_number', '=', $commerceNumber)->first();
         if ($invoice){
             //Send response with error code:
             return response()->json(['exists' => true, 'message' => 'Ticket number already exists', 'invoice' => $invoice->toArray()]);
