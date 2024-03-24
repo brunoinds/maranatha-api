@@ -30,7 +30,9 @@ class UpdateReportRequest extends FormRequest
             'status' => [Rule::in(['Draft', 'Submitted', 'Approved', 'Rejected', 'Restituted'])],
             'rejection_reason' => ['string', 'max:100', 'nullable'],
             'type' => [Rule::in(['Bill', 'Facture'])],
-            'money_type' => [Rule::in(['PEN', 'USD', 'PYG', 'BRL'])]
+            'money_type' => [Rule::in(['PEN', 'USD', 'PYG', 'BRL'])],
+            'country' => ['string', 'max:2'],
+            'metadata' => ['array']
         ];
     }
 }

@@ -16,11 +16,12 @@ class Report extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['user_id', 'title', 'type', 'money_type', 'from_date', 'to_date', 'status', 'exported_pdf', 'rejection_reason', 'approved_at', 'rejected_at', 'submitted_at'];
+    protected $fillable = ['user_id', 'title', 'type', 'money_type', 'from_date', 'to_date', 'status', 'exported_pdf', 'rejection_reason', 'approved_at', 'rejected_at', 'submitted_at', 'metadata', 'country'];
 
     protected $casts = [
         'money_type' => MoneyType::class,
-        'status' => ReportStatus::class
+        'status' => ReportStatus::class,
+        'metadata' => 'array',
     ];
     public function amount(){
         return $this->invoices()->sum('amount');

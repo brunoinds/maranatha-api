@@ -249,7 +249,8 @@ class ReportController extends Controller
         ]);
     }
 
-    public function downloadPDF(Report $report){
+    public function downloadPDF(Report $report)
+    {
         $assetId = $report->exported_pdf;
         if ($assetId == null) {
             return response()->json(['message' => 'Report not generated yet'], 400);
@@ -257,7 +258,8 @@ class ReportController extends Controller
 
         return Storage::disk('public')->download('reports/' . $assetId, $report->title . '.pdf');
     }
-    public function downloadExcel(Report $report){
+    public function downloadExcel(Report $report)
+    {
         $excel = ReportAssistant::generateExcelDocument($report);
         $documentName = $report->title . '.xlsx';
         //Generate a temp directory and save the file there:
