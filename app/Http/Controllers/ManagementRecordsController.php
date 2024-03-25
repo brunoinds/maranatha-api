@@ -6,6 +6,7 @@ use App\Support\Generators\Records\Attendances\RecordAttendancesByWorker;
 use App\Support\Generators\Records\Jobs\RecordJobsByCosts;
 use App\Support\Generators\Records\Attendances\RecordAttendancesByJobs;
 use App\Support\Generators\Records\Users\RecordUsersByCosts;
+use App\Support\Generators\Records\Reports\RecordReportsByTime;
 use DateTime;
 
 
@@ -135,6 +136,38 @@ class ManagementRecordsController extends Controller
             'expenseCode' => $validatedData['expense_code'],
             'type' => $validatedData['type'],
             'userId' => $validatedData['user_id'],
+        ]);
+
+        $document = $record->generate();
+
+        return response()->json($document);
+    }
+
+
+    public function reportsByTime()
+    {
+        $validatedData = request()->validate([
+            'start_date' => 'required|date',
+            'end_date' => 'required|date',
+            'country' => 'nullable|string',
+            'money_type' => 'nullable|string',
+            'type' => 'nullable|string',
+        ]);
+
+        $defaults = [
+            'country' => null,
+            'money_type' => null,
+            'type' => null,
+        ];
+
+        $validatedData = array_merge($defaults, $validatedData);
+
+        $record = new RecordReportsByTime([
+            'startDate' => new DateTime($validatedData['start_date']),
+            'endDate' => new DateTime($validatedData['end_date']),
+            'country' => $validatedData['country'],
+            'moneyType' => $validatedData['money_type'],
+            'type' => $validatedData['type'],
         ]);
 
         $document = $record->generate();

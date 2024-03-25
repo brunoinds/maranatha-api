@@ -104,22 +104,16 @@ class ReportController extends Controller
         if ($report->status === ReportStatus::Approved){
             $report->approved_at = (new DateTime())->format('c');
             BalanceAssistant::createBalanceExpenseFromReport($report);
-        } else {
-            $report->approved_at = null;
         }
 
         if ($report->status === ReportStatus::Restituted){
             $report->restituted_at = (new DateTime())->format('c');
             BalanceAssistant::createBalanceRestitutionFromReport($report);
-        } else {
-            $report->restituted_at = null;
         }
 
         if ($report->status === ReportStatus::Rejected){
             $report->rejected_at = (new DateTime())->format('c');
             BalanceAssistant::deleteBalancesFromReport($report);
-        } else {
-            $report->rejected_at = null;
         }
 
         if ($report->status === ReportStatus::Submitted){
@@ -132,14 +126,30 @@ class ReportController extends Controller
             BalanceAssistant::deleteBalancesFromReport($report);
         }
 
+        if ($report->status === ReportStatus::Draft){
+            $report->rejected_at = null;
+            $report->submitted_at = null;
+            $report->approved_at = null;
+            $report->restituted_at = null;
+        }elseif ($report->status === ReportStatus::Submitted){
+            $report->rejected_at = null;
+            $report->approved_at = null;
+            $report->restituted_at = null;
+        }elseif ($report->status === ReportStatus::Approved){
+            $report->rejected_at = null;
+            $report->restituted_at = null;
+        }elseif ($report->status === ReportStatus::Rejected){
+            $report->approved_at = null;
+            $report->restituted_at = null;
+        }
+
+
         $report->save();
 
         if ($previousStatus !== $report->status && env('APP_ENV') === 'production'){
             $excelOutput = ReportGenerator::generateExcelOutput();
             Excel::updateDBSheet($excelOutput);
         }
-
-
         if ($previousStatus === ReportStatus::Draft && $report->status === ReportStatus::Submitted){
             //Send notification
             $user = $report->user()->get()->first();
@@ -154,7 +164,6 @@ class ReportController extends Controller
                 ]
             );
         }
-
         if ($previousStatus === ReportStatus::Submitted && $report->status === ReportStatus::Approved){
             //Send notification
             $user = $report->user()->get()->first();
@@ -168,7 +177,6 @@ class ReportController extends Controller
                 ]
             );
         }
-
         if ($previousStatus === ReportStatus::Approved && $report->status === ReportStatus::Restituted){
             //Send notification
             $user = $report->user()->get()->first();
@@ -182,7 +190,6 @@ class ReportController extends Controller
                 ]
             );
         }
-
         if ($previousStatus === ReportStatus::Submitted && $report->status === ReportStatus::Rejected){
             //Send notification
             $user = $report->user()->get()->first();
