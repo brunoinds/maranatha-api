@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 use App\Models\User;
 use App\Models\Job;
 use App\Models\Expense;
+use Carbon\Carbon;
 
 class Attendance extends Model
 {
@@ -44,6 +45,14 @@ class Attendance extends Model
         foreach ($period as $date) {
             $dates[] = $date;
         }
+
+        if (count($dates) === 0){
+            if (Carbon::createFromDate($from_date)->isSameDay(Carbon::createFromDate($to_date))){
+                $dates[] = Carbon::createFromDate($from_date)->toDateTime();
+            }
+        }
+
+
         return $dates;
     }
     public function datesWorkers():array{
