@@ -7,7 +7,7 @@ use \avadim\FastExcelWriter\Excel;
 
 class ReportAssistant{
     public static function generateExcelDocument(Report $report): Excel{
-        $invoices = $report->invoices()->get();
+        $invoices = $report->invoices()->orderBy('date', 'asc')->get();
 
         $user = $report->user()->get()->first();
 
