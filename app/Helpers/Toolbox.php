@@ -48,6 +48,20 @@ class Toolbox{
         }
     }
 
+    public static function countryName(string $countryCode)
+    {
+        if ($countryCode === 'BR'){
+            return 'Brazil';
+        }elseif ($countryCode === 'PE'){
+            return 'Peru';
+        }elseif ($countryCode === 'PY'){
+            return 'Paraguay';
+        }elseif ($countryCode === 'US'){
+            return 'United States';
+        }else{
+            return 'Unknown';
+        }
+    }
 
     public static function getOneSignalUserId(int $userId): string{
         if (env('APP_ENV') === 'production'){

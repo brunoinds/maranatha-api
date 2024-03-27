@@ -2,6 +2,7 @@
 
 namespace App\Support\Assistants;
 
+use App\Helpers\Toolbox;
 use App\Models\Report;
 use \avadim\FastExcelWriter\Excel;
 
@@ -45,7 +46,7 @@ class ReportAssistant{
             'vertical-align' => 'center',
             'height' => 24,
         ]);
-        $sheet->writeRow(['Country - Peru'], [
+        $sheet->writeRow(['Country - ' . Toolbox::countryName($report->country)], [
             'font' => [
                 'size' => 12,
             ],
