@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+
+<style>
+table.heading{
+    border-collapse: collapse;
+    font-size: 9px;
+    font-family: helvetica;
+    width: 100%;
+}
+
+table.heading tr > td{
+    border-width: 0.5px;
+}
+
+
+table.heading tr > td:nth-child(1){
+    text-align: right;
+    min-width: 160px;
+    padding-right: 8px;
+}
+table.heading tr > td:nth-child(2){
+    text-align: left;
+}
+
+table.heading tr[center] > td{
+    text-align: center;
+}
+
+table.heading tr[center]:nth-child(1){
+    font-weight: bold;
+    font-size: 14px;
+}
+table.heading tr[center]:nth-child(2){
+    font-weight: bold;
+    font-size: 10px;
+}
+
+table.heading tr[center]:nth-child(3){
+    font-size: 9px;
+}
+
+table.items{
+    border-collapse: collapse;
+    font-size: 8px;
+    font-family: helvetica;
+}
+table.items td, table.items th {
+    border-width: 0.5px;
+    border-color: gray;
+    border-style: solid;
+    padding: 4px 4px;
+    text-align: center;
+}
+table.items th {
+    background-color: #ebebeb;
+    white-space: nowrap;
+    text-align: center;
+    padding: 6px 6px;
+}
+
+table.items tr > td:nth-child(3){
+    width: 100%;
+    text-align: left;
+}
+table.items tr[totals] td{
+    padding: 6px 6px;
+    font-weight: bold;
+    font-size: 10px;
+}
+table.items tr[totals] > td:nth-child(3){
+    width: 100%;
+    text-align: left;
+}
+
+
+.images{
+    
+}
+.images > article{
+    page-break-before: always;
+    width: 100%;
+    height: 100%;
+    position: relative;
+}
+
+.images > article > h1{
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    font-size: 11px;
+    font-family: helvetica;
+    color: #F4E628;
+    z-index: 10;
+}
+.images > article > h1:nth-child(2) {
+    position: absolute;
+    top: 11.2px;
+    left: 11.2px;
+    z-index: 9;
+    color: black;
+}
+
+.images img{
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    max-width: 100%;
+    max-height: 100%;
+}
+</style>
+</head>
+<body>
+<table class="heading">
+    <thead>
+        <th></th>
+        <th></th>
+    </thead>
+    <tbody>
+        <tr center>
+        <td colspan="2">MARANATHA</td>
+        </tr>
+        <tr center>
+        <td colspan="2">EXPENSE REPORT</td>
+        </tr>
+        <tr center>
+        <td colspan="2">Country - {{$country}}</td>
+        </tr>
+        <tr>
+        <td colspan="2"><br></td>
+        </tr>
+        <tr>
+        <td>Report dates:</td>
+        <td>{{$reportDates}}</td>
+        </tr>
+        <tr>
+        <td>Submitted by:</td>
+        <td>{{$submittedBy}}</td>
+        </tr>
+        <tr>
+        <td>Currency:</td>
+        <td>{{$currency}}</td>
+        </tr>
+    </tbody>
+    </table>
+    <br>
+    <table class="items" style="width: 100%; border: 2px solid black;">
+    <thead>
+        <th>DATE</th>
+        <th>INVOICE/TICKET</th>
+        <th>INVOICE/TICKET DESCRIPTION</th>
+        <th>JOB</th>
+        <th>EXPENSE CODE</th>
+        <th>#</th>
+        <th>TOTAL</th>
+    </thead>
+        <tbody>
+            {{$invoicesItems}}
+        <tr totals>
+        <td style="text-align: right" colspan="6">Total</td><td style="font-weight: bold; white-space: nowrap;">{{$tableTotals}}</td>
+        </tr>
+    </tbody>
+    </table>
+    <section class="images">
+        {{$imagesPages}}
+    </section>
+</body>
+</html>

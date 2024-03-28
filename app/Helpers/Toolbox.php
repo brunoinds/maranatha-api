@@ -3,7 +3,8 @@
 namespace App\Helpers;
 
 class Toolbox{
-    public static function moneyPrefix(string $moneyType): string{
+    public static function moneyPrefix(string $moneyType): string
+    {
         switch($moneyType){
             case 'PEN':
                 return "S/.";
@@ -17,7 +18,8 @@ class Toolbox{
                 return "S/.";
         }
     }
-    public static function toObject(array $array): object{
+    public static function toObject(array $array): object
+    {
         return json_decode(json_encode($array));
     }
     public static function validateImageBase64(string|null $base64Image, int|null $maxSizeInBytes = null)
@@ -47,7 +49,6 @@ class Toolbox{
             ]);
         }
     }
-
     public static function countryName(string $countryCode)
     {
         if ($countryCode === 'BR'){
@@ -62,7 +63,6 @@ class Toolbox{
             return 'Unknown';
         }
     }
-
     public static function getOneSignalUserId(int $userId): string{
         if (env('APP_ENV') === 'production'){
             return (string) 'user-id-'.$userId;

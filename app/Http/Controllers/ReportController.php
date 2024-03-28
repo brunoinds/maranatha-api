@@ -20,6 +20,8 @@ use App\Models\User;
 use App\Support\Assistants\BalanceAssistant;
 use Spatie\TemporaryDirectory\TemporaryDirectory;
 use DateTime;
+use App\Support\Creators\Reports\ReportPDFCreator;
+
 
 class ReportController extends Controller
 {
@@ -258,13 +260,20 @@ class ReportController extends Controller
 
     public function downloadPDF(Report $report)
     {
-        $assetId = $report->exported_pdf;
-        if ($assetId == null) {
-            return response()->json(['message' => 'Report not generated yet'], 400);
-        }
+        $pdf = ReportPDFCreator::new($report);
+        $content = $pdf->create()->output();
 
-        return Storage::disk('public')->download('reports/' . $assetId, $report->title . '.pdf');
+        $documentName = $report->title . '.pdf';
+
+        $temporaryDirectory = (new TemporaryDirectory())->create();
+        $tempPath = $temporaryDirectory->path($documentName);
+
+        file_put_contents($tempPath, $content);
+
+        return response()->download($tempPath, $documentName)->deleteFileAfterSend(true);
     }
+
+
     public function downloadExcel(Report $report)
     {
         $excel = ReportAssistant::generateExcelDocument($report);

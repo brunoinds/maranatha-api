@@ -17,6 +17,8 @@ use App\Support\GoogleSheets\Excel;
 use mikehaertl\shellcommand\Command;
 use App\Http\Controllers\ManagementRecordsController;
 use App\Http\Controllers\ManagementBalancesController;
+
+
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -111,6 +113,8 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 
 
 Route::middleware(['auth:sanctum'])->group(function () {
+
+
     Route::apiResource('users', UserController::class);
     Route::get('/users/{user}/roles', UserController::class . '@roles');
     Route::post('/users/{user}/roles', UserController::class . '@addRole');
@@ -186,6 +190,12 @@ Route::middleware(['auth:sanctum'])->group(function () {
     });
 });
 
+Route::get('/reports/{report}/excel-download', [
+    ReportController::class, 'downloadExcel' 
+]);
+Route::get('/reports/{report}/pdf-download', [
+    ReportController::class, 'downloadPDF' 
+]);
 Route::get("check", function(){
     return response()->json(["message" => "API is working!"], 200);
 });
@@ -193,12 +203,7 @@ Route::post("login", [AuthController::class, 'login']);
 Route::post("register", [AuthController::class, 'register']);
 Route::post("users", [UserController::class, 'store']);
 
-Route::get('/reports/{report}/excel-download', [
-    ReportController::class, 'downloadExcel' 
-]);
-Route::get('/reports/{report}/pdf-download', [
-    ReportController::class, 'downloadPDF' 
-]);
+
 Route::get('/workers-list', function(){
     $workers = WorkersAssistant::getListWorkers();
     return response()->json($workers);

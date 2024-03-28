@@ -11,7 +11,8 @@ use App\Support\Exchange\Exchanger;
 use Illuminate\Support\Facades\Storage;
 use Intervention\Image\Facades\Image;
 use Illuminate\Support\Str;
-
+use App\Models\Job;
+use App\Models\Expense;
 
 
 class Invoice extends Model
@@ -55,6 +56,16 @@ class Invoice extends Model
 
     public function report(){
         return $this->belongsTo(Report::class)->first();
+    }
+
+    public function job()
+    {
+        return $this->belongsTo(Job::class)->first();
+    }
+
+    public function expense()
+    {
+        return $this->belongsTo(Expense::class)->first();
     }
 
 
