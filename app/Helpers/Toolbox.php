@@ -12,7 +12,7 @@ class Toolbox{
             case 'BRL':
                 return "R$";
             case 'PYG':
-                return "₲";
+                return "Gs.";
             default:
                 return "S/.";
         }
