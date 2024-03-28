@@ -351,16 +351,16 @@
         },
         {
             "name": "brunoinds/paraguay-dolar-laravel",
-            "version": "v1.0.0",
+            "version": "v1.0.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/brunoinds/paraguay-dolar-laravel.git",
-                "reference": "7b4c10800964ab7d3cbfc493b757c4d5e75e74e3"
+                "reference": "8bdcccd3c04506746b2f8fb1f364bad87dd7c083"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/brunoinds/paraguay-dolar-laravel/zipball/7b4c10800964ab7d3cbfc493b757c4d5e75e74e3",
-                "reference": "7b4c10800964ab7d3cbfc493b757c4d5e75e74e3",
+                "url": "https://api.github.com/repos/brunoinds/paraguay-dolar-laravel/zipball/8bdcccd3c04506746b2f8fb1f364bad87dd7c083",
+                "reference": "8bdcccd3c04506746b2f8fb1f364bad87dd7c083",
                 "shasum": ""
             },
             "type": "library",
@@ -381,9 +381,9 @@
             ],
             "support": {
                 "issues": "https://github.com/brunoinds/paraguay-dolar-laravel/issues",
-                "source": "https://github.com/brunoinds/paraguay-dolar-laravel/tree/v1.0.0"
+                "source": "https://github.com/brunoinds/paraguay-dolar-laravel/tree/v1.0.1"
             },
-            "time": "2024-03-21T12:28:41+00:00"
+            "time": "2024-03-28T15:51:36+00:00"
         },
         {
             "name": "brunoinds/sunat-dolar",

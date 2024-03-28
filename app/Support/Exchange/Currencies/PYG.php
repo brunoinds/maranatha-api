@@ -3,13 +3,24 @@
 namespace App\Support\Exchange\Currencies;
 
 use DateTime;
+use Illuminate\Support\Facades\Log;
 
 
 class PYG{
     public static function convertFromDollar(DateTime $date, float $amount){
-        return \Brunoinds\ParaguayDolarLaravel\Exchange::on($date)->convert(\Brunoinds\ParaguayDolarLaravel\Enums\Currency::USD, $amount)->to(\Brunoinds\ParaguayDolarLaravel\Enums\Currency::PYG);
+        try {
+            return \Brunoinds\ParaguayDolarLaravel\Exchange::on($date)->convert(\Brunoinds\ParaguayDolarLaravel\Enums\Currency::USD, $amount)->to(\Brunoinds\ParaguayDolarLaravel\Enums\Currency::PYG);
+        } catch (\Throwable $th) {
+            Log::warning('Failed to convert USD to PYG', ['date' => $date, 'amount' => $amount, 'error' => $th->getMessage()]);
+            return 0;
+        }
     }
     public static function convertToDollar(DateTime $date, float $amount){
-        return \Brunoinds\ParaguayDolarLaravel\Exchange::on($date)->convert(\Brunoinds\ParaguayDolarLaravel\Enums\Currency::PYG, $amount)->to(\Brunoinds\ParaguayDolarLaravel\Enums\Currency::USD);
+        try {
+            return \Brunoinds\ParaguayDolarLaravel\Exchange::on($date)->convert(\Brunoinds\ParaguayDolarLaravel\Enums\Currency::PYG, $amount)->to(\Brunoinds\ParaguayDolarLaravel\Enums\Currency::USD);
+        } catch (\Throwable $th) {
+            Log::warning('Failed to convert PYG to USD', ['date' => $date, 'amount' => $amount, 'error' => $th->getMessage()]);
+            return 0;
+        }
     }
 }
