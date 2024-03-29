@@ -125,6 +125,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::apiResource('balances', BalanceController::class);
 
 
+    
     //Users group:
     Route::group([], function(){
         Route::get('/users/{user}/roles', UserController::class . '@roles');
