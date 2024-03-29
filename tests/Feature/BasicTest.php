@@ -18,7 +18,7 @@ class BasicTest extends TestCase
 
     public function test_the_api_returns_a_successful_response(): void
     {
-        $response = $this->get('/api/check');
+        $response = $this->get('/api/cd/check');
         $response->assertJson([
             'message' => 'API is working!',
         ]);
