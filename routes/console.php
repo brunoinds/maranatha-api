@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\Invoice;
 use Illuminate\Foundation\Inspiring;
 use Illuminate\Support\Facades\Artisan;
 use mikehaertl\shellcommand\Command;
@@ -50,4 +51,10 @@ Artisan::command('sqlite:check', function(){
 Artisan::command('sqlite:version', function(){
     $sqliteVersion = json_encode(SQLite3::version());
     $this->info('Version: ' . $sqliteVersion);
+});
+
+Artisan::command('check:invoices', function(){
+    Invoice::all()->each(function($invoice){
+        $invoice->imageSize();
+    });
 });

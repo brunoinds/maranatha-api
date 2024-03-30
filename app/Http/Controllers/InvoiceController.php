@@ -22,13 +22,6 @@ class InvoiceController extends Controller
         return Invoice::all();
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
-    }
 
     public function show(Invoice $invoice)
     {

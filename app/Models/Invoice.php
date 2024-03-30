@@ -19,9 +19,7 @@ class Invoice extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['type', 'description', 'report_id', 'ticket_number', 'commerce_number', 'date', 'job_code', 'expense_code', 'amount', 'qrcode_data', 'image'];
-
-
+    protected $fillable = ['type', 'description', 'report_id', 'ticket_number', 'commerce_number', 'date', 'job_code', 'expense_code', 'amount', 'qrcode_data', 'image', 'image_size'];
 
     public function amountIn(MoneyType $currency)
     {
@@ -52,6 +50,30 @@ class Invoice extends Model
     //! This method should be removed soon
     public function amountInDollars(){
         return $this->amountIn(MoneyType::USD);
+    }
+
+    public function imageSize() : ?int
+    {
+        if ($this->image === null){
+            return null;
+        }
+
+        if ($this->image_size !== null){
+            return $this->image_size;
+        }
+
+        $path = 'invoices/' . $this->image;
+        $imageExists = Storage::disk('public')->exists($path);
+        if (!$imageExists){
+            $this->image_size = null;
+            $this->save();
+            return null;
+        }
+
+        $imageSize = Storage::disk('public')->size($path);
+        $this->image_size = $imageSize;
+        $this->save();
+        return $imageSize;
     }
 
     public function report(){
