@@ -384,7 +384,7 @@ class BalanceAssistant{
             'user_id' => $report->user_id,
             'ticket_number' => null,
             'report_id' => $report->id,
-            'date' => $report->firstInvoiceDate(),
+            'date' => (new DateTime())->format('c'),
             'type' => BalanceType::Debit,
             'model' => BalanceModel::Expense,
             'amount' => $report->amountInSoles(),
