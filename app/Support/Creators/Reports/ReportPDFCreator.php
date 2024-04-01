@@ -32,9 +32,18 @@ class ReportPDFCreator
     }
     private function loadPlaceholders(Report $report)
     {
-        $carbonStart = Carbon::create($report->from_date);
-        $carbonEnd = Carbon::create($report->to_date);
-        $dates = "from " . $carbonStart->format('F j, Y') . " to " . $carbonEnd->format('F j, Y');
+        $firstInvoiceDate = $report->firstInvoiceDate();
+        $lastInvoiceDate = $report->lastInvoiceDate();
+
+        if ($firstInvoiceDate && $lastInvoiceDate){
+            $carbonStart = Carbon::create($firstInvoiceDate);
+            $carbonEnd = Carbon::create($lastInvoiceDate);
+            $dates = "from " . $carbonStart->format('F j, Y') . " to " . $carbonEnd->format('F j, Y');
+        }else {
+            $carbonStart = Carbon::create($report->from_date);
+            $carbonEnd = Carbon::create($report->to_date);
+            $dates = "from " . $carbonStart->format('F j, Y') . " to " . $carbonEnd->format('F j, Y');
+        }
 
 
         $this->html = str_replace('{{$country}}', Toolbox::countryName($report->country), $this->html);
