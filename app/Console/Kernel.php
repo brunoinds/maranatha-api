@@ -13,8 +13,7 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule): void
     {
-        $schedule->command('backup:clean')->daily();
-        $schedule->command('backup:run')->daily();
+        $schedule->command('backup:clean; backup:run')->daily();
         CronRun::create();
     }
 
