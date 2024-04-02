@@ -78,6 +78,8 @@ class InvoiceController extends Controller
         }
 
         $invoice = Invoice::create($validatedData);
+        $invoice->report()->updateFromToDates();
+
         return response()->json(['message' => 'Invoice created', 'invoice' => $invoice->toArray()]);
     }
 
@@ -143,6 +145,10 @@ class InvoiceController extends Controller
 
         $invoice->update($validatedData);
         $invoice->save();
+
+        $invoice->report()->updateFromToDates();
+
+
         return response()->json(['message' => 'Invoice updated', 'invoice' => $invoice->toArray()]);
     }
 
@@ -151,7 +157,10 @@ class InvoiceController extends Controller
      */
     public function destroy(Invoice $invoice)
     {
+        $report = $invoice->report();
         $invoice->delete();
+        $report->updateFromToDates();
+        
         return response()->json(['message' => 'Invoice deleted']);
     }
 

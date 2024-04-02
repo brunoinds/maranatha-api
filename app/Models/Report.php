@@ -66,6 +66,19 @@ class Report extends Model
         $this->balances()->delete();
         return parent::delete();
     }
+
+    public function updateFromToDates()
+    {
+        $firstInvoiceDate = $this->firstInvoiceDate();
+        $lastInvoiceDate = $this->lastInvoiceDate();
+        if ($firstInvoiceDate === null || $lastInvoiceDate === null){
+            return;
+        }
+        $this->from_date = $firstInvoiceDate;
+        $this->to_date = $lastInvoiceDate;
+        $this->save();
+    }
+
     public function firstInvoiceDate(){
         $firstInvoice = $this->invoices()->orderBy('date', 'asc')->first();
         if ($firstInvoice === null){
