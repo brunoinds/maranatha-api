@@ -13,6 +13,7 @@ use Carbon\Carbon;
 use Carbon\CarbonPeriod;
 use App\Models\Invoice;
 use Brunoinds\SunatDolarLaravel\Exchange;
+use App\Models\Attendance;
 
 
 class RecordAttendancesByJobs
@@ -75,9 +76,16 @@ class RecordAttendancesByJobs
 
 
         $spendingsInSpan = array_column($spendingsInSpan->map(function($spendings, $code){
+            $attendanceId = explode('/~/', $code)[0];
+            $attendance = Attendance::find($attendanceId)->get()->first();
+            $attendanceFromDate = Carbon::parse($attendance->from_date)->format('d/m/Y');
+            $attendanceToDate = Carbon::parse($attendance->to_date)->format('d/m/Y');
+
             return [
-                'attendance_id' => explode('/~/', $code)[0],
+                'attendance_id' => $attendanceId,
                 'attendance_created_at' => explode('/~/', $code)[1],
+                'attendance_from_date' => $attendanceFromDate,
+                'attendance_to_date' => $attendanceToDate,
                 'job_code' => explode('/~/', $code)[2],
                 'expense_code' => explode('/~/', $code)[3],
                 'worker_dni' => explode('/~/', $code)[4],
@@ -145,8 +153,16 @@ class RecordAttendancesByJobs
         return [
             'headers' => [
                 [
-                    'title' => 'Fecha',
+                    'title' => 'Fecha Creación Reporte',
                     'key' => 'attendance_created_at',
+                ],
+                [
+                    'title' => 'Fecha Inicio Reporte',
+                    'key' => 'attendance_from_date',
+                ],
+                [
+                    'title' => 'Fecha Fin Reporte',
+                    'key' => 'attendance_to_date',
                 ],
                 [
                     'title' => 'Supervisor',
@@ -181,8 +197,16 @@ class RecordAttendancesByJobs
                     'key' => 'day_work_amount_in_dollars',
                 ],
                 [
+                    'title' => 'Costo/Día (S/.)',
+                    'key' => 'day_work_amount_in_soles',
+                ],
+                [
                     'title' => 'Costo Total ($)',
                     'key' => 'amount_in_dollars',
+                ],
+                [
+                    'title' => 'Costo Total (S/.)',
+                    'key' => 'amount_in_soles',
                 ]
             ],
             'body' => $spendings,
