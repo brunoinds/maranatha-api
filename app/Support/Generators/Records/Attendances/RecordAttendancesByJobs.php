@@ -74,7 +74,6 @@ class RecordAttendancesByJobs
             return $spending['attendance']['id'] . '/~/' . $spending['attendance']['created_at'] . '/~/' . $spending['job']['code'] . '/~/' . $spending['expense']['code'] . '/~/' . $spending['attendance_day']['worker_dni'] . '/~/' . $spending['worker']['supervisor'] . '/~/' . $spending['worker']['name'];
         });
 
-
         $spendingsInSpan = array_column($spendingsInSpan->map(function($spendings, $code){
             $attendanceId = explode('/~/', $code)[0];
             $attendance = Attendance::where('id', $attendanceId)->first();
@@ -152,10 +151,6 @@ class RecordAttendancesByJobs
         
         return [
             'headers' => [
-                [
-                    'title' => 'ID Reporte',
-                    'key' => 'attendance_id',
-                ],
                 [
                     'title' => 'Fecha Creación Reporte',
                     'key' => 'attendance_created_at',

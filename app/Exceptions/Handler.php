@@ -4,6 +4,7 @@ namespace App\Exceptions;
 
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
 use Throwable;
+use Sentry\Laravel\Integration;
 
 class Handler extends ExceptionHandler
 {
@@ -24,7 +25,19 @@ class Handler extends ExceptionHandler
     public function register(): void
     {
         $this->reportable(function (Throwable $e) {
-            //
+            $user = auth()->user();
+
+            \Sentry\configureScope(function (\Sentry\State\Scope $scope) use ($user) {
+                if ($user) {
+                    $scope->setUser([
+                        'id' => $user->id,
+                        'name' => $user->name,
+                        'email' => $user->email,
+                    ]);
+                }
+            });
+
+            Integration::captureUnhandledException($e);
         });
     }
 }

@@ -26,6 +26,7 @@
         "laravel/tinker": "^2.8",
         "mikehaertl/php-shellcommand": "^1.7",
         "revolution/laravel-google-sheets": "^6.2",
+        "sentry/sentry-laravel": "^4.4",
         "spatie/laravel-backup": "^8.6",
         "spatie/laravel-google-cloud-storage": "^2.2",
         "spatie/temporary-directory": "^2.2",
