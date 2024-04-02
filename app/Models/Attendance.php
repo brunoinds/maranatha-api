@@ -32,7 +32,8 @@ class Attendance extends Model
     public function expense(){
         return Expense::where('code', $this->expense_code)->first();
     }
-    public function dates(): array{
+    public function dates(): array
+    {
         $dates = [];
         $from_date = new \DateTime($this->from_date);
         $to_date = Carbon::createFromDate(new \DateTime($this->to_date))->addDays(1)->toDateTime();
@@ -53,7 +54,8 @@ class Attendance extends Model
 
         return $dates;
     }
-    public function datesWorkers():array{
+    public function datesWorkers():array
+    {
         $dayWorkers = $this->dayWorkers();
         $dates = $this->dates();
 
@@ -73,11 +75,13 @@ class Attendance extends Model
 
     }
 
-    public function dayWorkers(){
+    public function dayWorkers()
+    {
         return AttendanceDayWorker::where('attendance_id', $this->id)->get();
     }
 
-    public function attachWorkerDni(string $workerDni){
+    public function attachWorkerDni(string $workerDni)
+    {
         collect($this->dates())->each(function(\DateTime $date) use ($workerDni){
             AttendanceDayWorker::create([
                 'worker_dni' => $workerDni,
@@ -88,9 +92,45 @@ class Attendance extends Model
         });
     }
 
-    public function removeWorkerDni(string $workerDni){
+    public function removeWorkerDni(string $workerDni)
+    {
         $this->dayWorkers()->where('worker_dni', $workerDni)->each(function(AttendanceDayWorker $dayWorker){
             $dayWorker->delete();
+        });
+    }
+
+    public function updateFromToDatesInAttendanceDayWorker()
+    {
+        $instance = $this;
+        $dates = $this->dates();
+        $dayWorkers = $this->dayWorkers();
+
+        $dayWorkersDNIs = $dayWorkers->map(function(AttendanceDayWorker $dayWorker){
+            return $dayWorker->worker_dni;
+        })->unique();
+
+        $dayWorkers->each(function(AttendanceDayWorker $dayWorker) use ($dates){
+            $date = new \DateTime($dayWorker->date);
+            if (!in_array($date, $dates)){
+                $dayWorker->delete();
+            }
+        });
+        $dayWorkers = $this->dayWorkers();
+        collect($dates)->each(function(\DateTime $date) use ($dayWorkers, $instance, $dayWorkersDNIs){
+            $dateString = $date->format('c');
+            $dayWorker = $dayWorkers->first(function(AttendanceDayWorker $dayWorker) use ($dateString){
+                return $dayWorker->date === $dateString;
+            });
+            if ($dayWorker === null){
+                $dayWorkersDNIs->each(function(string $workerDni) use ($date, $instance){
+                    AttendanceDayWorker::create([
+                        'worker_dni' => $workerDni,
+                        'attendance_id' => $instance->id,
+                        'date' => $date->format('c'),
+                        'status' => AttendanceStatus::Present,
+                    ]);
+                });
+            }
         });
     }
 

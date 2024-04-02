@@ -24,6 +24,8 @@ class UpdateAttendanceRequest extends FormRequest
         return [
             'description' => ['string', 'nullable', 'max:400'],
             'job_code' => ['required', 'string', 'max:100'],
+            'from_date' => ['date'],
+            'to_date' => ['date'],
             'expense_code' => ['required', 'string', 'max:100'],
         ];
     }

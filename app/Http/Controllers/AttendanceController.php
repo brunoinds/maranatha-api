@@ -101,6 +101,7 @@ class AttendanceController extends Controller
     public function update(UpdateAttendanceRequest $request, Attendance $attendance)
     {
         $attendance->update($request->validated());
+        $attendance->updateFromToDatesInAttendanceDayWorker();
         return response()->json(['message' => 'Attendance updated', 'attendance' => $attendance->toArray()]);
     }
 
