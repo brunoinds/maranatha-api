@@ -103,6 +103,7 @@ class ReportPDFCreator
     private function loadImagesPages()
     {
         $listSrcs = [];
+        $instance = $this;
         $this->report->invoices()->orderBy('date', 'asc')->each(function($invoice, $i) use (&$listSrcs){
             $imageId = $invoice->image;
             if (!$imageId){
@@ -122,16 +123,27 @@ class ReportPDFCreator
         });
 
         $imagesItemsHtml = '';
-        collect($listSrcs)->each(function($item, $i) use (&$imagesItemsHtml){
+        collect($listSrcs)->each(function($item, $i) use (&$imagesItemsHtml, $instance){
             $invoice = $item['invoice'];
             $imageSrc = $item['src'];
 
             $jobName = $invoice->job()?->get()?->first()?->name;
+
+            $amount = Toolbox::moneyPrefix($instance->report->money_type->value) . ' ' . number_format($invoice->amount, 2); 
+
+
+            $invoiceDescription = $invoice->description;
+
+            //Check if is invoice with multiples Jobs, by brackets:
+            $hasKeysWithTextInside = preg_match('/\[(.*?)\]/', $invoiceDescription, $matches);
+            if ($hasKeysWithTextInside){
+                $invoiceDescription = str_replace($matches[0], "($amount)", $invoiceDescription);
+            }
             
             $imagesItemsHtml .= '
                 <article>
-                    <h1>'.$jobName.' '.$invoice->job_code . ' - '.$invoice->expense_code . '<br> '.$invoice->description.'</h1>
-                    <h1>'.$jobName.' '.$invoice->job_code . ' - '.$invoice->expense_code . '<br> '.$invoice->description.'</h1>
+                    <h1>'.$jobName.' '.$invoice->job_code . ' - '.$invoice->expense_code . '<br> '.$invoiceDescription.'</h1>
+                    <h1>'.$jobName.' '.$invoice->job_code . ' - '.$invoice->expense_code . '<br> '.$invoiceDescription.'</h1>
                     <img src="'.$imageSrc.'">
                 </article>
             ';
