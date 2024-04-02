@@ -77,7 +77,7 @@ class RecordAttendancesByJobs
 
         $spendingsInSpan = array_column($spendingsInSpan->map(function($spendings, $code){
             $attendanceId = explode('/~/', $code)[0];
-            $attendance = Attendance::find($attendanceId)->get()->first();
+            $attendance = Attendance::where('id', $attendanceId)->first();
             $attendanceFromDate = Carbon::parse($attendance->from_date)->format('d/m/Y');
             $attendanceToDate = Carbon::parse($attendance->to_date)->format('d/m/Y');
 
