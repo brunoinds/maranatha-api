@@ -132,10 +132,20 @@ class ReportAssistant{
 
             $dateFormatedLocal = date('d/m/Y', strtotime($invoice->date));
 
+            $invoiceDescription = $invoice->description;
+
+            //Check if is invoice with multiples Jobs, by brackets:
+            $hasKeysWithTextInside = preg_match('/\[(.*?)\]/', $invoiceDescription, $matches);
+            if ($hasKeysWithTextInside){
+                $invoiceDescription = str_replace($matches[0], "($invoice->amount)", $invoiceDescription);
+            }
+
+
+
             $sheet->writeRow([
                 $dateFormatedLocal,
                 $invoice->ticket_number,
-                $invoice->description,
+                $invoiceDescription,
                 $invoice->job_code,
                 $invoice->expense_code,
                 ($j + 1),

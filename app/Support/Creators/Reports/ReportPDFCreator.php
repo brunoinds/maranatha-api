@@ -63,10 +63,19 @@ class ReportPDFCreator
 
             $amount = Toolbox::moneyPrefix($report->money_type->value) . ' ' . number_format($invoice->amount, 2); 
 
+            $invoiceDescription = $invoice->description;
+
+            //Check if is invoice with multiples Jobs, by brackets:
+            $hasKeysWithTextInside = preg_match('/\[(.*?)\]/', $invoiceDescription, $matches);
+            if ($hasKeysWithTextInside){
+                $invoiceDescription = str_replace($matches[0], "($amount)", $invoiceDescription);
+            }
+
+
             $invoicesItemsHtml .= "<tr>
                 <td>$date</td>
                 <td>$invoice->ticket_number</td>
-                <td>$invoice->description</td>
+                <td>$invoiceDescription</td>
                 <td>$invoice->job_code</td>
                 <td>$invoice->expense_code</td>
                 <td>$iteration</td>
