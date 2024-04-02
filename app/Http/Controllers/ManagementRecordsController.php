@@ -8,6 +8,7 @@ use App\Support\Generators\Records\Attendances\RecordAttendancesByJobs;
 use App\Support\Generators\Records\Users\RecordUsersByCosts;
 use App\Support\Generators\Records\Reports\RecordReportsByTime;
 use DateTime;
+use Carbon\Carbon;
 
 
 class ManagementRecordsController extends Controller
@@ -34,8 +35,8 @@ class ManagementRecordsController extends Controller
         $validatedData = array_merge($defaults, $validatedData);
 
         $record = new RecordAttendancesByWorker([
-            'startDate' => new DateTime($validatedData['start_date']),
-            'endDate' => new DateTime($validatedData['end_date']),
+            'startDate' => Carbon::parse(new DateTime($validatedData['start_date']))->startOfDay()->toDateTime(),
+            'endDate' => Carbon::parse(new DateTime($validatedData['end_date']))->endOfDay()->toDateTime(),
             'supervisor' => $validatedData['supervisor'],
             'team' => $validatedData['team'],
             'function' => $validatedData['function'],
