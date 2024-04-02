@@ -153,6 +153,10 @@ class RecordAttendancesByJobs
         return [
             'headers' => [
                 [
+                    'title' => 'ID Reporte',
+                    'key' => 'attendance_id',
+                ],
+                [
                     'title' => 'Fecha Creación Reporte',
                     'key' => 'attendance_created_at',
                 ],
