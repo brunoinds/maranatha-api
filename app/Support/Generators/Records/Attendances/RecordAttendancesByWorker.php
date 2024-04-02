@@ -42,9 +42,7 @@ class RecordAttendancesByWorker
         $workers = WorkersAssistant::getListWorkers();
 
         $query = AttendanceDayWorker::query()
-            ->where('date', '>=', $this->startDate)
-            ->where('date', '<=', $this->endDate);
-
+            ->whereBetween('date', [$this->startDate->format('c'), $this->endDate->format('c')]);
         
         if ($this->workerDni !== null){
             $query = $query->where('worker_dni', '=', $this->workerDni);
