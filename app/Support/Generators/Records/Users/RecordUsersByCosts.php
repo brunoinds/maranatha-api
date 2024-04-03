@@ -16,6 +16,8 @@ use Brunoinds\SunatDolarLaravel\Exchange;
 use App\Models\Report;
 use App\Helpers\Enums\ReportStatus;
 use App\Models\User;
+use App\Support\Exchange\Exchanger;
+use App\Helpers\Enums\MoneyType;
 
 
 class RecordUsersByCosts
@@ -138,7 +140,7 @@ class RecordUsersByCosts
             })();
             $spending->amountInDollars = (function() use ($spending){
                 $date = new DateTime($spending->date);
-                return Exchange::on($date)->convert(\Brunoinds\SunatDolarLaravel\Enums\Currency::PEN, $spending->amount)->to(\Brunoinds\SunatDolarLaravel\Enums\Currency::USD);
+                return Exchanger::on($date)->convert($spending->amount,MoneyType::PEN, MoneyType::USD);
             })();
             return $spending;
         })->map(function($item){

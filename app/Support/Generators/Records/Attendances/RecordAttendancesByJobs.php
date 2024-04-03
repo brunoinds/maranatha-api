@@ -3,6 +3,9 @@
 namespace App\Support\Generators\Records\Attendances;
 
 use App\Helpers\Enums\AttendanceStatus;
+use App\Helpers\Enums\MoneyType;
+use App\Support\Exchange\Exchanger;
+
 use App\Helpers\Toolbox;
 use App\Models\AttendanceDayWorker;
 
@@ -14,6 +17,7 @@ use Carbon\CarbonPeriod;
 use App\Models\Invoice;
 use Brunoinds\SunatDolarLaravel\Exchange;
 use App\Models\Attendance;
+
 
 
 class RecordAttendancesByJobs
@@ -97,7 +101,7 @@ class RecordAttendancesByJobs
                     })();
                     $spending->amountInDollars = (function() use ($spending){
                         $date = new DateTime($spending->date);
-                        return Exchange::on($date)->convert(\Brunoinds\SunatDolarLaravel\Enums\Currency::PEN, $spending->amount)->to(\Brunoinds\SunatDolarLaravel\Enums\Currency::USD);
+                        return Exchanger::on($date)->convert($spending->amount,MoneyType::PEN, MoneyType::USD);
                     })();
 
                     return $spending;
