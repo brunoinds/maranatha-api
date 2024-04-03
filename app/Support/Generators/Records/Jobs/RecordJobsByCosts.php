@@ -134,7 +134,8 @@ class RecordJobsByCosts
         return $spendingsInSpan;
     }
 
-    private function createTable():array{
+    private function createTable():array
+    {
         $spendings = $this->getWorkersData();
         $invoices = $this->getInvoicesData();
 
