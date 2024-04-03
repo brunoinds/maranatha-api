@@ -13,7 +13,8 @@ use App\Models\Attendance;
 use App\Helpers\Enums\AttendanceStatus;
 
 class WorkersAssistant{
-    public static function getListWorkers():array{
+    public static function getListWorkers():array
+    {
         $workers = collect(Excel::getWorkersSheet())->map(function($item){
             return [
                 'dni' => $item['dni'],
@@ -26,7 +27,8 @@ class WorkersAssistant{
         });
         return $workers->toArray();
     }
-    public static function getListWorkersWithPayments():array{
+    public static function getListWorkersWithPayments():array
+    {
         $workers = collect(Excel::getWorkersSheet())->map(function($item){
             return [
                 'dni' => $item['dni'],
@@ -40,7 +42,8 @@ class WorkersAssistant{
         });
         return $workers->toArray();
     }
-    public static function getWorkerByDNI(string $dni):array{
+    public static function getWorkerByDNI(string $dni):array
+    {
         $workers = self::getListWorkers();
         foreach($workers as $worker){
             if ($worker['dni'] === $id){
@@ -66,8 +69,6 @@ class WorkersAssistant{
             foreach ($attendancesByMonthYear as $monthYear => $attendances){
                 $attendances = collect($attendances);
                 $payment = collect($worker['payments'])->where('month_year', '=', $monthYear)->first();
-
-
                 $perDayPresentDistribution = (function() use ($monthYear, $attendances, $payment, $worker){
                     $countDaysPresent = $attendances->where('status', '=', AttendanceStatus::Present->value)->count();
                     $amountPerDayInMonthYear = 0;
@@ -134,8 +135,6 @@ class WorkersAssistant{
                         'attendances_with_payments' => $attendancesWithPaymentAmount
                     ];
                 })();
-
-
                 $attendancesByMonthYear[$monthYear] = $perDayPresentDistribution;
             }
 
@@ -166,16 +165,19 @@ class WorkersAssistant{
                     $listAttendancesIds->push($spending['attendance']['id']);
                 }
 
-                $listAttendances = Attendance::query()->whereIn('id', $listAttendancesIds->unique()->toArray())->get();
+                $listAttendances = Attendance::query()
+                    ->whereIn('id', $listAttendancesIds->unique()->toArray())
+                    ->with('job', 'expense') // Eager load the job and expense relationships
+                    ->get();
 
                 foreach ($spendingsNonFilled as &$spending){
                     $attendance = $listAttendances->where('id', '=', $spending['attendance']['id'])->first();
                     if ($attendance !== null){
                         $spending['attendance']['user_id'] = (int) $attendance->user_id;
                         $spending['attendance']['created_at'] = $attendance->created_at;
-                        $spending['job']['code'] = $attendance->job()->code;
-                        $spending['job']['zone'] = $attendance->job()->zone;
-                        $spending['expense']['code'] = $attendance->expense()->code;
+                        $spending['job']['code'] = $attendance->job->code;
+                        $spending['job']['zone'] = $attendance->job->zone;
+                        $spending['expense']['code'] = $attendance->expense->code;
                     }
                 }
                 return $spendingsNonFilled;
@@ -191,4 +193,8 @@ class WorkersAssistant{
 
         return $workersPaymentDistribution;
     }
+
+
+    private static Collection $jobs;
+    private static Collection $expenses;
 }

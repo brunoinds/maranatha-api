@@ -27,10 +27,10 @@ class Attendance extends Model
         return $this->belongsTo(User::class);
     }
     public function job(){
-        return Job::where('code', $this->job_code)->first();
+        return $this->belongsTo(Job::class, 'job_code', 'code');
     }
     public function expense(){
-        return Expense::where('code', $this->expense_code)->first();
+        return $this->belongsTo(Expense::class, 'expense_code', 'code');
     }
     public function dates(): array
     {
