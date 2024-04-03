@@ -6,14 +6,24 @@ use SoftinkLab\LaravelKeyvalueStorage\Facades\KVOption;
 
 
 class BRLAdapter{
+    private static $db = [
+        'name' => 'Brunoinds\FrankfurterLaravel',
+        'value' => null,
+    ];
     public function get()
     {
-        return KVOption::get('Brunoinds\FrankfurterLaravel');
+        if (self::$db['value'] !== null) {
+            return self::$db['value'];
+        }
+
+        self::$db['value'] = KVOption::get(self::$db['name']);
+        return self::$db['value'];
     }
 
     public function set(string $value)
     {
-        return KVOption::set('Brunoinds\FrankfurterLaravel', $value);
+        KVOption::set(self::$db['name'], $value);
+        self::$db['value'] = $value;
     }
 
     public static function getStore(): \Brunoinds\FrankfurterLaravel\Store\Store
