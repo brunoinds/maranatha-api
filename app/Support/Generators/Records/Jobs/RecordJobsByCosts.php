@@ -50,6 +50,7 @@ class RecordJobsByCosts
         //For each date, get the invoices:
 
         $invoicesInSpan = Invoice::query()
+                    ->with('report')
                     ->join('reports', 'invoices.report_id', '=', 'reports.id')
                     ->join('jobs', 'invoices.job_code', '=', 'jobs.code')
                     ->where('invoices.date', '>=', $this->startDate)

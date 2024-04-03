@@ -193,8 +193,4 @@ class WorkersAssistant{
 
         return $workersPaymentDistribution;
     }
-
-
-    private static Collection $jobs;
-    private static Collection $expenses;
 }

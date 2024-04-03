@@ -23,7 +23,7 @@ class Invoice extends Model
 
     public function amountIn(MoneyType $currency)
     {
-        $moneyType = $this->report()?->money_type;
+        $moneyType = $this->report->money_type;
         if ($moneyType === $currency){
             return $this->amount;
         }else {
@@ -77,7 +77,7 @@ class Invoice extends Model
     }
 
     public function report(){
-        return $this->belongsTo(Report::class)->first();
+        return $this->belongsTo(Report::class);
     }
 
     public function job()
