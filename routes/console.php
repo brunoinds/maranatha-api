@@ -1,6 +1,7 @@
 <?php
 
 use App\Models\Invoice;
+use App\Support\Exchange\Adapters\BRLAdapter;
 use Illuminate\Foundation\Inspiring;
 use Illuminate\Support\Facades\Artisan;
 use mikehaertl\shellcommand\Command;

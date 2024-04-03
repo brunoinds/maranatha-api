@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "3ef5580854aeb310e846433b669b47f6",
+    "content-hash": "cee0ddd277f1619a95405d0c1232c17c",
     "packages": [
         {
             "name": "avadim/fast-excel-helper",
@@ -315,16 +315,16 @@
         },
         {
             "name": "brunoinds/frankfurter-laravel",
-            "version": "v1.0.0",
+            "version": "v1.1.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/brunoinds/frankfurter-laravel.git",
-                "reference": "d8413253238945fd8ce72b66b247d931d523da24"
+                "reference": "43ff82ef125d9d332150abe28529a142f10c3a5b"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/brunoinds/frankfurter-laravel/zipball/d8413253238945fd8ce72b66b247d931d523da24",
-                "reference": "d8413253238945fd8ce72b66b247d931d523da24",
+                "url": "https://api.github.com/repos/brunoinds/frankfurter-laravel/zipball/43ff82ef125d9d332150abe28529a142f10c3a5b",
+                "reference": "43ff82ef125d9d332150abe28529a142f10c3a5b",
                 "shasum": ""
             },
             "type": "library",
@@ -345,22 +345,22 @@
             ],
             "support": {
                 "issues": "https://github.com/brunoinds/frankfurter-laravel/issues",
-                "source": "https://github.com/brunoinds/frankfurter-laravel/tree/v1.0.0"
+                "source": "https://github.com/brunoinds/frankfurter-laravel/tree/v1.1.0"
             },
-            "time": "2024-03-21T11:32:35+00:00"
+            "time": "2024-04-03T12:10:51+00:00"
         },
         {
             "name": "brunoinds/paraguay-dolar-laravel",
-            "version": "v1.0.1",
+            "version": "v1.1.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/brunoinds/paraguay-dolar-laravel.git",
-                "reference": "8bdcccd3c04506746b2f8fb1f364bad87dd7c083"
+                "reference": "fa091379542048355a3d69adcecb60338a99ae87"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/brunoinds/paraguay-dolar-laravel/zipball/8bdcccd3c04506746b2f8fb1f364bad87dd7c083",
-                "reference": "8bdcccd3c04506746b2f8fb1f364bad87dd7c083",
+                "url": "https://api.github.com/repos/brunoinds/paraguay-dolar-laravel/zipball/fa091379542048355a3d69adcecb60338a99ae87",
+                "reference": "fa091379542048355a3d69adcecb60338a99ae87",
                 "shasum": ""
             },
             "type": "library",
@@ -381,59 +381,22 @@
             ],
             "support": {
                 "issues": "https://github.com/brunoinds/paraguay-dolar-laravel/issues",
-                "source": "https://github.com/brunoinds/paraguay-dolar-laravel/tree/v1.0.1"
+                "source": "https://github.com/brunoinds/paraguay-dolar-laravel/tree/v1.1.0"
             },
-            "time": "2024-03-28T15:51:36+00:00"
-        },
-        {
-            "name": "brunoinds/sunat-dolar",
-            "version": "v1.0.0",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/brunoinds/php-sunat-dolar.git",
-                "reference": "492f74415107b5b52ae8f1b5c4fc2fc1387866e5"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/brunoinds/php-sunat-dolar/zipball/492f74415107b5b52ae8f1b5c4fc2fc1387866e5",
-                "reference": "492f74415107b5b52ae8f1b5c4fc2fc1387866e5",
-                "shasum": ""
-            },
-            "require-dev": {
-                "phpunit/phpunit": "^10.5"
-            },
-            "type": "library",
-            "autoload": {
-                "psr-4": {
-                    "Brunoinds\\SunatDolar\\": "src/"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "authors": [
-                {
-                    "name": "Bruno Freire",
-                    "email": "brunoqm99@gmail.com"
-                }
-            ],
-            "description": "Calculate SUNAT Perú dollar exchange",
-            "support": {
-                "issues": "https://github.com/brunoinds/php-sunat-dolar/issues",
-                "source": "https://github.com/brunoinds/php-sunat-dolar/tree/v1.0.0"
-            },
-            "time": "2023-12-29T00:24:37+00:00"
+            "time": "2024-04-03T12:10:21+00:00"
         },
         {
             "name": "brunoinds/sunat-dolar-laravel",
-            "version": "v1.0.3",
+            "version": "v1.1.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/brunoinds/sunat-dolar-laravel.git",
-                "reference": "fc2d810d13f29356cfa5c65a3885d7b0d7fca1e3"
+                "reference": "009ce82d07db69bb3c5930398a032b1612e7547b"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/brunoinds/sunat-dolar-laravel/zipball/fc2d810d13f29356cfa5c65a3885d7b0d7fca1e3",
-                "reference": "fc2d810d13f29356cfa5c65a3885d7b0d7fca1e3",
+                "url": "https://api.github.com/repos/brunoinds/sunat-dolar-laravel/zipball/009ce82d07db69bb3c5930398a032b1612e7547b",
+                "reference": "009ce82d07db69bb3c5930398a032b1612e7547b",
                 "shasum": ""
             },
             "type": "library",
@@ -454,9 +417,9 @@
             ],
             "support": {
                 "issues": "https://github.com/brunoinds/sunat-dolar-laravel/issues",
-                "source": "https://github.com/brunoinds/sunat-dolar-laravel/tree/v1.0.3"
+                "source": "https://github.com/brunoinds/sunat-dolar-laravel/tree/v1.1.0"
             },
-            "time": "2024-01-08T21:09:49+00:00"
+            "time": "2024-04-03T12:09:42+00:00"
         },
         {
             "name": "carbonphp/carbon-doctrine-types",
@@ -6168,6 +6131,76 @@
                 }
             ],
             "time": "2024-03-25T13:06:38+00:00"
+        },
+        {
+            "name": "softinklab/laravel-keyvalue-storage",
+            "version": "v1.8",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/SoftinkLab/laravel-keyvalue-storage.git",
+                "reference": "8beb98ced05f2b1675eca99e1e465f369d8e05b5"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/SoftinkLab/laravel-keyvalue-storage/zipball/8beb98ced05f2b1675eca99e1e465f369d8e05b5",
+                "reference": "8beb98ced05f2b1675eca99e1e465f369d8e05b5",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=7.2"
+            },
+            "require-dev": {
+                "illuminate/database": "^6.0|^7.0|^8.0|^9.0",
+                "illuminate/support": "^6.0|^7.0|^8.0|^9.0",
+                "orchestra/database": "^4.0|^5.0|^6.0",
+                "orchestra/testbench": "^4.0|^5.0|^6.0"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "SoftinkLab\\LaravelKeyvalueStorage\\KeyValueStorageServiceProvider"
+                    ],
+                    "aliases": {
+                        "KVOption": "SoftinkLab\\LaravelKeyvalueStorage\\KeyValueStorageServiceProvider\\Facades\\KVOption"
+                    }
+                }
+            },
+            "autoload": {
+                "files": [
+                    "src/Http/helpers.php"
+                ],
+                "psr-4": {
+                    "SoftinkLab\\LaravelKeyvalueStorage\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Pasan Bhanu Guruge",
+                    "email": "pasan@softinklab.com",
+                    "homepage": "https://www.softinklab.com",
+                    "role": "Developer"
+                }
+            ],
+            "description": "Key-Value Storage for Laravel using Database or JSON File",
+            "homepage": "https://www.softinklab.com",
+            "keywords": [
+                "json storage",
+                "key value storage",
+                "laravel key value storage",
+                "laravel options",
+                "softink lab"
+            ],
+            "support": {
+                "email": "info@softinklab.com",
+                "issues": "https://github.com/SoftinkLab/laravel-keyvalue-storage/issues",
+                "source": "https://github.com/SoftinkLab/laravel-keyvalue-storage/tree/v1.8"
+            },
+            "time": "2022-03-27T06:08:46+00:00"
         },
         {
             "name": "spatie/db-dumper",
