@@ -82,12 +82,12 @@ class Invoice extends Model
 
     public function job()
     {
-        return $this->belongsTo(Job::class)->first();
+        return $this->belongsTo(Job::class, 'job_code', 'code');
     }
 
     public function expense()
     {
-        return $this->belongsTo(Expense::class)->first();
+        return $this->belongsTo(Expense::class, 'expense_code', 'code');
     }
 
 

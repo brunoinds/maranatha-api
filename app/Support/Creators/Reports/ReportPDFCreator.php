@@ -127,7 +127,7 @@ class ReportPDFCreator
             $invoice = $item['invoice'];
             $imageSrc = $item['src'];
 
-            $jobName = $invoice->job()?->get()?->first()?->name;
+            $jobName = $invoice->job?->name;
 
             $amount = Toolbox::moneyPrefix($instance->report->money_type->value) . ' ' . number_format($invoice->amount, 2); 
 
@@ -142,7 +142,6 @@ class ReportPDFCreator
             
             $imagesItemsHtml .= '
                 <article>
-                    <h1>'.$jobName.' '.$invoice->job_code . ' - '.$invoice->expense_code . '<br> '.$invoiceDescription.'</h1>
                     <h1>'.$jobName.' '.$invoice->job_code . ' - '.$invoice->expense_code . '<br> '.$invoiceDescription.'</h1>
                     <img src="'.$imageSrc.'">
                 </article>
