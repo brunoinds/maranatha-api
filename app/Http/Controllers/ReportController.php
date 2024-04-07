@@ -270,7 +270,10 @@ class ReportController extends Controller
 
         file_put_contents($tempPath, $content);
 
-        return response()->download($tempPath, $documentName)->deleteFileAfterSend(true);
+        return response()
+            ->download($tempPath, $documentName, [
+                'Content-Length' => filesize($tempPath),
+            ])->deleteFileAfterSend(true);
     }
 
 
@@ -285,6 +288,8 @@ class ReportController extends Controller
 
         $excel->save($tempPath, true);
 
-        return response()->download($tempPath, $documentName)->deleteFileAfterSend(true);
+        return response()->download($tempPath, $documentName, [
+            'Content-Length' => filesize($tempPath),
+        ])->deleteFileAfterSend(true);
     }
 }
