@@ -17,6 +17,7 @@ use App\Support\GoogleSheets\Excel;
 use mikehaertl\shellcommand\Command;
 use App\Http\Controllers\ManagementRecordsController;
 use App\Http\Controllers\ManagementBalancesController;
+use App\Http\Controllers\ApplicationNativeController;
 
 
 /*
@@ -34,7 +35,7 @@ use App\Http\Controllers\ManagementBalancesController;
 Route::group(['prefix' => 'cd'], function () {
     Route::get('config-cache', function(){
         $commandLine = 'cd .. && php artisan config:clear && php artisan cache:clear';
-    
+
         $result = [
             'message' => null,
             'exitCode' => null,
@@ -49,7 +50,7 @@ Route::group(['prefix' => 'cd'], function () {
             $result['message'] = $command->getError();
             $result['exitCode'] = $command->getExitCode();
         }
-    
+
         if (!$result['wasSuccessful']){
             return response()->json([
                 'message' => 'Failed to resolve config cache',
@@ -60,7 +61,7 @@ Route::group(['prefix' => 'cd'], function () {
                 ]
             ], 500);
         }
-    
+
         return response()->json([
             'message' => 'Cache updated successfully',
             'command' => [
@@ -72,8 +73,8 @@ Route::group(['prefix' => 'cd'], function () {
     });
     Route::get('migrate', function(){
         $commandLine = 'cd .. && php artisan migrate --force';
-    
-    
+
+
         $result = [
             'message' => null,
             'exitCode' => null,
@@ -88,7 +89,7 @@ Route::group(['prefix' => 'cd'], function () {
             $result['message'] = $command->getError();
             $result['exitCode'] = $command->getExitCode();
         }
-    
+
         if (!$result['wasSuccessful']){
             return response()->json([
                 'message' => 'Failed to migrate',
@@ -99,7 +100,7 @@ Route::group(['prefix' => 'cd'], function () {
                 ]
             ], 500);
         }
-    
+
         return response()->json([
             'message' => 'Migrated successfully',
             'command' => [
@@ -125,7 +126,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::apiResource('balances', BalanceController::class);
 
 
-    
+
     //Users group:
     Route::group([], function(){
         Route::get('/users/{user}/roles', UserController::class . '@roles');
@@ -143,7 +144,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
     });
 
 
-    
+
     //Me group:
     Route::group([], function(){
         Route::get('/me/reports', ReportController::class . '@myReports');
@@ -188,10 +189,10 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::group([], function(){
         Route::get('invoices/ticket-number/check', InvoiceController::class . '@checkTicketNumber');
         Route::post('/invoices/{invoice}/image-upload', [
-            InvoiceController::class, 'uploadImage' 
+            InvoiceController::class, 'uploadImage'
         ]);
         Route::get('/invoices/{invoice}/image', [
-            InvoiceController::class, 'showImage' 
+            InvoiceController::class, 'showImage'
         ]);
     });
 
@@ -200,14 +201,14 @@ Route::middleware(['auth:sanctum'])->group(function () {
     //Report group:
     Route::group([], function(){
         Route::post('/reports/{report}/pdf-upload', [
-            ReportController::class, 'uploadReportPDF' 
+            ReportController::class, 'uploadReportPDF'
         ]);
         Route::get('/reports/{report}/invoices', ReportController::class . '@invoices');
         Route::get('/reports/{report}/excel-download', [
-            ReportController::class, 'downloadExcel' 
+            ReportController::class, 'downloadExcel'
         ]);
         Route::get('/reports/{report}/pdf-download', [
-            ReportController::class, 'downloadPDF' 
+            ReportController::class, 'downloadPDF'
         ]);
     });
 
@@ -237,4 +238,11 @@ Route::group([], function(){
     Route::post("login", [AuthController::class, 'login']);
     Route::post("register", [AuthController::class, 'register']);
     Route::post("users", [UserController::class, 'store']);
+
+
+    //Application native group:
+    Route::group(['prefix' => 'app/native'], function () {
+        Route::get('bundles', ApplicationNativeController::class . '@bundles');
+        Route::get('bundles/{version}', ApplicationNativeController::class . '@bundle');
+    });
 });
