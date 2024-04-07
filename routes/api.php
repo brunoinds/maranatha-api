@@ -245,4 +245,5 @@ Route::group([], function(){
         Route::get('bundles', ApplicationNativeController::class . '@bundles');
         Route::get('bundles/{version}', ApplicationNativeController::class . '@bundle');
     });
+
 });
