@@ -159,7 +159,7 @@ class ReportController extends Controller
 
             OneSignal::sendNotificationToExternalUser(
                 headings: "Nuevo reporte recibido 📥",
-                message: $user->name . " ha enviado un nuevo reporte de " . Toolbox::moneyPrefix($report->money_type->value) . ' ' . number_format($report->amount(), 2) . " y está esperando por su aprobación.", 
+                message: $user->name . " ha enviado un nuevo reporte de " . Toolbox::moneyPrefix($report->money_type->value) . ' ' . number_format($report->amount(), 2) . " y está esperando por su aprobación.",
                 userId: Toolbox::getOneSignalUserId($adminUser->id),
                 data: [
                     'deepLink' => $notificationUrlOnUserReports
@@ -172,7 +172,7 @@ class ReportController extends Controller
 
             OneSignal::sendNotificationToExternalUser(
                 headings: "Reporte aprobado ✅",
-                message: "El administrador ha aprobado su reporte de " . Toolbox::moneyPrefix($report->money_type->value) . ' ' . number_format($report->amount(), 2) . ". Pronto recibirás su reembolso.", 
+                message: "El administrador ha aprobado su reporte de " . Toolbox::moneyPrefix($report->money_type->value) . ' ' . number_format($report->amount(), 2) . ". Pronto recibirás su reembolso.",
                 userId: Toolbox::getOneSignalUserId($user->id),
                 data: [
                     'deepLink' => $notificationUrlOnUserReports
@@ -185,7 +185,7 @@ class ReportController extends Controller
 
             OneSignal::sendNotificationToExternalUser(
                 headings: "Reporte reembolsado 💰",
-                message: "El administrador ha reembolsado " . Toolbox::moneyPrefix($report->money_type->value) . ' ' . number_format($report->amount(), 2) . " vía depósito en su cuenta bancária por su reporte aprobado.", 
+                message: "El administrador ha reembolsado " . Toolbox::moneyPrefix($report->money_type->value) . ' ' . number_format($report->amount(), 2) . " vía depósito en su cuenta bancária por su reporte aprobado.",
                 userId: Toolbox::getOneSignalUserId($user->id),
                 data: [
                     'deepLink' => $notificationUrlOnUserReports
@@ -198,7 +198,7 @@ class ReportController extends Controller
 
             OneSignal::sendNotificationToExternalUser(
                 headings: "Reporte rechazado ❌",
-                message: "El administrador ha rechazado su reporte de " . Toolbox::moneyPrefix($report->money_type->value) . ' ' . number_format($report->amount(), 2) . ". Ingrese a la aplicación para ver el motivo de rechazo.", 
+                message: "El administrador ha rechazado su reporte de " . Toolbox::moneyPrefix($report->money_type->value) . ' ' . number_format($report->amount(), 2) . ". Ingrese a la aplicación para ver el motivo de rechazo.",
                 userId: Toolbox::getOneSignalUserId($user->id),
                 data: [
                     'deepLink' => $notificationUrlOnUserReports
@@ -270,7 +270,9 @@ class ReportController extends Controller
 
         file_put_contents($tempPath, $content);
 
-        return response()->download($tempPath, $documentName)->deleteFileAfterSend(true);
+        return response()
+            ->header('Content-Length', filesize($tempPath))
+            ->download($tempPath, $documentName)->deleteFileAfterSend(true);
     }
 
 
@@ -279,12 +281,14 @@ class ReportController extends Controller
         $excel = ReportAssistant::generateExcelDocument($report);
         $documentName = $report->title . '.xlsx';
         //Generate a temp directory and save the file there:
-        
+
         $temporaryDirectory = (new TemporaryDirectory())->create();
         $tempPath = $temporaryDirectory->path($documentName);
 
         $excel->save($tempPath, true);
 
-        return response()->download($tempPath, $documentName)->deleteFileAfterSend(true);
+        return response()
+            ->header('Content-Length', filesize($tempPath))
+            ->download($tempPath, $documentName)->deleteFileAfterSend(true);
     }
 }
