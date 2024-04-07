@@ -2,13 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Support\Assistants\BalanceAssistant;
-use App\Support\Generators\Records\Attendances\RecordAttendancesByWorker;
-use App\Support\Generators\Records\Jobs\RecordJobsByCosts;
-use App\Support\Generators\Records\Attendances\RecordAttendancesByJobs;
-use App\Support\Generators\Records\Users\RecordUsersByCosts;
-use DateTime;
-use App\Models\User;
+
 use App\Support\Assistants\ApplicationNativeAssistant;
 
 
