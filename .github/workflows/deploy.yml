@@ -30,6 +30,8 @@ jobs:
         run: cd maranatha-sender-native && npm install
       - name: 🔨 Build Ionic Project
         run: cd maranatha-sender-native && npm run build-laravel && npm run bundle-laravel
+      - name: List resources/ionic folder
+        run: ls -la maranatha-sender-native/resources/ionic
       - name: 🧹 Clean Ionic Source
         run: rm -rf maranatha-sender-native
       - name: 🧪 Run Laravel Tests
