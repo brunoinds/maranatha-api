@@ -239,7 +239,6 @@ Route::group([], function(){
     Route::post("register", [AuthController::class, 'register']);
     Route::post("users", [UserController::class, 'store']);
 
-
     //Application native group:
     Route::group(['prefix' => 'app/native'], function () {
         Route::get('bundles', ApplicationNativeController::class . '@bundles');
