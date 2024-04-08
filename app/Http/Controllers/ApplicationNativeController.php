@@ -22,6 +22,7 @@ class ApplicationNativeController extends Controller
             'bundles' => [
                 [
                     'version' => $bundleFile->version,
+                    'minimalVersion' => $bundleFile->minimalVersion,
                     'size' => $bundleFile->size,
                     'url' => $bundleFile->url,
                 ]
