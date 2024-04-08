@@ -28,10 +28,10 @@ jobs:
         run: npm install -g @ionic/cli
       - name: 📦 Install Ionic Dependencies
         run: cd maranatha-sender-native && npm install
-      - name: 🔨 Build Ionic Project
-        run: cd maranatha-sender-native && npm run build-laravel && npm run bundle-laravel
-      - name: List resources/ionic folder
-        run: ls -la resources/ionic
+      - name: 🔨🌎 Build Ionic Project (Web)
+        run: cd maranatha-sender-native && npm run build-laravel
+      - name: 🔨📲 Build Ionic Project (Native Live Update)
+        run: cd maranatha-sender-native && npm run bundle-laravel
       - name: 🧹 Clean Ionic Source
         run: rm -rf maranatha-sender-native
       - name: 🧪 Run Laravel Tests
@@ -47,9 +47,9 @@ jobs:
                   .env
                   storage/app/public
                   database/database.sqlite
-      - name: 🧼  Config cache on server
+      - name: 🧼  Clear server cache
         run: curl -X GET https://maranatha.imedicineapp.com/api/cd/config-cache
       - name: ⏰ Migrate on server
         run: curl -X GET https://maranatha.imedicineapp.com/api/cd/migrate
-      - name: 🧼  Config cache on server
+      - name: 🧼  Clear server cache
         run: curl -X GET https://maranatha.imedicineapp.com/api/cd/config-cache
