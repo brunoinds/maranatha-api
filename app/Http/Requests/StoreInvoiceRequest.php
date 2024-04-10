@@ -30,7 +30,7 @@ class StoreInvoiceRequest extends FormRequest
             'date' => ['required', 'date'],
             'job_code' => ['required', 'string', 'max:100'],
             'expense_code' => ['required', 'string', 'max:100'],
-            'amount' => ['required', 'numeric', 'max:999999999999.99'],
+            'amount' => ['required', 'numeric', 'max:99999999999999.99'],
             'qrcode_data' => ['nullable', 'string', 'max:1000'],
             'image' => ['nullable', 'string'],
         ];
