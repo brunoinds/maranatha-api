@@ -273,9 +273,9 @@ class ReportController extends Controller
         return response()
             ->download($tempPath, $documentName, [
                 'Content-Length' => filesize($tempPath),
+                'Maranatha-Content-Size' => filesize($tempPath),
             ])->deleteFileAfterSend(true);
     }
-
 
     public function downloadExcel(Report $report)
     {
@@ -290,6 +290,7 @@ class ReportController extends Controller
 
         return response()->download($tempPath, $documentName, [
             'Content-Length' => filesize($tempPath),
+            'Maranatha-Content-Size' => filesize($tempPath),
         ])->deleteFileAfterSend(true);
     }
 }
