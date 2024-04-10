@@ -26,7 +26,8 @@ class StoreJobRequest extends FormRequest
             'name' => ['required', 'string', 'max:255'],
             'code' => ['required', 'string', 'max:255', 'unique:jobs'],
             'zone' => ['required', 'string', 'max:255'],
-            'details' => ['string', 'max:1000']
+            'details' => ['string', 'max:1000'],
+            'state' => ['required', 'string', Rule::in(['Active', 'Inactive'])],
         ];
     }
 }
