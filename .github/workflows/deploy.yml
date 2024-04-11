@@ -22,18 +22,6 @@ jobs:
         run: php artisan config:cache && php artisan storage:link && php artisan config:cache
       - name: 👮🏻 Directory Permissions
         run: chmod -R 777 storage bootstrap/cache
-      - name: ⬇️ Getting Ionic Project
-        run: git clone https://github.com/brunoinds/maranatha-sender-native.git
-      - name: 💻 Install Ionic CLI
-        run: npm install -g @ionic/cli
-      - name: 📦 Install Ionic Dependencies
-        run: cd maranatha-sender-native && npm install
-      - name: ⭐️ Setting project as "production"
-        run: cd maranatha-sender-native && npm run ensure-production
-      - name: 🔨🌎 Build Ionic Project (Web)
-        run: cd maranatha-sender-native && npm run build-laravel
-      - name: 🧹 Clean Ionic Source
-        run: rm -rf maranatha-sender-native
       - name: 🧪 Run Laravel Tests
         run: php artisan test
       - name: 🗂️ Sync files
@@ -49,6 +37,8 @@ jobs:
                   public/storage
                   public/storage/**
                   database/database.sqlite
+                  resources/ionic
+                  resources/ionic/**
       - name: 🧼  Clear server cache
         run: curl -X GET https://maranatha.imedicineapp.com/api/cd/config-cache
       - name: ⏰ Migrate on server
