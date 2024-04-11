@@ -32,8 +32,6 @@ jobs:
         run: cd maranatha-sender-native && npm run ensure-production
       - name: 🔨🌎 Build Ionic Project (Web)
         run: cd maranatha-sender-native && npm run build-laravel
-      - name: 🔨📲 Build Ionic Project (Native Live Update)
-        run: cd maranatha-sender-native && npm run bundle-laravel
       - name: 🧹 Clean Ionic Source
         run: rm -rf maranatha-sender-native
       - name: 🧪 Run Laravel Tests

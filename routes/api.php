@@ -243,5 +243,6 @@ Route::group([], function(){
     Route::group(['prefix' => 'app/native'], function () {
         Route::get('bundles', ApplicationNativeController::class . '@bundles');
         Route::get('bundles/{version}', ApplicationNativeController::class . '@bundle');
+        Route::post('bundles', ApplicationNativeController::class . '@receiveBundle');
     });
 });

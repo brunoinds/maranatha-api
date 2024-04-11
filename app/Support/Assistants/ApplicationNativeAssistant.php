@@ -2,6 +2,10 @@
 
 namespace App\Support\Assistants;
 
+use Exception;
+use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Storage;
+
 class BundleFile{
     public string $version;
     public string $minimalVersion;
@@ -22,7 +26,7 @@ class BundleFile{
 }
 class ApplicationNativeAssistant{
     public static function bundleFile() :BundleFile|null{
-        $bundleFolder = resource_path('ionic/.bundles');
+        $bundleFolder = Storage::disk('public')->path('bundles');
 
         if (!file_exists($bundleFolder)) {
             return null;
@@ -65,5 +69,21 @@ class ApplicationNativeAssistant{
             }
         }
         return $bundleFile;
+    }
+
+    public static function setBundleFile(string $filePath, string $fileName)
+    {
+        if (Storage::disk('public')->exists('bundles')){
+            File::deleteDirectory(Storage::disk('public')->path('bundles'), true);
+        }
+
+        $path = 'bundles/' . $fileName;
+        $wasSuccessfull = Storage::disk('public')->put($path, file_get_contents($filePath));
+
+        if (!$wasSuccessfull) {
+            throw new Exception('Bundle upload failed');
+        }
+
+        return self::bundleFile();
     }
 }
