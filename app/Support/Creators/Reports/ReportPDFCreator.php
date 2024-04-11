@@ -61,7 +61,7 @@ class ReportPDFCreator
 
             $date = Carbon::create($invoice->date)->format('d/m/y');
 
-            $amount = Toolbox::moneyPrefix($report->money_type->value) . ' ' . number_format($invoice->amount, 2); 
+            $amount = Toolbox::moneyPrefix($report->money_type->value) . ' ' . number_format($invoice->amount, 2);
 
             $invoiceDescription = $invoice->description;
 
@@ -83,10 +83,10 @@ class ReportPDFCreator
             </tr>";
         });
 
-
-        $remainingRows = 29 - $this->report->invoices()->count();
+        $invoicesCount = $this->report->invoices()->count();
+        $remainingRows = 28 - $invoicesCount;
         for($i = 0; $i < $remainingRows; $i++){
-            $iteration = ($i + 1);
+            $iteration = ($i + 1) + $invoicesCount;
             $invoicesItemsHtml .= "<tr>
                 <td></td>
                 <td></td>
@@ -129,7 +129,7 @@ class ReportPDFCreator
 
             $jobName = $invoice->job?->name;
 
-            $amount = Toolbox::moneyPrefix($instance->report->money_type->value) . ' ' . number_format($invoice->amount, 2); 
+            $amount = Toolbox::moneyPrefix($instance->report->money_type->value) . ' ' . number_format($invoice->amount, 2);
 
 
             $invoiceDescription = $invoice->description;
@@ -139,7 +139,7 @@ class ReportPDFCreator
             if ($hasKeysWithTextInside){
                 $invoiceDescription = str_replace($matches[0], "($amount)", $invoiceDescription);
             }
-            
+
             $imagesItemsHtml .= '
                 <article>
                     <h1>'.$jobName.' '.$invoice->job_code . ' - '.$invoice->expense_code . '<br> '.$invoiceDescription.'</h1>
@@ -165,7 +165,7 @@ class ReportPDFCreator
     }
 
     public static function new(Report $report)
-    {   
+    {
         return new self($report);
     }
 }
