@@ -413,6 +413,7 @@ class BalanceAssistant{
 
         return $balance;
     }
+
     public static function deleteBalancesFromReport(Report $report):void{
         $balances = Balance::all()->where('report_id', $report->id);
         foreach($balances as $balance){
