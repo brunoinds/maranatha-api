@@ -18,6 +18,7 @@ use mikehaertl\shellcommand\Command;
 use App\Http\Controllers\ManagementRecordsController;
 use App\Http\Controllers\ManagementBalancesController;
 use App\Http\Controllers\ApplicationNativeController;
+use App\Http\Controllers\ApplicationWebController;
 
 
 /*
@@ -244,5 +245,9 @@ Route::group([], function(){
         Route::get('bundles', ApplicationNativeController::class . '@bundles');
         Route::get('bundles/{version}', ApplicationNativeController::class . '@bundle');
         Route::post('bundles', ApplicationNativeController::class . '@receiveBundle');
+    });
+
+    Route::group(['prefix' => 'app/web'], function () {
+        Route::post('bundles', ApplicationWebController::class . '@receiveBundle');
     });
 });

@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "cee0ddd277f1619a95405d0c1232c17c",
+    "content-hash": "c2332e2ccbca97d51cb7daf99c300b95",
     "packages": [
         {
             "name": "avadim/fast-excel-helper",

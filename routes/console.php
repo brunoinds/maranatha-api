@@ -12,6 +12,7 @@ use App\Support\Exchange\MoneyType;
 use Illuminate\Support\Facades\DB;
 use App\Support\Assistants\ApplicationNativeAssistant;
 
+use Brick\Math\BigDecimal;
 
 /*
 |--------------------------------------------------------------------------

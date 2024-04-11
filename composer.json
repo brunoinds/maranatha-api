@@ -9,6 +9,7 @@
         "avadim/fast-excel-writer": "^4.4",
         "berkayk/onesignal-laravel": "^2.0",
         "beyondcode/laravel-server-timing": "^1.4",
+        "brick/math": "^0.11.0",
         "brunoinds/frankfurter-laravel": "^1.0",
         "brunoinds/paraguay-dolar-laravel": "^1.0",
         "brunoinds/sunat-dolar-laravel": "^1.0.2",

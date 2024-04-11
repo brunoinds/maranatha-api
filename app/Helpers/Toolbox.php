@@ -2,6 +2,8 @@
 
 namespace App\Helpers;
 
+use Brick\Math\BigDecimal;
+
 class Toolbox{
     public static function moneyPrefix(string $moneyType): string
     {
@@ -74,11 +76,13 @@ class Toolbox{
 
     public static function numberSum($a, $b)
     {
+        return BigDecimal::of($a)->plus($b)->toFloat();
         return ( ( floor(round($a, 2) * 100) + floor(round($b, 2) * 100) ) / 100 );
     }
 
     public static function numberSub($a, $b)
     {
+        return BigDecimal::of($a)->minus($b)->toFloat();
         return ( ( floor(round($a, 2) * 100) - floor(round($b, 2) * 100) ) / 100 );
     }
 }
