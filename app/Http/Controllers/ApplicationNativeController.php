@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 
 use App\Support\Assistants\ApplicationNativeAssistant;
-
+use OneSignal;
 
 class ApplicationNativeController extends Controller
 {
@@ -91,7 +91,20 @@ class ApplicationNativeController extends Controller
             ], 400);
         }
 
+        //$previousBundleFile = ApplicationNativeAssistant::bundleFile();
+
         $bundleFile = ApplicationNativeAssistant::setBundleFile($file->getPathname(), $file->getClientOriginalName());
+
+        /*if ($previousBundleFile && $previousBundleFile->version < $bundleFile->version){
+            OneSignal::sendNotificationToExternalUser(
+                headings: "Nuevo reporte recibido 📥",
+                message: 'Hay una nueva actualización en la aplicación',
+                userId: Toolbox::getOneSignalUserId($adminUser->id),
+                data: [
+                    'deepLink' => $notificationUrlOnUserReports
+                ]
+            );
+        }*/
 
         return response()->json([
             'message' => 'Bundle received successfully',
