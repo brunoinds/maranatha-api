@@ -10,7 +10,6 @@ use Carbon\Carbon;
 use Dompdf\Dompdf;
 use Illuminate\Support\Facades\Storage;
 
-
 class ReportPDFCreator
 {
     private $html = '';
