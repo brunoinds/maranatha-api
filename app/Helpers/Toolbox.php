@@ -23,12 +23,12 @@ class Toolbox{
         return json_decode(json_encode($array));
     }
     public static function validateImageBase64(string|null $base64Image, int|null $maxSizeInBytes = null)
-    { 
+    {
         $maxSizeInBytes = $maxSizeInBytes ?? env('APP_MAXIMUM_UPLOAD_SIZE') ?? 2048 * 1024;
         if (!is_null($base64Image) && mb_strlen($base64Image) > 40){
             $imageSize = (fn() => strlen(base64_decode($base64Image)))();
             if ($imageSize > $maxSizeInBytes) {
-                
+
                 return Toolbox::toObject([
                     'isImage' => true,
                     'isValid' => false,
@@ -69,5 +69,16 @@ class Toolbox{
         }else{
             return (string) 'dev-user-id-'.$userId;
         }
+    }
+
+
+    public static function numberSum($a, $b)
+    {
+        return ( ( floor(round($a, 2) * 100) + floor(round($b, 2) * 100) ) / 100 );
+    }
+
+    public static function numberSub($a, $b)
+    {
+        return ( ( floor(round($a, 2) * 100) - floor(round($b, 2) * 100) ) / 100 );
     }
 }

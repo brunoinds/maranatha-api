@@ -12,6 +12,7 @@ use App\Helpers\Enums\MoneyType;
 use Carbon\Carbon;
 use DateTime;
 use DateTimeInterface;
+use App\Helpers\Toolbox;
 
 
 class BalanceAssistant{
@@ -52,9 +53,9 @@ class BalanceAssistant{
 
         foreach($balances as $balance){
             if ($balance->type === BalanceType::Credit){
-                $totalCredit += $balance->amount;
+                $totalCredit = Toolbox::numberSum($totalCredit, $balance->amount);
             }elseif ($balance->type === BalanceType::Debit){
-                $totalDebit += $balance->amount;
+                $totalDebit = Toolbox::numberSum($totalDebit, $balance->amount);
             }
 
 
@@ -67,7 +68,7 @@ class BalanceAssistant{
                 'type' => $balance->type,
                 'model' => $balance->model,
                 'amount' => $balance->amount,
-                'balance_here' => $totalCredit - $totalDebit,
+                'balance_here' => Toolbox::numberSub($totalCredit, $totalDebit),
                 'receipt_image_url' => $balance->getReceiptImageUrl(),
             ];
         }
@@ -103,8 +104,8 @@ class BalanceAssistant{
 
                 $itemsIn[$report->money_type->value][] = $item;
 
-                $totalInSoles += $report->amountInSoles();
-                $totalInDollars += $report->amountInDollars();
+                $totalInSoles = Toolbox::numberSum($totalInSoles, $report->amountInSoles());
+                $totalInDollars = Toolbox::numberSum($totalInDollars, $report->amountInDollars());
 
                 $items[] = $item;
             }
@@ -166,8 +167,8 @@ class BalanceAssistant{
 
                 $itemsIn[$report->money_type->value][] = $item;
 
-                $totalInSoles += $report->amountInSoles();
-                $totalInDollars += $report->amountInDollars();
+                $totalInSoles = Toolbox::numberSum($totalInSoles, $report->amountInSoles());
+                $totalInDollars = Toolbox::numberSum($totalInDollars, $report->amountInDollars());
 
                 $items[] = $item;
             }
@@ -230,8 +231,8 @@ class BalanceAssistant{
 
                     $itemsIn[$report->money_type->value][] = $item;
 
-                    $totalInSoles += $report->amountInSoles();
-                    $totalInDollars += $report->amountInDollars();
+                    $totalInSoles = Toolbox::numberSum($totalInSoles, $report->amountInSoles());
+                    $totalInDollars = Toolbox::numberSum($totalInDollars, $report->amountInDollars());
 
                     $items[] = $item;
                 }
@@ -268,7 +269,7 @@ class BalanceAssistant{
             $reportStatuses = ReportStatus::cases();
             foreach ($reportStatuses as $reportStatus){
                 $reports = Report::query()->where('user_id', $user->id)->where('status', '=', $reportStatus)->where('from_date', '>=', $timeBounds['start'])->where('to_date', '<=', $timeBounds['end'])->orderBy('from_date', 'asc')->get();
-                
+
                 $byStatus[] = [
                     'status' => $reportStatus->name,
                     'data' => $parseByStatus($reports)
@@ -281,13 +282,13 @@ class BalanceAssistant{
         $pittyCashGivenAmount = (function() use ($user, $yearBounds){
             $directCredits = Balance::all()->where('model', BalanceModel::Direct)->where('type', BalanceType::Credit)->where('user_id', $user->id)->where('date', '>=', $yearBounds['start'])->where('date', '<=', $yearBounds['end']);
             $directDebits = Balance::all()->where('model', BalanceModel::Direct)->where('type', BalanceType::Debit)->where('user_id', $user->id)->where('date', '>=', $yearBounds['start'])->where('date', '<=', $yearBounds['end']);
-            
+
             $total = 0;
             foreach($directCredits as $directCredit){
-                $total += $directCredit->amount;
+                $total = Toolbox::numberSum($total, $directCredit->amount);
             }
             foreach($directDebits as $directDebit){
-                $total -= $directDebit->amount;
+                $total = Toolbox::numberSub($total, $directDebit->amount);
             }
             return $total;
         })();
@@ -307,7 +308,7 @@ class BalanceAssistant{
                         $limit_usage_percentage = $used / $limit * 100;
                     } else {
                         $over_limit = $used - $limit;
-                        $limit_usage_percentage = 100 + ($over_limit / $limit * 100);  
+                        $limit_usage_percentage = 100 + ($over_limit / $limit * 100);
                     }
                     return $limit_usage_percentage;
                 }elseif ($currentBalance === 0){
@@ -319,13 +320,13 @@ class BalanceAssistant{
                         $limit_usage_percentage = $used / $limit * 100;
                     } else {
                         $over_limit = $used - $limit;
-                        $limit_usage_percentage = 100 + ($over_limit / $limit * 100);  
+                        $limit_usage_percentage = 100 + ($over_limit / $limit * 100);
                     }
                     return $limit_usage_percentage;
                 }
             })(),
         ];
-        
+
         return [
             'period' => [
                 'start' => $timeBounds['start'],
