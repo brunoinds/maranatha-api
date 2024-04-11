@@ -78,7 +78,7 @@ class InvoiceController extends Controller
         }
 
         $invoice = Invoice::create($validatedData);
-        $invoice->report->updateFromToDates();
+        $invoice->report?->updateFromToDates();
 
         return response()->json(['message' => 'Invoice created', 'invoice' => $invoice->toArray()]);
     }
@@ -89,7 +89,7 @@ class InvoiceController extends Controller
             'ticket_number' => 'required|string',
             'commerce_number' => 'required|string'
         ]);
-        
+
         $ticket = $request->input('ticket_number');
         $commerceNumber = $request->input('commerce_number');
         $invoice = Invoice::where('ticket_number', '=', $ticket)->where('commerce_number', '=', $commerceNumber)->first();
@@ -159,7 +159,7 @@ class InvoiceController extends Controller
         $report = $invoice->report;
         $invoice->delete();
         $report->updateFromToDates();
-        
+
         return response()->json(['message' => 'Invoice deleted']);
     }
 
