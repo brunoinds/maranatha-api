@@ -10,8 +10,9 @@ use Illuminate\Support\Collection;
 class Notifications{
     public static function sendNotificationsToAdministrator(Collection $notications)
     {
-        foreach ($notications as $notification) {
-            $notification->sendNotificationToAdministrator();
-        }
+
+        $notications = $notications->each(function($notification){
+            return $notification->sendNotificationToAdministrator();
+        });
     }
 }

@@ -15,6 +15,8 @@ use App\Support\EventLoop\RecordsEventLoop;
 use App\Support\EventLoop\ReportsEventLoop;
 use Brick\Math\BigDecimal;
 use App\Support\EventLoop\Notifications\Notifications;
+use App\Support\EventLoop\Notifications\Notification;
+
 
 /*
 |--------------------------------------------------------------------------
@@ -68,5 +70,6 @@ Artisan::command('event-loop:messages', function () {
 
 
 Artisan::command('event-loop:notifications', function () {
+
     Notifications::sendNotificationsToAdministrator(ReportsEventLoop::getNotifications());
 })->purpose('Execute the event loop and display the messages');

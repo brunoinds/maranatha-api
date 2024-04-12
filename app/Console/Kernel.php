@@ -45,10 +45,10 @@ class Kernel extends ConsoleKernel
 
 
         $schedule->call(function(){
-            $notification = collect(new Notification(
+            $notification = collect([new Notification(
                 title: '⭐️ Prueba de notificación',
                 message: 'Esto es una prueba de notificación automática del Cron Job'
-            ));
+            )]);
             Notifications::sendNotificationsToAdministrator($notification);
         })->everyMinute();
 
