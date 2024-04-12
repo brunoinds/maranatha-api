@@ -12,7 +12,7 @@ use App\Support\Generators\Records\Reports\RecordReportsByTime;
 
 class RecordsEventLoop{
     const MINIMAL_DIFFERENCE_TO_NOTIFY_ON_SPENDINGS = 10;
-    const MINIMAL_DIFFERENCE_TO_NOTIFY_ON_TIMMING = 10;
+    const MINIMAL_DIFFERENCE_TO_NOTIFY_ON_TIMMING = 3;
 
     public static function getMessages(): array{
         $trendingOnReportsSpendings = self::getTrendingOnReportsSpendings();
@@ -38,9 +38,9 @@ class RecordsEventLoop{
                 'title' => 'Nueva Tendencia en Tiempo de Aprobación de Reportes',
                 'message' => (function() use ($trendingOnReportsTimmingSubmittedAndApproved){
                     if ($trendingOnReportsTimmingSubmittedAndApproved['difference']['percentage'] < 0){
-                        return '📉 El tiempo promedio entre la presentación y la aprobación de reportes ha disminuido en un ' . number_format(abs($trendingOnReportsTimmingSubmittedAndApproved['difference']['percentage']), 2) . '% en comparación al mes pasado. Hasta ahora, el tiempo promedio ha sido de ' . number_format($trendingOnReportsTimmingSubmittedAndApproved['current']['amount'], 2) . ' horas, siendo que en el mismo periodo en el mes anterior fue de ' . number_format($trendingOnReportsTimmingSubmittedAndApproved['previous']['amount'], 2) . ' horas.';
+                        return '📉 El tiempo promedio entre la presentación y la aprobación de reportes ha disminuido en un ' . number_format(abs($trendingOnReportsTimmingSubmittedAndApproved['difference']['percentage']), 1) . '% en comparación al mes pasado. Hasta ahora, el tiempo promedio ha sido de ' . number_format($trendingOnReportsTimmingSubmittedAndApproved['current']['amount'], 2) . ' horas, siendo que en el mismo periodo en el mes anterior fue de ' . number_format($trendingOnReportsTimmingSubmittedAndApproved['previous']['amount'], 2) . ' horas.';
                     } else {
-                        return '📈 El tiempo promedio entre la presentación y la aprobación de reportes ha aumentado en un ' . number_format($trendingOnReportsTimmingSubmittedAndApproved['difference']['percentage'], 2) . '% en comparación al mes pasado. Hasta ahora, el tiempo promedio ha sido de ' . number_format($trendingOnReportsTimmingSubmittedAndApproved['current']['amount'], 2) . ' horas, siendo que en el mismo periodo en el mes anterior fue de ' . number_format($trendingOnReportsTimmingSubmittedAndApproved['previous']['amount'], 2) . ' horas.';
+                        return '📈 El tiempo promedio entre la presentación y la aprobación de reportes ha aumentado en un ' . number_format($trendingOnReportsTimmingSubmittedAndApproved['difference']['percentage'], 1) . '% en comparación al mes pasado. Hasta ahora, el tiempo promedio ha sido de ' . number_format($trendingOnReportsTimmingSubmittedAndApproved['current']['amount'], 2) . ' horas, siendo que en el mismo periodo en el mes anterior fue de ' . number_format($trendingOnReportsTimmingSubmittedAndApproved['previous']['amount'], 2) . ' horas.';
                     }
                 })()
             ];
