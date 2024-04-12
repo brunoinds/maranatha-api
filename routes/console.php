@@ -14,6 +14,7 @@ use App\Support\Assistants\ApplicationNativeAssistant;
 use App\Support\EventLoop\RecordsEventLoop;
 use App\Support\EventLoop\ReportsEventLoop;
 use Brick\Math\BigDecimal;
+use App\Support\EventLoop\Notifications\Notifications;
 
 /*
 |--------------------------------------------------------------------------
@@ -48,7 +49,8 @@ Artisan::command('check:environment', function () {
 })->purpose('Display an inspiring quote');
 
 
-Artisan::command('checker', function () {
+/*
+Artisan::command('event-loop:messages', function () {
     $messages = ReportsEventLoop::getMessages();
     foreach ($messages as $message){
         $this->info($message['title']);
@@ -61,4 +63,9 @@ Artisan::command('checker', function () {
         $this->info($message['title']);
         $this->line($message['message']);
     }
-})->purpose('Display an inspiring quote');
+})->purpose('Execute the event loop and display the messages');
+
+Artisan::command('event-loop:notifications', function () {
+    Notifications::sendNotificationsToAdministrator(ReportsEventLoop::getNotifications());
+})->purpose('Execute the event loop and display the messages');
+*/

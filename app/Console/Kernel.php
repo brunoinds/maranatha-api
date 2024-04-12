@@ -5,6 +5,9 @@ namespace App\Console;
 use App\Models\CronRun;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
+use App\Support\EventLoop\ReportsEventLoop;
+use App\Support\EventLoop\RecordsEventLoop;
+use App\Support\EventLoop\Notifications\Notifications;
 
 class Kernel extends ConsoleKernel
 {
@@ -13,10 +16,22 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule): void
     {
-        $schedule->command('backup:clean; backup:run')->dailyAt('06:00');
-
-        //$schedule->command('ls')->monthlyOn(13, '10:34');
         CronRun::create();
+
+        $schedule->command('backup:clean; backup:run')->dailyAt('02:00')->timezone('America/Lima');
+
+        $schedule->call(function(){
+            Notifications::sendNotificationsToAdministrator(RecordsEventLoop::getNotifications('TrendingOnSpendings'));
+        })->weekly()->sundays()->at('11:00')->timezone('America/Lima');
+
+        $schedule->call(function(){
+            Notifications::sendNotificationsToAdministrator(RecordsEventLoop::getNotifications('TrendingOnTimmingSubmittedAndApproved'));
+            Notifications::sendNotificationsToAdministrator(RecordsEventLoop::getNotifications('TrendingOnTimmingApprovedAndRestituted'));
+        })->weekly()->sundays()->at('11:30')->timezone('America/Lima');
+
+        $schedule->call(function(){
+            Notifications::sendNotificationsToAdministrator(ReportsEventLoop::getNotifications());
+        })->weekly()->daily()->at('19:15')->timezone('America/Lima');
     }
 
     /**

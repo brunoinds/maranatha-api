@@ -7,20 +7,10 @@ use Illuminate\Support\Collection;
 use App\Models\Report;
 use Carbon\Carbon;
 use DateTime;
+use App\Support\EventLoop\Notifications\Notification;
 
 
-/*
-$adminUser = User::where('username', 'admin')->first();
 
-OneSignal::sendNotificationToExternalUser(
-    headings: "Nuevo reporte recibido 📥",
-    message: $user->name . " ha enviado un nuevo reporte de " . Toolbox::moneyPrefix($report->money_type->value) . ' ' . number_format($report->amount(), 2) . " y está esperando por su aprobación.",
-    userId: Toolbox::getOneSignalUserId($adminUser->id),
-    data: [
-        'deepLink' => $notificationUrlOnUserReports
-    ]
-);
-*/
 class ReportsEventLoop{
     const MAXIMUM_WAITING_HOURS_APPROVAL = 24;
     const MAXIMUM_WAITING_HOURS_RESTITUTION = 24;
@@ -35,25 +25,37 @@ class ReportsEventLoop{
         if($slowWaitingApprovalReports->count() > 0){
             $messages[] = [
                 'title' => $slowWaitingApprovalReports->count() . ' reportes esperando aprobación 📥',
-                'message' => 'Hay ' . $slowWaitingApprovalReports->count() . ' reportes esperando aprobación por más de ' . self::MAXIMUM_WAITING_HOURS_APPROVAL . ' horas. Revísalos en la sección de reportes.'
+                'message' => 'Hay ' . $slowWaitingApprovalReports->count() . ' reportes esperando aprobación por más de ' . self::MAXIMUM_WAITING_HOURS_APPROVAL . ' horas. Revísalos en la sección de reportes.',
+                'type' => 'WaitingApprovalReports'
             ];
         }
 
         if($slowWaitingRestitutedReports->count() > 0){
             $messages[] = [
                 'title' => $slowWaitingRestitutedReports->count() . ' reportes esperando reembolso 💸',
-                'message' => 'Hay ' . $slowWaitingRestitutedReports->count() . ' reportes esperando reembolso por más de ' . self::MAXIMUM_WAITING_HOURS_RESTITUTION . ' horas. Revísalos en la sección de reportes.'
+                'message' => 'Hay ' . $slowWaitingRestitutedReports->count() . ' reportes esperando reembolso por más de ' . self::MAXIMUM_WAITING_HOURS_RESTITUTION . ' horas. Revísalos en la sección de reportes.',
+                'type' => 'WaitingRestitutedReports'
             ];
         }
 
         if($slowWaitingFixRejectedReports->count() > 0){
             $messages[] = [
                 'title' => $slowWaitingFixRejectedReports->count() . ' reportes esperando corrección 🛠️',
-                'message' => 'Hay ' . $slowWaitingFixRejectedReports->count() . ' reportes rechazados que están esperando corrección por más de ' . self::MAXIMUM_WAITING_HOURS_FIX_REJECTED . ' horas. Revísalos en la sección de reportes.'
+                'message' => 'Hay ' . $slowWaitingFixRejectedReports->count() . ' reportes rechazados que están esperando corrección por más de ' . self::MAXIMUM_WAITING_HOURS_FIX_REJECTED . ' horas. Revísalos en la sección de reportes.',
+                'type' => 'WaitingFixRejectedReports'
             ];
         }
 
         return $messages;
+    }
+
+    public static function getNotifications(string | null $ofType = null): Collection{
+        return collect(self::getMessages())->filter(function($message) use ($ofType){
+            return $ofType === null || $message['type'] === $ofType;
+        })->map(function($message){
+            $notification = new Notification($message['title'], $message['message']);
+            return $notification;
+        });
     }
 
 
