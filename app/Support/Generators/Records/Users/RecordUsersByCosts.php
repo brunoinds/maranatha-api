@@ -29,7 +29,7 @@ class RecordUsersByCosts
     private string|null $expenseCode = null;
     private string|null $type = null;
     private string|null $userId = null;
-    
+
     /**
      * @param array $options
      * @param DateTime $options['startDate']
@@ -39,7 +39,7 @@ class RecordUsersByCosts
      * @param null|string $options['type']
      * @param null|string $options['userId']
      */
-    
+
     public function __construct(array $options){
         $this->startDate = $options['startDate'];
         $this->endDate = $options['endDate'];
@@ -114,7 +114,7 @@ class RecordUsersByCosts
         if ($this->jobCode !== null){
             $spendingsInSpan = $spendingsInSpan->where('job.code', '=', $this->jobCode);
         }
-        
+
         if ($this->expenseCode !== null){
             $spendingsInSpan = $spendingsInSpan->where('expense.code', '=', $this->expenseCode);
         }
@@ -163,7 +163,7 @@ class RecordUsersByCosts
             return $itemData;
         });
 
-        
+
         return $spendings->toArray();
     }
 

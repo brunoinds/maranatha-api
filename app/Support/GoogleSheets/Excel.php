@@ -15,7 +15,7 @@ class Excel{
         $sheet = Sheets::spreadsheet(env('GOOGLE_SHEETS_DB_ID'))->sheet('🕋 BlackBox - Invoices');
         $workableRange = $sheet->range('A2:P600');
 
-        
+
         //Clear database:
         $rows = array_fill(0, 599, "");
         collect($rows)->each(function($item, $index) use (&$rows){
@@ -25,7 +25,7 @@ class Excel{
 
 
 
-        
+
 
         //Fill database:
         $output = collect($output)->map(function($item){
@@ -97,8 +97,8 @@ class Excel{
             ];
         })->toArray();
 
-        //Store for 10 minutes:
-        Cache::store('file')->put('Maranatha/Spreadsheets/Workers', $data, 10 * 60);
+        //Store for 30 minutes:
+        Cache::store('file')->put('Maranatha/Spreadsheets/Workers', $data, 30 * 60);
 
         return $data;
     }

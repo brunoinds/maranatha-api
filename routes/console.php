@@ -11,7 +11,8 @@ use App\Support\Exchange\Exchanger;
 use App\Support\Exchange\MoneyType;
 use Illuminate\Support\Facades\DB;
 use App\Support\Assistants\ApplicationNativeAssistant;
-
+use App\Support\EventLoop\RecordsEventLoop;
+use App\Support\EventLoop\ReportsEventLoop;
 use Brick\Math\BigDecimal;
 
 /*
@@ -44,4 +45,20 @@ Artisan::command('clear:db', function(){
 Artisan::command('check:environment', function () {
     $appEnvirontment = env('APP_ENV');
     $this->info('App environment: ' . $appEnvirontment);
+})->purpose('Display an inspiring quote');
+
+
+Artisan::command('checker', function () {
+    $messages = ReportsEventLoop::getMessages();
+    foreach ($messages as $message){
+        $this->info($message['title']);
+        $this->line($message['message']);
+    }
+
+    $messages = RecordsEventLoop::getMessages();
+
+    foreach ($messages as $message){
+        $this->info($message['title']);
+        $this->line($message['message']);
+    }
 })->purpose('Display an inspiring quote');

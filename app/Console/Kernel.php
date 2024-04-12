@@ -13,7 +13,9 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule): void
     {
-        $schedule->command('backup:clean; backup:run')->daily();
+        $schedule->command('backup:clean; backup:run')->dailyAt('06:00');
+
+        //$schedule->command('ls')->monthlyOn(13, '10:34');
         CronRun::create();
     }
 

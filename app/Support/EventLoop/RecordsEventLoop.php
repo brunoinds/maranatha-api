@@ -1,0 +1,279 @@
+<?php
+
+namespace App\Support\EventLoop;
+
+use App\Helpers\Enums\ReportStatus;
+use Illuminate\Support\Collection;
+use App\Models\Report;
+use Carbon\Carbon;
+use DateTime;
+use App\Support\Generators\Records\Users\RecordUsersByCosts;
+use App\Support\Generators\Records\Reports\RecordReportsByTime;
+
+class RecordsEventLoop{
+    const MINIMAL_DIFFERENCE_TO_NOTIFY_ON_SPENDINGS = 10;
+    const MINIMAL_DIFFERENCE_TO_NOTIFY_ON_TIMMING = 10;
+
+    public static function getMessages(): array{
+        $trendingOnReportsSpendings = self::getTrendingOnReportsSpendings();
+        $trendingOnReportsTimmingSubmittedAndApproved = self::getTrendingOnReportsTimmingSubmittedAndApproved();
+        $trendingOnReportsTimmingApprovedAndRestituted = self::getTrendingOnReportsTimmingApprovedAndRestituted();
+
+        $messages = [];
+        if($trendingOnReportsSpendings !== null && ($trendingOnReportsSpendings['difference']['percentage'] >= self::MINIMAL_DIFFERENCE_TO_NOTIFY_ON_SPENDINGS || $trendingOnReportsSpendings['difference']['percentage'] <= -self::MINIMAL_DIFFERENCE_TO_NOTIFY_ON_SPENDINGS)){
+            $messages[] = [
+                'title' => 'Nueva Tendencia de Gastos con Reportes',
+                'message' => (function() use ($trendingOnReportsSpendings){
+                    if ($trendingOnReportsSpendings['difference']['percentage'] < 0){
+                        return '📉 Los gastos con boletas/facturas han disminuido en un ' . number_format(abs($trendingOnReportsSpendings['difference']['percentage']), 2) . '% en comparación al mes pasado. Hasta ahora, se han gastado $' . number_format($trendingOnReportsSpendings['current']['amount'], 2) . ', siendo que, en el mismo periodo en el mes anterior, se habían gastado $' . number_format($trendingOnReportsSpendings['previous']['amount'], 2) . '.';
+                    } else {
+                        return '📈 Los gastos con boletas/facturas han aumentado en un ' . number_format($trendingOnReportsSpendings['difference']['percentage'], 2) . '% en comparación al mes pasado. Hasta ahora, se han gastado $' . number_format($trendingOnReportsSpendings['current']['amount'], 2) . ', siendo que, en el mismo periodo en el mes anterior, se habían gastado $' . number_format($trendingOnReportsSpendings['previous']['amount'], 2) . '.';
+                    }
+                })()
+            ];
+        }
+
+        if ($trendingOnReportsTimmingSubmittedAndApproved !== null && ($trendingOnReportsTimmingSubmittedAndApproved['difference']['percentage'] >= self::MINIMAL_DIFFERENCE_TO_NOTIFY_ON_TIMMING || $trendingOnReportsTimmingSubmittedAndApproved['difference']['percentage'] <= -self::MINIMAL_DIFFERENCE_TO_NOTIFY_ON_TIMMING)){
+            $messages[] = [
+                'title' => 'Nueva Tendencia en Tiempo de Aprobación de Reportes',
+                'message' => (function() use ($trendingOnReportsTimmingSubmittedAndApproved){
+                    if ($trendingOnReportsTimmingSubmittedAndApproved['difference']['percentage'] < 0){
+                        return '📉 El tiempo promedio entre la presentación y la aprobación de reportes ha disminuido en un ' . number_format(abs($trendingOnReportsTimmingSubmittedAndApproved['difference']['percentage']), 2) . '% en comparación al mes pasado. Hasta ahora, el tiempo promedio ha sido de ' . number_format($trendingOnReportsTimmingSubmittedAndApproved['current']['amount'], 2) . ' horas, siendo que en el mismo periodo en el mes anterior fue de ' . number_format($trendingOnReportsTimmingSubmittedAndApproved['previous']['amount'], 2) . ' horas.';
+                    } else {
+                        return '📈 El tiempo promedio entre la presentación y la aprobación de reportes ha aumentado en un ' . number_format($trendingOnReportsTimmingSubmittedAndApproved['difference']['percentage'], 2) . '% en comparación al mes pasado. Hasta ahora, el tiempo promedio ha sido de ' . number_format($trendingOnReportsTimmingSubmittedAndApproved['current']['amount'], 2) . ' horas, siendo que en el mismo periodo en el mes anterior fue de ' . number_format($trendingOnReportsTimmingSubmittedAndApproved['previous']['amount'], 2) . ' horas.';
+                    }
+                })()
+            ];
+        }
+
+        if ($trendingOnReportsTimmingApprovedAndRestituted !== null && ($trendingOnReportsTimmingApprovedAndRestituted['difference']['percentage'] >= self::MINIMAL_DIFFERENCE_TO_NOTIFY_ON_TIMMING || $trendingOnReportsTimmingApprovedAndRestituted['difference']['percentage'] <= -self::MINIMAL_DIFFERENCE_TO_NOTIFY_ON_TIMMING)){
+            $messages[] = [
+                'title' => 'Nueva Tendencia en Tiempo de Aprobación y Reembolso de Reportes',
+                'message' => (function() use ($trendingOnReportsTimmingApprovedAndRestituted){
+                    if ($trendingOnReportsTimmingApprovedAndRestituted['difference']['percentage'] < 0){
+                        return '📉 El tiempo promedio entre la aprobación y el reembolso de reportes ha disminuido en un ' . number_format(abs($trendingOnReportsTimmingApprovedAndRestituted['difference']['percentage']), 2) . '% en comparación al mes pasado. Hasta ahora, el tiempo promedio ha sido de ' . number_format($trendingOnReportsTimmingApprovedAndRestituted['current']['amount'], 2) . ' horas, siendo que en el mismo periodo en el mes anterior fue de ' . number_format($trendingOnReportsTimmingApprovedAndRestituted['previous']['amount'], 2) . ' horas.';
+                    } else {
+                        return '📈 El tiempo promedio entre la aprobación y el reembolso de reportes ha aumentado en un ' . number_format($trendingOnReportsTimmingApprovedAndRestituted['difference']['percentage'], 2) . '% en comparación al mes pasado. Hasta ahora, el tiempo promedio ha sido de ' . number_format($trendingOnReportsTimmingApprovedAndRestituted['current']['amount'], 2) . ' horas, siendo que en el mismo periodo en el mes anterior fue de ' . number_format($trendingOnReportsTimmingApprovedAndRestituted['previous']['amount'], 2) . ' horas.';
+                    }
+                })()
+            ];
+        }
+
+        return $messages;
+    }
+
+
+
+
+    private static function getTrendingOnReportsSpendings(): array|null
+    {
+        $previousMonthTimeSpan = [
+            'startDate' => Carbon::now()->subMonth()->startOfMonth()->toDateTime(),
+            'endDate' => Carbon::now()->subMonth()->toDateTime()
+        ];
+
+        $currentMonthTimeSpan = [
+            'startDate' => Carbon::now()->startOfMonth()->toDateTime(),
+            'endDate' => Carbon::now()->toDateTime(),
+        ];
+
+
+        $previousMonth = new RecordUsersByCosts([
+            'startDate' => $previousMonthTimeSpan['startDate'],
+            'endDate' => $previousMonthTimeSpan['endDate'],
+            'jobCode' => null,
+            'expenseCode' => null,
+            'type' => null,
+            'userId' => null,
+        ]);
+
+        $currentMonth = new RecordUsersByCosts([
+            'startDate' => $currentMonthTimeSpan['startDate'],
+            'endDate' => $currentMonthTimeSpan['endDate'],
+            'jobCode' => null,
+            'expenseCode' => null,
+            'type' => null,
+            'userId' => null,
+        ]);
+
+        $previousMonth = $previousMonth->generate();
+        $currentMonth = $currentMonth->generate();
+
+
+        $previousMonthSpendings = (function() use ($previousMonth){
+            return collect($previousMonth['data']['body'])->filter(function($item){
+                return $item['type'] !== 'Workers';
+            })->sum('amount_in_dollars');
+        })();
+        $currentMonthSpendings = (function() use ($currentMonth){
+            return collect($currentMonth['data']['body'])->filter(function($item){
+                return $item['type'] !== 'Workers';
+            })->sum('amount_in_dollars');
+        })();
+
+        $differenceInAmount = $currentMonthSpendings - $previousMonthSpendings;
+
+        if ($previousMonthSpendings === 0 || $currentMonthSpendings === 0){
+            return null;
+        }
+
+
+        $differenceInPercentage = ($differenceInAmount / $previousMonthSpendings) * 100;
+
+        return [
+            'previous' => [
+                'amount' => $previousMonthSpendings,
+            ],
+            'current' => [
+                'amount' => $currentMonthSpendings,
+            ],
+            'difference' => [
+                'amount' => $differenceInAmount,
+                'percentage' => $differenceInPercentage,
+            ],
+        ];
+    }
+
+    private static function getTrendingOnReportsTimmingSubmittedAndApproved(): array|null
+    {
+        $previousMonthTimeSpan = [
+            'startDate' => Carbon::now()->subMonth()->startOfMonth()->toDateTime(),
+            'endDate' => Carbon::now()->subMonth()->toDateTime()
+        ];
+
+        $currentMonthTimeSpan = [
+            'startDate' => Carbon::now()->startOfMonth()->toDateTime(),
+            'endDate' => Carbon::now()->toDateTime(),
+        ];
+
+
+        $previousMonth = new RecordReportsByTime([
+            'startDate' => $previousMonthTimeSpan['startDate'],
+            'endDate' => $previousMonthTimeSpan['endDate'],
+            'country' => null,
+            'moneyType' => null,
+            'type' => null,
+        ]);
+
+        $currentMonth = new RecordReportsByTime([
+            'startDate' => $currentMonthTimeSpan['startDate'],
+            'endDate' => $currentMonthTimeSpan['endDate'],
+            'country' => null,
+            'moneyType' => null,
+            'type' => null,
+        ]);
+
+        $previousMonth = $previousMonth->generate();
+        $currentMonth = $currentMonth->generate();
+
+
+        $previousMonthTimming = (function() use ($previousMonth){
+            return collect($previousMonth['data']['body'])->filter(function($item){
+                return $item['indicator'] === 'average_between_submitted_and_approved';
+            })->sum('average_time_in_hours');
+        })();
+        $currentMonthTimming = (function() use ($currentMonth){
+            return collect($currentMonth['data']['body'])->filter(function($item){
+                return $item['indicator'] === 'average_between_submitted_and_approved';
+            })->sum('average_time_in_hours');
+        })();
+
+
+        $differenceInAmount = $currentMonthTimming - $previousMonthTimming;
+
+        if ($previousMonthTimming === 0 || $currentMonthTimming === 0){
+            return null;
+        }
+
+
+        $differenceInPercentage = ($differenceInAmount / $previousMonthTimming) * 100;
+
+        return [
+            'previous' => [
+                'amount' => $previousMonthTimming,
+            ],
+            'current' => [
+                'amount' => $currentMonthTimming,
+            ],
+            'difference' => [
+                'amount' => $differenceInAmount,
+                'percentage' => $differenceInPercentage,
+            ],
+        ];
+    }
+
+    private static function getTrendingOnReportsTimmingApprovedAndRestituted(): array|null
+    {
+        $previousMonthTimeSpan = [
+            'startDate' => Carbon::now()->subMonth()->startOfMonth()->toDateTime(),
+            'endDate' => Carbon::now()->subMonth()->toDateTime()
+        ];
+
+        $currentMonthTimeSpan = [
+            'startDate' => Carbon::now()->startOfMonth()->toDateTime(),
+            'endDate' => Carbon::now()->toDateTime(),
+        ];
+
+
+        $previousMonth = new RecordReportsByTime([
+            'startDate' => $previousMonthTimeSpan['startDate'],
+            'endDate' => $previousMonthTimeSpan['endDate'],
+            'country' => null,
+            'moneyType' => null,
+            'type' => null,
+        ]);
+
+        $currentMonth = new RecordReportsByTime([
+            'startDate' => $currentMonthTimeSpan['startDate'],
+            'endDate' => $currentMonthTimeSpan['endDate'],
+            'country' => null,
+            'moneyType' => null,
+            'type' => null,
+        ]);
+
+        $previousMonth = $previousMonth->generate();
+        $currentMonth = $currentMonth->generate();
+
+
+        $previousMonthTimming = (function() use ($previousMonth){
+            return collect($previousMonth['data']['body'])->filter(function($item){
+                return $item['indicator'] === 'average_between_approved_and_restituted';
+            })->sum('average_time_in_hours');
+        })();
+        $currentMonthTimming = (function() use ($currentMonth){
+            return collect($currentMonth['data']['body'])->filter(function($item){
+                return $item['indicator'] === 'average_between_approved_and_restituted';
+            })->sum('average_time_in_hours');
+        })();
+
+        $differenceInAmount = $currentMonthTimming - $previousMonthTimming;
+
+        if ($previousMonthTimming === 0 || $currentMonthTimming === 0){
+            return null;
+        }
+
+
+        $differenceInPercentage = ($differenceInAmount / $previousMonthTimming) * 100;
+
+        return [
+            'previous' => [
+                'amount' => $previousMonthTimming,
+            ],
+            'current' => [
+                'amount' => $currentMonthTimming,
+            ],
+            'difference' => [
+                'amount' => $differenceInAmount,
+                'percentage' => $differenceInPercentage,
+            ],
+        ];
+    }
+}
+
+
+/*
+Event list:
+- New trend on reports spending
+- New trend on envio y reembolso
+- New trend on aprobacion y reembolso
+*/
