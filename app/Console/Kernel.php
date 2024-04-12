@@ -36,19 +36,19 @@ class Kernel extends ConsoleKernel
 
 
         $schedule->call(function(){
-            $notification = new Notification(
+            $notification = collect(new Notification(
                 title: '⭐️ Prueba de notificación',
                 message: 'Esto es una prueba de notificación automática del Cron Job'
-            );
+            ));
             Notifications::sendNotificationsToAdministrator($notification);
         })->daily()->at('08:00')->timezone('America/Lima');
 
 
         $schedule->call(function(){
-            $notification = new Notification(
+            $notification = collect(new Notification(
                 title: '⭐️ Prueba de notificación',
                 message: 'Esto es una prueba de notificación automática del Cron Job'
-            );
+            ));
             Notifications::sendNotificationsToAdministrator($notification);
         })->everyMinute();
 
