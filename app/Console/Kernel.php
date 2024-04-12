@@ -19,7 +19,7 @@ class Kernel extends ConsoleKernel
     {
         CronRun::create();
 
-        /*$schedule->command('backup:clean; backup:run')->dailyAt('02:00')->timezone('America/Lima');
+        $schedule->command('backup:clean; backup:run')->dailyAt('02:00')->timezone('America/Lima');
 
         $schedule->call(function(){
             Notifications::sendNotificationsToAdministrator(RecordsEventLoop::getNotifications('TrendingOnSpendings'));
@@ -42,7 +42,7 @@ class Kernel extends ConsoleKernel
             );
             Notifications::sendNotificationsToAdministrator($notification);
         })->weekly()->daily()->at('08:00')->timezone('America/Lima');
-        */
+
 
         $schedule->call(function(){
             $notification = new Notification(
