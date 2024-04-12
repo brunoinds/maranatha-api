@@ -19,7 +19,7 @@ class RecordAttendancesByWorker
     private string|null $team = null;
     private string|null $function = null;
     private string|null $workerDni = null;
-    
+
     /**
      * @param array $options
      * @param DateTime $options['startDate']
@@ -43,7 +43,7 @@ class RecordAttendancesByWorker
 
         $query = AttendanceDayWorker::query()
             ->whereBetween('date', [$this->startDate->format('c'), $this->endDate->format('c')]);
-        
+
         if ($this->workerDni !== null){
             $query = $query->where('worker_dni', '=', $this->workerDni);
             $workers = collect($workers)->where('dni', '=', $this->workerDni);
@@ -55,6 +55,8 @@ class RecordAttendancesByWorker
             $absencesQuery = clone $query;
             $worker['attendances'] = $attendanesQuery->where('worker_dni', '=', $worker['dni'])->where('status', '=', AttendanceStatus::Present->value)->get()->count();
             $worker['absences'] = $absencesQuery->where('worker_dni', '=', $worker['dni'])->where('status', '=', AttendanceStatus::Absent->value)->get()->count();
+
+            $worker['is_active'] = $worker['is_active'] === true ? 'Sí' : 'No';
         }
 
 
@@ -94,6 +96,10 @@ class RecordAttendancesByWorker
                 [
                     'title' => 'Función',
                     'key' => 'function',
+                ],
+                [
+                    'title' => '¿Está activo?',
+                    'key' => 'is_active',
                 ],
                 [
                     'title' => 'Asistencias',
