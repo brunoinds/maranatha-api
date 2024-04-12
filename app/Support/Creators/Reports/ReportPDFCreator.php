@@ -115,7 +115,7 @@ class ReportPDFCreator
                 return;
             }
             $image = Storage::disk('public')->get($path);
-            $srcUrl = 'data:image/png;base64,' . base64_encode($image);
+            $srcUrl = 'data:image/jpeg;base64,' . base64_encode($image);
             $listSrcs[] = [
                 'src' => $srcUrl,
                 'invoice' => $invoice
