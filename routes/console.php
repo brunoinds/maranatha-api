@@ -34,7 +34,7 @@ Artisan::command('inspire', function () {
 })->purpose('Display an inspiring quote');
 
 
-Artisan::command('clear:db', function(){
+/*Artisan::command('clear:db', function(){
     $commandLine = 'rm -rf database/database.sqlite && touch database/database.sqlite && php artisan migrate --force';
     $command = new Command($commandLine);
     $response = $command->execute();
@@ -43,33 +43,9 @@ Artisan::command('clear:db', function(){
         return;
     }
     $this->info('Database cleared successfully');
-})->purpose('Clear the database and create a new one');
+})->purpose('Clear the database and create a new one');*/
 
 Artisan::command('check:environment', function () {
     $appEnvirontment = env('APP_ENV');
     $this->info('App environment: ' . $appEnvirontment);
-})->purpose('Display an inspiring quote');
-
-
-
-Artisan::command('event-loop:messages', function () {
-    $messages = ReportsEventLoop::getMessages();
-    foreach ($messages as $message){
-        $this->info($message['title']);
-        $this->line($message['message']);
-    }
-
-    $messages = RecordsEventLoop::getMessages();
-
-    foreach ($messages as $message){
-        $this->info($message['title']);
-        $this->line($message['message']);
-    }
-})->purpose('Execute the event loop and display the messages');
-
-
-
-Artisan::command('event-loop:notifications', function () {
-
-    Notifications::sendNotificationsToAdministrator(ReportsEventLoop::getNotifications());
-})->purpose('Execute the event loop and display the messages');
+})->purpose('Check the current environment');

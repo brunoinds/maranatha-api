@@ -33,25 +33,6 @@ class Kernel extends ConsoleKernel
         $schedule->call(function(){
             Notifications::sendNotificationsToAdministrator(ReportsEventLoop::getNotifications());
         })->daily()->at('19:15')->timezone('America/Lima');
-
-
-        $schedule->call(function(){
-            $notification = collect(new Notification(
-                title: '⭐️ Prueba de notificación',
-                message: 'Esto es una prueba de notificación automática del Cron Job'
-            ));
-            Notifications::sendNotificationsToAdministrator($notification);
-        })->daily()->at('08:00')->timezone('America/Lima');
-
-
-        $schedule->call(function(){
-            $notification = collect([new Notification(
-                title: '⭐️ Prueba de notificación',
-                message: 'Esto es una prueba de notificación automática del Cron Job'
-            )]);
-            Notifications::sendNotificationsToAdministrator($notification);
-        })->daily()->at('08:32')->timezone('America/Lima');
-
     }
 
     /**
