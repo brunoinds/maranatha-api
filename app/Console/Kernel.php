@@ -19,7 +19,7 @@ class Kernel extends ConsoleKernel
     {
         CronRun::create();
 
-        $schedule->command('backup:clean; backup:run')->dailyAt('02:00')->timezone('America/Lima');
+        /*$schedule->command('backup:clean; backup:run')->dailyAt('02:00')->timezone('America/Lima');
 
         $schedule->call(function(){
             Notifications::sendNotificationsToAdministrator(RecordsEventLoop::getNotifications('TrendingOnSpendings'));
@@ -42,6 +42,16 @@ class Kernel extends ConsoleKernel
             );
             Notifications::sendNotificationsToAdministrator($notification);
         })->weekly()->daily()->at('08:00')->timezone('America/Lima');
+        */
+
+        $schedule->call(function(){
+            $notification = new Notification(
+                title: '⭐️ Prueba de notificación',
+                message: 'Esto es una prueba de notificación automática del Cron Job'
+            );
+            Notifications::sendNotificationsToAdministrator($notification);
+        })->weekly()->daily()->at('08:08')->timezone('America/Lima');
+
     }
 
     /**

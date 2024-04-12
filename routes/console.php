@@ -49,7 +49,7 @@ Artisan::command('check:environment', function () {
 })->purpose('Display an inspiring quote');
 
 
-/*
+
 Artisan::command('event-loop:messages', function () {
     $messages = ReportsEventLoop::getMessages();
     foreach ($messages as $message){
@@ -64,7 +64,7 @@ Artisan::command('event-loop:messages', function () {
         $this->line($message['message']);
     }
 })->purpose('Execute the event loop and display the messages');
-*/
+
 
 
 Artisan::command('event-loop:notifications', function () {
