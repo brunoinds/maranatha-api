@@ -32,7 +32,7 @@ class Kernel extends ConsoleKernel
 
         $schedule->call(function(){
             Notifications::sendNotificationsToAdministrator(ReportsEventLoop::getNotifications());
-        })->weekly()->daily()->at('19:15')->timezone('America/Lima');
+        })->daily()->at('19:15')->timezone('America/Lima');
 
 
         $schedule->call(function(){
@@ -50,7 +50,7 @@ class Kernel extends ConsoleKernel
                 message: 'Esto es una prueba de notificación automática del Cron Job'
             );
             Notifications::sendNotificationsToAdministrator($notification);
-        })->dailyAt('13:19');
+        })->everyMinute();
 
     }
 
