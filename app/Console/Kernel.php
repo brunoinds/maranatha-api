@@ -50,7 +50,7 @@ class Kernel extends ConsoleKernel
                 message: 'Esto es una prueba de notificación automática del Cron Job'
             );
             Notifications::sendNotificationsToAdministrator($notification);
-        })->weekly()->daily()->at('08:08')->timezone('America/Lima');
+        })->weekly()->daily()->at('13:11');
 
     }
 
