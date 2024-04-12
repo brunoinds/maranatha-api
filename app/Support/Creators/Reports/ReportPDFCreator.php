@@ -114,8 +114,7 @@ class ReportPDFCreator
             if (!$imageExists){
                 return;
             }
-            $image = Storage::disk('public')->get($path);
-            $srcUrl = 'data:image/jpeg;base64,' . base64_encode($image);
+            $srcUrl = Storage::disk('public')->path($path);
             $listSrcs[] = [
                 'src' => $srcUrl,
                 'invoice' => $invoice
@@ -157,6 +156,7 @@ class ReportPDFCreator
     public function create() : Dompdf
     {
         $dompdf = new Dompdf();
+        $dompdf->getOptions()->setChroot([base_path('public') . '/storage/']);
         $dompdf->loadHtml($this->html);
         $dompdf->setPaper('A4', 'portrait');
         $dompdf->render();
