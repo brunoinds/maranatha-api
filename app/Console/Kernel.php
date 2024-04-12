@@ -8,6 +8,7 @@ use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
 use App\Support\EventLoop\ReportsEventLoop;
 use App\Support\EventLoop\RecordsEventLoop;
 use App\Support\EventLoop\Notifications\Notifications;
+use App\Support\EventLoop\Notifications\Notification;
 
 class Kernel extends ConsoleKernel
 {
@@ -32,6 +33,15 @@ class Kernel extends ConsoleKernel
         $schedule->call(function(){
             Notifications::sendNotificationsToAdministrator(ReportsEventLoop::getNotifications());
         })->weekly()->daily()->at('19:15')->timezone('America/Lima');
+
+
+        $schedule->call(function(){
+            $notification = new Notification(
+                title: '⭐️ Prueba de notificación',
+                message: 'Esto es una prueba de notificación automática del Cron Job'
+            );
+            Notifications::sendNotificationsToAdministrator($notification);
+        })->weekly()->daily()->at('08:00')->timezone('America/Lima');
     }
 
     /**
