@@ -147,7 +147,6 @@ class RecordAttendancesByJobs
             $item['day_work_amount_in_soles'] = $dayWorkAmountInSoles;
             $item['day_work_amount_in_dollars'] = $dayWorkAmountInDollars;
 
-
             return $item;
         });
 

@@ -82,15 +82,18 @@ class Attendance extends Model
 
     public function attachWorkerDni(string $workerDni)
     {
-        collect($this->dates())->each(function(\DateTime $date) use ($workerDni){
-            AttendanceDayWorker::create([
+        $records = collect($this->dates())->map(function(\DateTime $date) use ($workerDni){
+            return [
                 'worker_dni' => $workerDni,
                 'attendance_id' => $this->id,
                 'date' => $date->format('c'),
                 'status' => AttendanceStatus::Present,
-            ]);
-        });
+            ];
+        })->toArray();
+
+        AttendanceDayWorker::insert($records);
     }
+
 
     public function removeWorkerDni(string $workerDni)
     {
