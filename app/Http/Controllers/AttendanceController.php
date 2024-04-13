@@ -48,7 +48,7 @@ class AttendanceController extends Controller
     {
         $requestValidated = $request->validated();
         $attendance = Attendance::create($requestValidated);
-        
+
         foreach ($requestValidated['workers_dni'] as $worker_dni) {
             $attendance->attachWorkerDni($worker_dni);
         }
@@ -59,12 +59,22 @@ class AttendanceController extends Controller
     {
         $requestValidated = $request->validated();
         $workers = $requestValidated['workers'];
+
+        $updates = [];
+
         foreach ($workers as $worker) {
             foreach ($worker['days'] as $day) {
                 $id = $day['id'];
                 $newStatus = $day['status'];
-                AttendanceDayWorker::where('id', $id)->update(['status' => $newStatus]);
+                if (!isset($updates[$newStatus])) {
+                    $updates[$newStatus] = [];
+                }
+                $updates[$newStatus][] = $id;
             }
+        }
+
+        foreach ($updates as $status => $ids) {
+            AttendanceDayWorker::whereIn('id', $ids)->update(['status' => $status]);
         }
         return response()->json(['message' => 'Workers attendances updated']);
     }

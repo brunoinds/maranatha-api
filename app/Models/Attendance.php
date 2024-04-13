@@ -97,9 +97,7 @@ class Attendance extends Model
 
     public function removeWorkerDni(string $workerDni)
     {
-        $this->dayWorkers()->where('worker_dni', $workerDni)->each(function(AttendanceDayWorker $dayWorker){
-            $dayWorker->delete();
-        });
+        $this->dayWorkers()->where('worker_dni', $workerDni)->delete();
     }
 
     public function updateFromToDatesInAttendanceDayWorker()
@@ -112,27 +110,31 @@ class Attendance extends Model
             return $dayWorker->worker_dni;
         })->unique();
 
-        $dayWorkers->each(function(AttendanceDayWorker $dayWorker) use ($dates){
+        $dayWorkerIdsToDelete = $dayWorkers->filter(function(AttendanceDayWorker $dayWorker) use ($dates){
             $date = new \DateTime($dayWorker->date);
-            if (!in_array($date, $dates)){
-                $dayWorker->delete();
-            }
-        });
+            return !in_array($date, $dates);
+        })->pluck('id');
+
+        AttendanceDayWorker::whereIn('id', $dayWorkerIdsToDelete)->delete();
+
         $dayWorkers = $this->dayWorkers();
+
         collect($dates)->each(function(\DateTime $date) use ($dayWorkers, $instance, $dayWorkersDNIs){
             $dateString = $date->format('c');
             $dayWorker = $dayWorkers->first(function(AttendanceDayWorker $dayWorker) use ($dateString){
                 return $dayWorker->date === $dateString;
             });
             if ($dayWorker === null){
-                $dayWorkersDNIs->each(function(string $workerDni) use ($date, $instance){
-                    AttendanceDayWorker::create([
+                $records = $dayWorkersDNIs->map(function(string $workerDni) use ($date, $instance){
+                    return [
                         'worker_dni' => $workerDni,
                         'attendance_id' => $instance->id,
                         'date' => $date->format('c'),
                         'status' => AttendanceStatus::Present,
-                    ]);
-                });
+                    ];
+                })->toArray();
+
+                AttendanceDayWorker::insert($records);
             }
         });
     }
