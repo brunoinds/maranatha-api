@@ -105,6 +105,7 @@ class RecordUsersByCosts
     }
     private function getUserWorkersCosts():array
     {
+        return [];
         $workersSpendings = collect(WorkersAssistant::getWorkersSpendings())->map(function($workerSpendings){
             return $workerSpendings['spendings'];
         })->flatten(1);
