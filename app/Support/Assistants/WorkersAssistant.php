@@ -11,6 +11,7 @@ use Carbon\Carbon;
 use Illuminate\Support\Collection;
 use App\Models\Attendance;
 use App\Helpers\Enums\AttendanceStatus;
+use Illuminate\Support\Facades\Cache;
 
 class WorkersAssistant{
     public static function getListWorkers():array
@@ -54,6 +55,14 @@ class WorkersAssistant{
     }
 
     public static function getWorkersSpendings():array{
+
+        $cachedValue = Cache::store('file')->get('Maranatha/Workers/Spendings');
+
+        if ($cachedValue !== null){
+            return $cachedValue;
+        }
+
+
         $listWorkersWithPayments = WorkersAssistant::getListWorkersWithPayments();
         $workersPaymentDistribution = [];
         foreach ($listWorkersWithPayments as $worker){
@@ -190,6 +199,34 @@ class WorkersAssistant{
                 'spendings' => $spendingsFilled,
             ];
         }
+
+
+        $saveInCache = function($workerspaymentDistribution){
+            //Check if days of month is from 28 to day 5 of next month:
+
+            $cacheConfigs = [
+                'lowCache' => [
+                    'days' => [28, 29, 30, 31, 1, 2, 3, 4, 5],
+                    'minutes' => 2
+                ],
+                'highCache' => [
+                    'days' => [6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27],
+                    'minutes' => 30
+                ]
+            ];
+
+            $currentDate = Carbon::now();
+            $dayOfMonth = (int) $currentDate->format('d');
+
+            if (in_array($dayOfMonth, $cacheConfigs['lowCache']['days'])){
+                Cache::store('file')->put('Maranatha/Workers/Spendings', $workerspaymentDistribution, $cacheConfigs['lowCache']['minutes'] * 60);
+            }else{
+                Cache::store('file')->put('Maranatha/Workers/Spendings', $workerspaymentDistribution, $cacheConfigs['highCache']['minutes'] * 60);
+            }
+        };
+
+
+        $saveInCache($workersPaymentDistribution);
 
         return $workersPaymentDistribution;
     }

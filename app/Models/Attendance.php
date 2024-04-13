@@ -35,6 +35,7 @@ class Attendance extends Model
     public function dates(): array
     {
         $dates = [];
+
         $from_date = new \DateTime($this->from_date);
         $to_date = Carbon::createFromDate(new \DateTime($this->to_date))->addDays(1)->toDateTime();
         $interval = \DateInterval::createFromDateString('1 day');
