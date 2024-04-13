@@ -51,53 +51,54 @@ class RecordUsersByCosts
 
     private function getUserInvoicesCosts(): array
     {
-    $outputList = [];
+        $outputList = [];
 
-    // Eager load reports with related invoices and users
-    $reports = Report::with('invoices', 'user')
-        ->where('status', ReportStatus::Approved)
-        ->orWhere('status', ReportStatus::Restituted)
-        ->when($this->userId !== null, function ($query) {
-            return $query->where('user_id', $this->userId);
-        })
-        ->get();
+        // Eager load reports with related invoices and users
+        $reports = Report::with('invoices', 'user')
+            ->where('status', ReportStatus::Approved)
+            ->orWhere('status', ReportStatus::Restituted)
+            ->when($this->userId !== null, function ($query) {
+                return $query->where('user_id', $this->userId);
+            })
+            ->get();
 
-    foreach ($reports as $report) {
-        foreach ($report->invoices as $invoice) {
-            // Filter invoices based on conditions
-            if (($this->startDate === null || $invoice->date >= $this->startDate->format('c'))
-                && ($this->endDate === null || $invoice->date <= $this->endDate->format('c'))
-                && ($this->jobCode === null || $invoice->job_code === $this->jobCode)
-                && ($this->expenseCode === null || $invoice->expense_code === $this->expenseCode)
-                && ($this->type === null || $this->type === 'Invoices' || $invoice->type === $this->type)) {
+        foreach ($reports as $report) {
+            foreach ($report->invoices as $invoice) {
+                // Filter invoices based on conditions
+                if (($this->startDate === null || $invoice->date >= $this->startDate->format('c'))
+                    && ($this->endDate === null || $invoice->date <= $this->endDate->format('c'))
+                    && ($this->jobCode === null || $invoice->job_code === $this->jobCode)
+                    && ($this->expenseCode === null || $invoice->expense_code === $this->expenseCode)
+                    && ($this->type === null || $this->type === 'Invoices' || $invoice->type === $this->type)) {
 
-                $invoiceData = [
-                    'id' => $invoice->id,
-                    'date' => $invoice->date,
-                    'description' => $invoice->description,
-                    'type' => $invoice->type,
-                    'user' => [
-                        'id' => $report->user->id,
-                        'name' => $report->user->name,
-                        'username' => $report->user->username,
-                    ],
-                    'user_name' => $report->user->name,
-                    'job_code' => $invoice->job_code,
-                    'expense_code' => $invoice->expense_code,
-                    'amount_in_soles' => $invoice->amountInSoles(),
-                    'amount_in_dollars' => $invoice->amountInDollars(),
-                ];
+                    $invoiceData = [
+                        'id' => $invoice->id,
+                        'date' => $invoice->date,
+                        'description' => $invoice->description,
+                        'type' => $invoice->type,
+                        'user' => [
+                            'id' => $report->user->id,
+                            'name' => $report->user->name,
+                            'username' => $report->user->username,
+                        ],
+                        'user_name' => $report->user->name,
+                        'job_code' => $invoice->job_code,
+                        'expense_code' => $invoice->expense_code,
+                        'amount_in_soles' => $invoice->amountInSoles(),
+                        'amount_in_dollars' => $invoice->amountInDollars(),
+                    ];
 
-                $outputList[] = $invoiceData;
+                    $outputList[] = $invoiceData;
+                }
             }
         }
-    }
 
-    return $outputList;
-}
+        return $outputList;
+    }
 
     private function getUserWorkersCosts():array
     {
+        return [];
         $workersSpendings = collect(WorkersAssistant::getWorkersSpendings())->map(function($workerSpendings){
             return $workerSpendings['spendings'];
         })->flatten(1);
