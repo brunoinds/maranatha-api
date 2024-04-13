@@ -53,7 +53,6 @@ class RecordUsersByCosts
     {
         $outputList = [];
 
-        // Eager load reports with related invoices and users
         $reports = Report::with('invoices', 'user')
             ->where('status', ReportStatus::Approved)
             ->orWhere('status', ReportStatus::Restituted)
@@ -64,8 +63,21 @@ class RecordUsersByCosts
 
         foreach ($reports as $report) {
             foreach ($report->invoices as $invoice) {
-                // Filter invoices based on conditions
-                if (($this->startDate === null || $invoice->date >= $this->startDate->format('c'))
+                // Filter invoices based on conditions. Is the same of:
+                /*
+                    $invoices = $report->invoices()->where('date', '>=', $instance->startDate->format('c'))->where('date', '<=', $instance->endDate->format('c'));
+                    if ($instance->jobCode !== null){
+                        $invoices = $invoices->where('job_code', '=', $instance->jobCode);
+                    }
+                    if ($instance->expenseCode !== null){
+                        $invoices = $invoices->where('expense_code', '=', $instance->expenseCode);
+                    }
+                    if ($instance->type !== null && $instance->type !== 'Invoices'){
+                        $invoices = $invoices->where('type', '=', $instance->type);
+                    }
+                */
+
+                if (   ($this->startDate === null || $invoice->date >= $this->startDate->format('c'))
                     && ($this->endDate === null || $invoice->date <= $this->endDate->format('c'))
                     && ($this->jobCode === null || $invoice->job_code === $this->jobCode)
                     && ($this->expenseCode === null || $invoice->expense_code === $this->expenseCode)
@@ -98,7 +110,7 @@ class RecordUsersByCosts
 
     private function getUserWorkersCosts():array
     {
-        return [];
+        //TODO: Refactor to use Eagle Loading in the future, on the getWorkersSpendings
         $workersSpendings = collect(WorkersAssistant::getWorkersSpendings())->map(function($workerSpendings){
             return $workerSpendings['spendings'];
         })->flatten(1);
@@ -124,7 +136,6 @@ class RecordUsersByCosts
 
         $spendings = collect($spendingsInSpan)
         ->filter(function($spending){
-            //Should filter all spendings with > 0 amount
             return $spending['amount'] > 0;
         })
         ->map(function($spending){
