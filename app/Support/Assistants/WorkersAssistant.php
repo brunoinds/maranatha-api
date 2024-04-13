@@ -54,7 +54,6 @@ class WorkersAssistant{
     }
 
     public static function getWorkersSpendings():array{
-        return [];
         $listWorkersWithPayments = WorkersAssistant::getListWorkersWithPayments();
         $workersPaymentDistribution = [];
         foreach ($listWorkersWithPayments as $worker){
