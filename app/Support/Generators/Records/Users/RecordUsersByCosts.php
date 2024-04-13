@@ -49,63 +49,55 @@ class RecordUsersByCosts
         $this->userId = $options['userId'];
     }
 
-    private function getUserInvoicesCosts():array
+    private function getUserInvoicesCosts(): array
     {
-        $instance = $this;
-        $outputList = collect([]);
+    $outputList = [];
 
-        $query = Report::query()->where('status', '=', ReportStatus::Approved)->orWhere('status', '=', ReportStatus::Restituted);
+    // Eager load reports with related invoices and users
+    $reports = Report::with('invoices', 'user')
+        ->where('status', ReportStatus::Approved)
+        ->orWhere('status', ReportStatus::Restituted)
+        ->when($this->userId !== null, function ($query) {
+            return $query->where('user_id', $this->userId);
+        })
+        ->get();
 
-        if ($this->userId !== null){
-            $query = $query->where('user_id', '=', $this->userId);
-        }
+    foreach ($reports as $report) {
+        foreach ($report->invoices as $invoice) {
+            // Filter invoices based on conditions
+            if (($this->startDate === null || $invoice->date >= $this->startDate->format('c'))
+                && ($this->endDate === null || $invoice->date <= $this->endDate->format('c'))
+                && ($this->jobCode === null || $invoice->job_code === $this->jobCode)
+                && ($this->expenseCode === null || $invoice->expense_code === $this->expenseCode)
+                && ($this->type === null || $this->type === 'Invoices' || $invoice->type === $this->type)) {
 
-        $reports = $query->get();
-
-        $reports->each(function(Report $report) use (&$outputList, $instance){
-            $invoices = $report->invoices()->where('date', '>=', $instance->startDate->format('c'))->where('date', '<=', $instance->endDate->format('c'));
-
-            if ($instance->jobCode !== null){
-                $invoices = $invoices->where('job_code', '=', $instance->jobCode);
-            }
-
-            if ($instance->expenseCode !== null){
-                $invoices = $invoices->where('expense_code', '=', $instance->expenseCode);
-            }
-
-            if ($instance->type !== null && $instance->type !== 'Invoices'){
-                $invoices = $invoices->where('type', '=', $instance->type);
-            }
-
-            $invoices = $invoices->get();
-
-
-            $invoices->each(function(Invoice $invoice) use (&$outputList, $report){
                 $invoiceData = [
                     'id' => $invoice->id,
                     'date' => $invoice->date,
                     'description' => $invoice->description,
                     'type' => $invoice->type,
                     'user' => [
-                        'id' => $report->user()->get()->first()->id,
-                        'name' => $report->user()->get()->first()->name,
-                        'username' => $report->user()->get()->first()->username,
+                        'id' => $report->user->id,
+                        'name' => $report->user->name,
+                        'username' => $report->user->username,
                     ],
-                    'user_name' => $report->user()->get()->first()->name,
+                    'user_name' => $report->user->name,
                     'job_code' => $invoice->job_code,
                     'expense_code' => $invoice->expense_code,
                     'amount_in_soles' => $invoice->amountInSoles(),
                     'amount_in_dollars' => $invoice->amountInDollars(),
                 ];
-                $outputList->push($invoiceData);
-            });
-        });
 
-        return $outputList->toArray();
+                $outputList[] = $invoiceData;
+            }
+        }
     }
+
+    return $outputList;
+}
+
     private function getUserWorkersCosts():array
     {
-        return [];
         $workersSpendings = collect(WorkersAssistant::getWorkersSpendings())->map(function($workerSpendings){
             return $workerSpendings['spendings'];
         })->flatten(1);
