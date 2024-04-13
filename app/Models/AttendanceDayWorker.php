@@ -25,6 +25,6 @@ class AttendanceDayWorker extends Model
     ];
 
     public function attendance(){
-        return $this->belongsTo(Attendance::class)->first();
+        return $this->belongsTo(Attendance::class);
     }
 }

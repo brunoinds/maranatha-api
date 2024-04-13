@@ -55,7 +55,6 @@ class RecordAttendancesByWorker
             $absencesQuery = clone $query;
             $worker['attendances'] = $attendanesQuery->where('worker_dni', '=', $worker['dni'])->where('status', '=', AttendanceStatus::Present->value)->get()->count();
             $worker['absences'] = $absencesQuery->where('worker_dni', '=', $worker['dni'])->where('status', '=', AttendanceStatus::Absent->value)->get()->count();
-
             $worker['is_active'] = $worker['is_active'] === true ? 'Sí' : 'No';
         }
 
