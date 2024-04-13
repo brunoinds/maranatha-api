@@ -29,7 +29,7 @@ class RecordAttendancesByJobs
     private string|null $expenseCode = null;
     private string|null $supervisor = null;
     private string|null $workerDni = null;
-    
+
     /**
      * @param array $options
      * @param DateTime $options['startDate']
@@ -39,7 +39,7 @@ class RecordAttendancesByJobs
      * @param null|string $options['supervisor']
      * @param null|string $options['workerDni']
      */
-    
+
     public function __construct(array $options){
         $this->startDate = $options['startDate'];
         $this->endDate = $options['endDate'];
@@ -64,7 +64,7 @@ class RecordAttendancesByJobs
         if ($this->jobCode !== null){
             $spendingsInSpan = $spendingsInSpan->where('job.code', '=', $this->jobCode);
         }
-        
+
         if ($this->expenseCode !== null){
             $spendingsInSpan = $spendingsInSpan->where('expense.code', '=', $this->expenseCode);
         }
@@ -78,9 +78,17 @@ class RecordAttendancesByJobs
             return $spending['attendance']['id'] . '/~/' . $spending['attendance']['created_at'] . '/~/' . $spending['job']['code'] . '/~/' . $spending['expense']['code'] . '/~/' . $spending['attendance_day']['worker_dni'] . '/~/' . $spending['worker']['supervisor'] . '/~/' . $spending['worker']['name'];
         });
 
-        $spendingsInSpan = array_column($spendingsInSpan->map(function($spendings, $code){
+        // Get all attendance IDs
+        $attendanceIds = collect($spendingsInSpan)->map(function($spendings, $code) {
+            return explode('/~/', $code)[0];
+        })->unique()->toArray();
+
+        // Load all Attendance records at once
+        $allAttendances = Attendance::query()->whereIn('id', $attendanceIds)->get();
+
+        $spendingsInSpan = array_column($spendingsInSpan->map(function($spendings, $code) use ($allAttendances){
             $attendanceId = explode('/~/', $code)[0];
-            $attendance = Attendance::where('id', $attendanceId)->first();
+            $attendance = $allAttendances->where('id', $attendanceId)->first();
             $attendanceFromDate = Carbon::parse($attendance->from_date)->format('d/m/Y');
             $attendanceToDate = Carbon::parse($attendance->to_date)->format('d/m/Y');
 
@@ -152,7 +160,7 @@ class RecordAttendancesByJobs
 
         $spendings = array_column($spendings, null);
 
-        
+
         return [
             'headers' => [
                 [
