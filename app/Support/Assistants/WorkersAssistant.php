@@ -192,7 +192,6 @@ class WorkersAssistant{
             ];
         }
 
-
         return $workersPaymentDistribution;
     }
 }

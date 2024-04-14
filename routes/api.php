@@ -1,7 +1,6 @@
 <?php
 
 use App\Http\Controllers\AttendanceController;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\InvoiceController;
 use App\Http\Controllers\ReportController;
@@ -12,8 +11,6 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\JobController;
 use App\Http\Controllers\ExpenseController;
 use App\Support\Assistants\WorkersAssistant;
-use App\Support\Generators\ReportGenerator;
-use App\Support\GoogleSheets\Excel;
 use mikehaertl\shellcommand\Command;
 use App\Http\Controllers\ManagementRecordsController;
 use App\Http\Controllers\ManagementBalancesController;

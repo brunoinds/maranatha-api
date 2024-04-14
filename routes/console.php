@@ -21,27 +21,7 @@ Artisan::command('inspire', function () {
 })->purpose('Display an inspiring quote');
 
 
-/*Artisan::command('clear:db', function(){
-    $commandLine = 'rm -rf database/database.sqlite && touch database/database.sqlite && php artisan migrate --force';
-    $command = new Command($commandLine);
-    $response = $command->execute();
-    if (!$response){
-        $this->error('Failed to clear database');
-        return;
-    }
-    $this->info('Database cleared successfully');
-})->purpose('Clear the database and create a new one');*/
-
 Artisan::command('check:environment', function () {
     $appEnvirontment = env('APP_ENV');
     $this->info('App environment: ' . $appEnvirontment);
 })->purpose('Check the current environment');
-
-
-Artisan::command('re', function(){
-    $from_date = '2024-04-01T01:00:00.000-04:00';
-    $carbon = Carbon::parse($from_date);
-
-
-    $this->info($carbon->startOfDay()->toIso8601String());
-});

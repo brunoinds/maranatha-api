@@ -13,7 +13,6 @@ return [
         'source' => [
 
             'files' => [
-
                 /*
                  * The list of directories and files that will be included in the backup.
                  */
@@ -190,7 +189,6 @@ return [
      * the `Spatie\Backup\Notifications\Notifications` classes.
      */
     'notifications' => [
-
         'notifications' => [
             \Spatie\Backup\Notifications\Notifications\BackupHasFailedNotification::class => ['mail'],
             \Spatie\Backup\Notifications\Notifications\UnhealthyBackupWasFoundNotification::class => ['mail'],
