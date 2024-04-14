@@ -34,25 +34,13 @@ class Attendance extends Model
     }
     public function dates(): array
     {
-        $dates = [];
+        $startDate = Carbon::parse($fromDate)->startOfDay();
+        $endDate = Carbon::parse($toDate)->endOfDay();
 
-        $from_date = new \DateTime($this->from_date);
-        $to_date = Carbon::createFromDate(new \DateTime($this->to_date))->addDays(1)->toDateTime();
-        $interval = \DateInterval::createFromDateString('1 day');
-        $period = new \DatePeriod($from_date, $interval, $to_date);
-
-
+        $period = CarbonPeriod::create($startDate, $endDate);
         foreach ($period as $date) {
-            $dates[] = $date;
+            $dates[] = $date->toDateTime();
         }
-
-        if (count($dates) === 0){
-            if (Carbon::createFromDate($from_date)->isSameDay(Carbon::createFromDate($to_date))){
-                $dates[] = Carbon::createFromDate($from_date)->toDateTime();
-            }
-        }
-
-
         return $dates;
     }
     public function datesWorkers():array
