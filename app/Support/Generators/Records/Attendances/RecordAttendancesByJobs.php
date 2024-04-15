@@ -203,19 +203,19 @@ class RecordAttendancesByJobs
                     'key' => 'expense_code',
                 ],
                 [
-                    'title' => 'Costo/Día ($)',
+                    'title' => 'Costo/Día (Dólares)',
                     'key' => 'day_work_amount_in_dollars',
                 ],
                 [
-                    'title' => 'Costo/Día (S/.)',
+                    'title' => 'Costo/Día (Soles)',
                     'key' => 'day_work_amount_in_soles',
                 ],
                 [
-                    'title' => 'Costo Total ($)',
+                    'title' => 'Costo Total (Dólares)',
                     'key' => 'amount_in_dollars',
                 ],
                 [
-                    'title' => 'Costo Total (S/.)',
+                    'title' => 'Costo Total (Soles)',
                     'key' => 'amount_in_soles',
                 ]
             ],
