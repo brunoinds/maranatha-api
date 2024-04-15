@@ -34,8 +34,8 @@ class Attendance extends Model
     }
     public function dates(): array
     {
-        $startDate = Carbon::parse($fromDate)->startOfDay();
-        $endDate = Carbon::parse($toDate)->endOfDay();
+        $startDate = Carbon::parse($this->from_date)->startOfDay();
+        $endDate = Carbon::parse($this->to_date)->endOfDay();
 
         $period = CarbonPeriod::create($startDate, $endDate);
         foreach ($period as $date) {
