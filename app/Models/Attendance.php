@@ -9,6 +9,7 @@ use App\Models\User;
 use App\Models\Job;
 use App\Models\Expense;
 use Carbon\Carbon;
+use Carbon\CarbonPeriod;
 
 class Attendance extends Model
 {
