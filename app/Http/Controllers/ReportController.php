@@ -21,6 +21,7 @@ use App\Support\Assistants\BalanceAssistant;
 use Spatie\TemporaryDirectory\TemporaryDirectory;
 use DateTime;
 use App\Support\Creators\Reports\ReportPDFCreator;
+use Illuminate\Support\Str;
 
 
 class ReportController extends Controller
@@ -263,7 +264,9 @@ class ReportController extends Controller
         $pdf = ReportPDFCreator::new($report);
         $content = $pdf->create()->output();
 
-        $documentName = $report->title . '.pdf';
+        $documentName = Str::slug($report->title, '-') . '.pdf';
+
+
 
         $temporaryDirectory = (new TemporaryDirectory())->create();
         $tempPath = $temporaryDirectory->path($documentName);
@@ -280,7 +283,7 @@ class ReportController extends Controller
     public function downloadExcel(Report $report)
     {
         $excel = ReportAssistant::generateExcelDocument($report);
-        $documentName = $report->title . '.xlsx';
+        $documentName = Str::slug($report->title, '-') . '.xlsx';
         //Generate a temp directory and save the file there:
 
         $temporaryDirectory = (new TemporaryDirectory())->create();
