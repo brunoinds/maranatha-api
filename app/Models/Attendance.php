@@ -87,7 +87,11 @@ class Attendance extends Model
 
     public function removeWorkerDni(string $workerDni)
     {
-        $this->dayWorkers()->where('worker_dni', $workerDni)->delete();
+        foreach ($this->dayWorkers()->filter(function ($dayWorker) use ($workerDni) {
+            return $dayWorker->worker_dni === $workerDni;
+        }) as $dayWorker) {
+            $dayWorker->delete();
+        }
     }
 
     public function updateFromToDatesInAttendanceDayWorker()
@@ -126,6 +130,25 @@ class Attendance extends Model
 
                 AttendanceDayWorker::insert($records);
             }
+        });
+    }
+
+    public function updateWorkersDnis(array $workersDnis)
+    {
+        $dayWorkers = $this->dayWorkers();
+        $dayWorkersDNIs = $dayWorkers->map(function(AttendanceDayWorker $dayWorker){
+            return $dayWorker->worker_dni;
+        })->unique();
+
+        $workersDnisToDelete = $dayWorkersDNIs->diff($workersDnis);
+        $workersDnisToAdd = collect($workersDnis)->diff($dayWorkersDNIs);
+
+        $workersDnisToDelete->each(function(string $workerDni){
+            $this->removeWorkerDni($workerDni);
+        });
+
+        $workersDnisToAdd->each(function(string $workerDni){
+            $this->attachWorkerDni($workerDni);
         });
     }
 

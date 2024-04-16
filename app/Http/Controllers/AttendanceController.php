@@ -7,6 +7,7 @@ use App\Http\Requests\UpdateAttendanceRequest;
 use App\Models\Attendance;
 use App\Http\Requests\StoreAttendanceWithWorkersRequest;
 use App\Http\Requests\StoreWorkersAttendancesRequest;
+use App\Http\Requests\TransferAttendanceRequest;
 use App\Models\AttendanceDayWorker;
 
 class AttendanceController extends Controller
@@ -112,7 +113,17 @@ class AttendanceController extends Controller
     {
         $attendance->update($request->validated());
         $attendance->updateFromToDatesInAttendanceDayWorker();
+
+        if (isset($request->validated()['workers_dnis'])) {
+            $attendance->updateWorkersDnis($request->validated()['workers_dnis']);
+        }
         return response()->json(['message' => 'Attendance updated', 'attendance' => $attendance->toArray()]);
+    }
+
+    public function transferOwnership(TransferAttendanceRequest $request, Attendance $attendance)
+    {
+        $attendance->update($request->validated());
+        return response()->json(['message' => 'Attendance ownership transfered', 'attendance' => $attendance->toArray()]);
     }
 
     /**

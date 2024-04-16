@@ -4,14 +4,14 @@ namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class UpdateAttendanceRequest extends FormRequest
+class TransferAttendanceRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
      */
     public function authorize(): bool
     {
-        return true;
+        return auth()->check() && auth()->user()->isAdmin();
     }
 
     /**
@@ -22,13 +22,7 @@ class UpdateAttendanceRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'description' => ['string', 'nullable', 'max:400'],
-            'job_code' => ['required', 'string', 'max:100'],
-            'from_date' => ['date'],
-            'to_date' => ['date'],
-            'expense_code' => ['required', 'string', 'max:100'],
-            'workers_dnis' => ['array', 'min:1'],
-            'workers_dnis.*' => ['string', 'max:100'],
+            'user_id' => ['required', 'integer', 'exists:users,id'],
         ];
     }
 }

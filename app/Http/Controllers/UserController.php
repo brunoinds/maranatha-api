@@ -40,7 +40,9 @@ class UserController extends Controller
             }
         }
 
-        $user = User::create($request->validated());
+        $data['username'] = strtolower($data['username']);
+
+        $user = User::create($data);
         return response()->json(['message' => 'User created', 'user' => $user->toArray()]);
     }
 
@@ -61,7 +63,7 @@ class UserController extends Controller
         if ($user->username === 'admin'){
             return response()->json(['message' => 'You can not delete the admin'], 403);
         }
-        
+
         if (!auth()->user()->isAdmin()){
             return response()->json(['message' => 'You do not have permission to delete users'], 403);
         }

@@ -175,6 +175,8 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::post('attendances-with-workers', AttendanceController::class . '@storeWithWorkers');
         Route::get('attendances/{attendance}/with-workers-attendances', AttendanceController::class . '@showWithWorkersAttendances');
         Route::put('attendances/{attendance}/workers-attendances', AttendanceController::class . '@storeWorkersAttendances');
+        Route::put('attendances/{attendance}/transfer-ownership', AttendanceController::class . '@transferOwnership');
+
         Route::get('/workers-list', function(){
             $workers = WorkersAssistant::getListWorkers();
             return response()->json($workers);
