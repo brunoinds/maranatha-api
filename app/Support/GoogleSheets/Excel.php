@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Log;
 
 class Excel{
     public static function updateDBSheet($output):void{
@@ -59,10 +60,17 @@ class Excel{
         }
 
 
+        $workers = null;
+        $paymentsMonths = null;
+        try {
+            $sheet = Sheets::spreadsheet(env('GOOGLE_SHEETS_DB_ID'))->sheet('👷 Workers');
+            $workers = $sheet->range('A4:Z600')->all();
+            $paymentsMonths = $sheet->range('G3:Z3')->all()[0];
+        } catch (\Google\Service\Exception $exception) {
+            Log::warning('Failed to get Workers from Google Spreadsheet Workers', ['exception' => $exception]);
+            return [];
+        }
 
-        $sheet = Sheets::spreadsheet(env('GOOGLE_SHEETS_DB_ID'))->sheet('👷 Workers');
-        $workers = $sheet->range('A4:Z600')->all();
-        $paymentsMonths = $sheet->range('G3:Z3')->all()[0];
 
         $data = collect($workers)->filter(function($item){
             return $item[0] !== "";
