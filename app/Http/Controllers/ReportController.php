@@ -21,7 +21,6 @@ use App\Support\Assistants\BalanceAssistant;
 use Spatie\TemporaryDirectory\TemporaryDirectory;
 use DateTime;
 use App\Support\Creators\Reports\ReportPDFCreator;
-use Illuminate\Support\Str;
 
 
 class ReportController extends Controller
