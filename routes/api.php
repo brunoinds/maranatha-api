@@ -219,6 +219,8 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::group(['prefix' => 'records'], function () {
             Route::get('attendances/by-worker', ManagementRecordsController::class . '@attendancesByWorker');
             Route::get('attendances/by-jobs', ManagementRecordsController::class . '@attendancesByJobs');
+            Route::get('attendances/by-jobs-expenses', ManagementRecordsController::class . '@attendancesByJobsExpenses');
+
             Route::get('jobs/by-costs', ManagementRecordsController::class . '@jobsByCosts');
             Route::get('users/by-costs', ManagementRecordsController::class . '@usersByCosts');
             Route::get('reports/by-time', ManagementRecordsController::class . '@reportsByTime');

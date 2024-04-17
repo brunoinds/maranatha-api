@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Support\Generators\Records\Attendances\RecordAttendancesByWorker;
 use App\Support\Generators\Records\Jobs\RecordJobsByCosts;
 use App\Support\Generators\Records\Attendances\RecordAttendancesByJobs;
+use App\Support\Generators\Records\Attendances\RecordAttendancesByJobsExpenses;
 use App\Support\Generators\Records\Users\RecordUsersByCosts;
 use App\Support\Generators\Records\Reports\RecordReportsByTime;
 use DateTime;
@@ -13,7 +14,7 @@ use Carbon\Carbon;
 
 class ManagementRecordsController extends Controller
 {
-    
+
     public function attendancesByWorker()
     {
         $validatedData = request()->validate([
@@ -97,6 +98,40 @@ class ManagementRecordsController extends Controller
         $validatedData = array_merge($defaults, $validatedData);
 
         $record = new RecordAttendancesByJobs([
+            'startDate' => new DateTime($validatedData['start_date']),
+            'endDate' => new DateTime($validatedData['end_date']),
+            'jobCode' => $validatedData['job_code'],
+            'expenseCode' => $validatedData['expense_code'],
+            'supervisor' => $validatedData['supervisor'],
+            'workerDni' => $validatedData['worker_dni'],
+        ]);
+
+        $document = $record->generate();
+
+        return response()->json($document);
+    }
+
+    public function attendancesByJobsExpenses()
+    {
+        $validatedData = request()->validate([
+            'start_date' => 'required|date',
+            'end_date' => 'required|date',
+            'job_code' => 'nullable|string',
+            'expense_code' => 'nullable|string',
+            'supervisor' => 'nullable|string',
+            'worker_dni' => 'nullable|string',
+        ]);
+
+        $defaults = [
+            'job_code' => null,
+            'expense_code' => null,
+            'supervisor' => null,
+            'worker_dni' => null,
+        ];
+
+        $validatedData = array_merge($defaults, $validatedData);
+
+        $record = new RecordAttendancesByJobsExpenses([
             'startDate' => new DateTime($validatedData['start_date']),
             'endDate' => new DateTime($validatedData['end_date']),
             'jobCode' => $validatedData['job_code'],
