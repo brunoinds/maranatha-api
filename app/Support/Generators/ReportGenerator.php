@@ -32,6 +32,7 @@ class ReportGenerator{
                         'amount' => $reportAmount,
                         'money_type' => $report->money_type,
                         'date' => $reportDate,
+                        'country' => $report->country
                     ],
                     'ticket_number' => $invoice->ticket_number,
                     'commerce_number' => $invoice->commerce_number,

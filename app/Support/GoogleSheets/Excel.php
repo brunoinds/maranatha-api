@@ -42,6 +42,7 @@ class Excel{
                 $item['job_code'],
                 $item['amount'],
                 $item['report']['money_type'],
+                $item['report']['country'],
                 $item['identifier'],
                 $item['report']['date'],
                 $item['report']['amount'],
