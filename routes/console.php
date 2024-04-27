@@ -27,3 +27,13 @@ Artisan::command('check:environment', function () {
     $appEnvirontment = env('APP_ENV');
     $this->info('App environment: ' . $appEnvirontment);
 })->purpose('Check the current environment');
+
+
+Artisan::command('run:lowercase', function () {
+    $users = App\Models\User::all();
+    $users->each(function($user){
+        $user->username = strtolower($user->username);
+        $user->save();
+    });
+    $this->info('All users usernames set to lowercase');
+})->purpose('Set all users usernames to lowercase');

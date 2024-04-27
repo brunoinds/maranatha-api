@@ -6,13 +6,11 @@ use App\Helpers\Enums\ReportStatus;
 use App\Helpers\Toolbox;
 use App\Http\Requests\StoreReportRequest;
 use App\Http\Requests\UpdateReportRequest;
-use App\Mail\NewReportSent;
 use App\Models\Report;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use App\Support\Assistants\ReportAssistant;
-use Illuminate\Support\Facades\Mail;
 use App\Support\Generators\ReportGenerator;
 use App\Support\GoogleSheets\Excel;
 use OneSignal;
@@ -144,7 +142,6 @@ class ReportController extends Controller
             $report->approved_at = null;
             $report->restituted_at = null;
         }
-
 
         $report->save();
 
