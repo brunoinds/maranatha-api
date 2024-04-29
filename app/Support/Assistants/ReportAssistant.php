@@ -125,6 +125,7 @@ class ReportAssistant{
                     'border' => 'thin',
                     'height' => 24,
                 ]);
+
                 $i++;
                 continue;
             }
@@ -157,6 +158,10 @@ class ReportAssistant{
                 'height' => 24,
             ]);
             $i++;
+
+            $sheet->setStyle("G$i", [
+                'text-align' => 'right',
+            ]);
         }
 
 
@@ -178,6 +183,10 @@ class ReportAssistant{
             'vertical-align' => 'center',
             'border' => 'thin',
             'height' => 24,
+        ]);
+
+        $sheet->setStyle("G$totalsCellIndex", [
+            'text-align' => 'right',
         ]);
         $sheet->mergeCells("A$totalsCellIndex:F$totalsCellIndex");
 
