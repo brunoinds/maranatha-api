@@ -147,7 +147,7 @@ class ReportAssistant{
                 $dateFormatedLocal,
                 $invoice->ticket_number,
                 $invoiceDescription,
-                $invoice->job_code,
+                self::jobCodeOverride($invoice->job_code),
                 $invoice->expense_code,
                 ($j + 1),
                 $invoice->amount,
@@ -193,5 +193,15 @@ class ReportAssistant{
         $sheet->setColWidths(['A' => 15, 'B' => 16, 'C' => 40, 'D' => 10, 'E' => 15, 'F' => 10, 'G' => 20]);
 
         return $excel;
+    }
+
+    public static function jobCodeOverride(string $jobCode): string{
+        $override = ['0001', '0000'];
+
+        if (in_array($jobCode, $override)){
+            return '';
+        }
+
+        return $jobCode;
     }
 }

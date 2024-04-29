@@ -5,6 +5,7 @@ namespace App\Support\Creators\Reports;
 
 use App\Helpers\Toolbox;
 use App\Models\Report;
+use App\Support\Assistants\ReportAssistant;
 use DateTime;
 use Carbon\Carbon;
 use Dompdf\Dompdf;
@@ -71,12 +72,13 @@ class ReportPDFCreator
                 $invoiceDescription = str_replace($matches[0], "($amount)", $invoiceDescription);
             }
 
+            $jobCode = ReportAssistant::jobCodeOverride($invoice->job_code);
 
             $invoicesItemsHtml .= "<tr>
                 <td>$date</td>
                 <td>$invoice->ticket_number</td>
                 <td>$invoiceDescription</td>
-                <td>$invoice->job_code</td>
+                <td>$jobCode</td>
                 <td>$invoice->expense_code</td>
                 <td>$iteration</td>
                 <td>$amount</td>
