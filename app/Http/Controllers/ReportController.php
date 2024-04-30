@@ -20,6 +20,7 @@ use Spatie\TemporaryDirectory\TemporaryDirectory;
 use DateTime;
 use App\Support\Creators\Reports\ReportPDFCreator;
 use Illuminate\Support\Facades\Response;
+use Illuminate\Support\Facades\Cache;
 
 class ReportController extends Controller
 {
@@ -255,10 +256,34 @@ class ReportController extends Controller
         ]);
     }
 
+
+    public function checkProgressDownloadPDF(Request $request)
+    {
+        $progressId = request()->query('progress_id');
+
+        if (!$progressId){
+            return response()->json(['message' => 'Progress ID not found'], 404);
+        }
+
+        $progressItem = json_decode(Cache::store('file')->get('Maranatha/PDFRender/Progress/' . $progressId), true);
+        if ($progressItem === null){
+            return response()->json(['message' => 'Progress not found'], 404);
+        }
+        return response()->json($progressItem);
+    }
+
     public function downloadPDF(Report $report)
     {
+        //Check if request has query item called progress_id:
+        $progressId = request()->query('progress_id');
+        $options = [];
+        if ($progressId){
+            $options['progressId'] = $progressId;
+        }
+
+
         $pdf = ReportPDFCreator::new($report);
-        $content = $pdf->create()->output();
+        $content = $pdf->create($options)->output();
 
         $documentName = Str::slug($report->title, '-') . '.pdf';
 

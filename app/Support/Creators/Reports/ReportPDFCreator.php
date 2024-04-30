@@ -10,6 +10,8 @@ use DateTime;
 use Carbon\Carbon;
 use Dompdf\Dompdf;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Cache;
+
 
 class ReportPDFCreator
 {
@@ -155,14 +157,61 @@ class ReportPDFCreator
 
 
 
-    public function create() : Dompdf
+    public function create($options = []) : Dompdf
     {
         $dompdf = new Dompdf();
         $dompdf->getOptions()->setChroot([base_path('public') . '/storage/']);
+
+        $totalFramesToRenderCount = 0;
+        $finishedFramesToRenderCount = 0;
+
+
+
+        if ($options['progressId']){
+            $onProgress = function($percentage, $framesRendered, $framesTotal) use ($options){
+                $progressItem = [
+                    'percentage' => $percentage,
+                    'framesRendered' => $framesRendered,
+                    'framesTotal' => $framesTotal
+                ];
+                Cache::store('file')->put('Maranatha/PDFRender/Progress/' . $options['progressId'], json_encode($progressItem));
+            };
+            $dompdf->setCallbacks([
+                'checksum' => [
+                    'event' => 'end_frame',
+                    'f' => function ($frame) use (&$finishedFramesToRenderCount, &$totalFramesToRenderCount, &$onProgress) {
+                        $finishedFramesToRenderCount++;
+
+                        if ($totalFramesToRenderCount === 0 || $finishedFramesToRenderCount > $totalFramesToRenderCount){
+                            return;
+                        }
+                        $onProgress($finishedFramesToRenderCount / $totalFramesToRenderCount * 100, $finishedFramesToRenderCount, $totalFramesToRenderCount);
+                    }
+                ],
+                'checksum2' => [
+                    "event" => "begin_frame",
+                    "f" => function ($frame) use (&$dompdf, &$totalFramesToRenderCount){
+                        if ($totalFramesToRenderCount !== 0){
+                            return;
+                        }
+                        $reflection = new \ReflectionClass($dompdf);
+                        $property = $reflection->getProperty('tree');
+                        $property->setAccessible(true);
+                        $tree = $property->getValue($dompdf);
+
+                        foreach ($tree as $frame) {
+                            $totalFramesToRenderCount++;
+                        }
+                    }
+                ]
+            ]);
+        }
+
+
+
         $dompdf->loadHtml($this->html);
         $dompdf->setPaper('A4', 'portrait');
         $dompdf->render();
-
         return $dompdf;
     }
 

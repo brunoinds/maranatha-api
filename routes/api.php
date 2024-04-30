@@ -210,6 +210,9 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::get('/reports/{report}/pdf-download', [
             ReportController::class, 'downloadPDF'
         ]);
+        Route::get('/reports/{report}/check-progress-pdf-download', [
+            ReportController::class, 'checkProgressDownloadPDF'
+        ]);
     });
 
 
