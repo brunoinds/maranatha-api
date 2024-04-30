@@ -19,7 +19,7 @@ use App\Support\Assistants\BalanceAssistant;
 use Spatie\TemporaryDirectory\TemporaryDirectory;
 use DateTime;
 use App\Support\Creators\Reports\ReportPDFCreator;
-
+use Illuminate\Support\Facades\Response;
 
 class ReportController extends Controller
 {
@@ -271,6 +271,7 @@ class ReportController extends Controller
 
         return response()
             ->download($tempPath, $documentName, [
+                'Content-Encoding' => 'base64',
                 'Content-Length' => filesize($tempPath),
                 'Maranatha-Content-Size' => filesize($tempPath),
             ])->deleteFileAfterSend(true);
