@@ -273,7 +273,6 @@ class ReportController extends Controller
             ->download($tempPath, $documentName, [
                 'Content-Encoding' => 'base64',
                 'Content-Length' => filesize($tempPath),
-                'Maranatha-Content-Size' => filesize($tempPath),
             ])->deleteFileAfterSend(true);
     }
 
