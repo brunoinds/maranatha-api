@@ -167,7 +167,7 @@ class ReportPDFCreator
 
 
 
-        if ($options['progressId']){
+        if (isset($options['progressId'])){
             $onProgress = function($percentage, $framesRendered, $framesTotal) use ($options){
                 $progressItem = [
                     'percentage' => $percentage,
