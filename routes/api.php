@@ -16,7 +16,7 @@ use App\Http\Controllers\ManagementRecordsController;
 use App\Http\Controllers\ManagementBalancesController;
 use App\Http\Controllers\ApplicationNativeController;
 use App\Http\Controllers\ApplicationWebController;
-
+use App\Http\Controllers\InstantMessageController;
 
 /*
 |--------------------------------------------------------------------------
@@ -218,6 +218,18 @@ Route::middleware(['auth:sanctum'])->group(function () {
                 ReportController::class, 'checkProgressDownloadPDF'
             ]);
         });
+    });
+
+
+    //Chat group:
+    Route::group([], function(){
+        Route::post('/chats/users/{user}/messages', [
+            InstantMessageController::class, 'store'
+        ]);
+
+        Route::get('/chats/users/{user}/messages', [
+            InstantMessageController::class, 'messagesInConversation'
+        ]);
     });
 
 
