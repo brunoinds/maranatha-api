@@ -29,6 +29,7 @@ class RecordAttendancesByJobs
     private string|null $expenseCode = null;
     private string|null $supervisor = null;
     private string|null $workerDni = null;
+    private string|null $jobZone = null;
 
     /**
      * @param array $options
@@ -38,6 +39,7 @@ class RecordAttendancesByJobs
      * @param null|string $options['expenseCode']
      * @param null|string $options['supervisor']
      * @param null|string $options['workerDni']
+     * @param null|string $options['jobZone']
      */
 
     public function __construct(array $options){
@@ -47,6 +49,7 @@ class RecordAttendancesByJobs
         $this->expenseCode = $options['expenseCode'];
         $this->supervisor = $options['supervisor'];
         $this->workerDni = $options['workerDni'];
+        $this->jobZone = $options['jobZone'];
     }
 
     private function getWorkersData():array
@@ -73,9 +76,14 @@ class RecordAttendancesByJobs
             $spendingsInSpan = $spendingsInSpan->where('worker.supervisor', '=', $this->supervisor);
         }
 
+        if ($this->jobZone !== null){
+            $spendingsInSpan = $spendingsInSpan->where('job.zone', '=', $this->jobZone);
+        }
+
+
 
         $spendingsInSpan = collect($spendingsInSpan)->groupBy(function($spending){
-            return $spending['attendance']['id'] . '/~/' . $spending['attendance']['created_at'] . '/~/' . $spending['job']['code'] . '/~/' . $spending['expense']['code'] . '/~/' . $spending['attendance_day']['worker_dni'] . '/~/' . $spending['worker']['supervisor'] . '/~/' . $spending['worker']['name'];
+            return $spending['attendance']['id'] . '/~/' . $spending['attendance']['created_at'] . '/~/' . $spending['job']['code'] . '/~/' . $spending['expense']['code'] . '/~/' . $spending['attendance_day']['worker_dni'] . '/~/' . $spending['worker']['supervisor'] . '/~/' . $spending['worker']['name'] . '/~/' . $spending['job']['zone'];
         });
 
         // Get all attendance IDs
@@ -102,6 +110,7 @@ class RecordAttendancesByJobs
                 'worker_dni' => explode('/~/', $code)[4],
                 'supervisor' => explode('/~/', $code)[5],
                 'worker_name' => explode('/~/', $code)[6],
+                'job_zone' => explode('/~/', $code)[7],
                 'spendings' => collect($spendings)->map(function($spending){
                     $spending = Toolbox::toObject($spending);
                     $spending->amountInSoles = (function() use ($spending){
@@ -199,6 +208,10 @@ class RecordAttendancesByJobs
                     'key' => 'job_code',
                 ],
                 [
+                    'title' => 'Job Zone',
+                    'key' => 'job_zone',
+                ],
+                [
                     'title' => 'Expense',
                     'key' => 'expense_code',
                 ],
@@ -234,6 +247,7 @@ class RecordAttendancesByJobs
                 'jobCode' => $this->jobCode,
                 'expenseCode' => $this->expenseCode,
                 'workerDni' => $this->workerDni,
+                'jobZone' => $this->jobZone,
             ],
         ];
     }

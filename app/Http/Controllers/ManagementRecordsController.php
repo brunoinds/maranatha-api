@@ -87,10 +87,12 @@ class ManagementRecordsController extends Controller
             'expense_code' => 'nullable|string',
             'supervisor' => 'nullable|string',
             'worker_dni' => 'nullable|string',
+            'job_zone' => 'nullable|string',
         ]);
 
         $defaults = [
             'job_code' => null,
+            'job_zone' => null,
             'expense_code' => null,
             'supervisor' => null,
             'worker_dni' => null,
@@ -105,6 +107,7 @@ class ManagementRecordsController extends Controller
             'expenseCode' => $validatedData['expense_code'],
             'supervisor' => $validatedData['supervisor'],
             'workerDni' => $validatedData['worker_dni'],
+            'jobZone' => $validatedData['job_zone'],
         ]);
 
         $document = $record->generate();
@@ -121,6 +124,7 @@ class ManagementRecordsController extends Controller
             'expense_code' => 'nullable|string',
             'supervisor' => 'nullable|string',
             'worker_dni' => 'nullable|string',
+            'job_zone' => 'nullable|string',
         ]);
 
         $defaults = [
@@ -128,6 +132,7 @@ class ManagementRecordsController extends Controller
             'expense_code' => null,
             'supervisor' => null,
             'worker_dni' => null,
+            'job_zone' => null
         ];
 
         $validatedData = array_merge($defaults, $validatedData);
@@ -139,6 +144,7 @@ class ManagementRecordsController extends Controller
             'expenseCode' => $validatedData['expense_code'],
             'supervisor' => $validatedData['supervisor'],
             'workerDni' => $validatedData['worker_dni'],
+            'jobZone' => $validatedData['job_zone'],
         ]);
 
         $document = $record->generate();

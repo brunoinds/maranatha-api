@@ -23,6 +23,7 @@ class RecordAttendancesByJobsExpenses
     private string|null $expenseCode = null;
     private string|null $supervisor = null;
     private string|null $workerDni = null;
+    private string|null $jobZone = null;
 
     /**
      * @param array $options
@@ -32,6 +33,7 @@ class RecordAttendancesByJobsExpenses
      * @param null|string $options['expenseCode']
      * @param null|string $options['supervisor']
      * @param null|string $options['workerDni']
+     * @param null|string $options['jobZone']
      */
 
     public function __construct(array $options){
@@ -41,6 +43,7 @@ class RecordAttendancesByJobsExpenses
         $this->expenseCode = $options['expenseCode'];
         $this->supervisor = $options['supervisor'];
         $this->workerDni = $options['workerDni'];
+        $this->jobZone = $options['jobZone'];
     }
 
     private function getWorkersData():array
@@ -67,8 +70,12 @@ class RecordAttendancesByJobsExpenses
             $spendingsInSpan = $spendingsInSpan->where('worker.supervisor', '=', $this->supervisor);
         }
 
+        if ($this->jobZone !== null){
+            $spendingsInSpan = $spendingsInSpan->where('job.zone', '=', $this->jobZone);
+        }
+
         $spendingsInSpan = collect($spendingsInSpan)->groupBy(function($spending){
-            return $spending['job']['code'] . '/~/' . $spending['expense']['code'];
+            return $spending['job']['code'] . '/~/' . $spending['expense']['code'] . '/~/' . $spending['job']['zone'];
         })->sortKeys();
 
 
@@ -78,9 +85,11 @@ class RecordAttendancesByJobsExpenses
         $attendancesByJobExpense = collect($spendingsInSpan)->map(function($spendings, $identificator) use ($jobs, $expenses) {
             $jobCode = explode('/~/', $identificator)[0];
             $expenseCode = explode('/~/', $identificator)[1];
+            $jobZone = explode('/~/', $identificator)[2];
 
             return [
                 'job' => $jobCode . ' - ' . $jobs->where('code', $jobCode)->first()->name,
+                'job_zone' => $jobZone,
                 'expense' => $expenseCode . ' - ' . $expenses->where('code', $expenseCode)->first()->name,
                 'spendings' => collect($spendings)->map(function($spending){
                     $spending = Toolbox::toObject($spending);
@@ -116,6 +125,7 @@ class RecordAttendancesByJobsExpenses
 
             return [
                 'job' => $item['job'],
+                'job_zone' => $item['job_zone'],
                 'expense' => $item['expense'],
                 'amount_in_soles' => $item['totals']['amount_in_soles'],
                 'amount_in_dollars' => $item['totals']['amount_in_dollars'],
@@ -155,6 +165,29 @@ class RecordAttendancesByJobsExpenses
             return $indexes;
         })();
 
+        $mergingJobZoneRows = (function() use ($spendings){
+            $indexes = [];
+            $currentJobZone = null;
+            $currentIndex = null;
+            foreach($spendings as $index => $spending){
+                if ($currentJobZone === null){
+                    $currentJobZone = $spending['job_zone'];
+                    $currentIndex = $index;
+                } else {
+                    if ($currentJobZone === $spending['job_zone']){
+                        continue;
+                    } else {
+                        if ($currentIndex !== $index - 1){
+                            $indexes[] = ['from' => $currentIndex, 'to' => $index - 1];
+                        }
+                        $currentJobZone = $spending['job_zone'];
+                        $currentIndex = $index;
+                    }
+                }
+            }
+            return $indexes;
+        })();
+
         return [
             'headers' => [
                 [
@@ -164,6 +197,10 @@ class RecordAttendancesByJobsExpenses
                 [
                     'title' => 'Expense',
                     'key' => 'expense',
+                ],
+                [
+                    'title' => 'Zona',
+                    'key' => 'job_zone',
                 ],
                 [
                     'title' => 'Costo Total (Dólares)',
@@ -196,6 +233,10 @@ class RecordAttendancesByJobsExpenses
                         [
                             'key' => 'job',
                             'indexes' => $mergingJobCodeRows
+                        ],
+                        [
+                            'key' => 'job_zone',
+                            'indexes' => $mergingJobZoneRows
                         ]
                     ]
                 ]
@@ -214,6 +255,7 @@ class RecordAttendancesByJobsExpenses
                 'jobCode' => $this->jobCode,
                 'expenseCode' => $this->expenseCode,
                 'workerDni' => $this->workerDni,
+                'jobZone' => $this->jobZone,
             ],
         ];
     }
