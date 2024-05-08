@@ -126,8 +126,10 @@ class WorkersAssistant{
                                     'amount_per_day' => $amountPerDayInMonthYear,
                                 ],
                                 'amount' => $item['payment']['amount'],
+                                'amount_data' => $payment['amount_data']
                             ],
                             'amount' => $item['payment']['amount'],
+                            'amount_data' => $payment['amount_data']
                         ];
 
                         return $item;

@@ -136,6 +136,8 @@ class RecordAttendancesByJobs
             $dayWorkAmountInDollars = 0;
 
 
+
+
             foreach ($item['spendings'] as $spending){
                 $daysWorked += $spending->attendance_day->status === AttendanceStatus::Present->value ? 1 : 0;
                 $daysNotWorked += $spending->attendance_day->status === AttendanceStatus::Absent->value ? 1 : 0;
@@ -153,6 +155,7 @@ class RecordAttendancesByJobs
             $item['days_not_worked'] = $daysNotWorked;
             $item['amount_in_soles'] = $amountInSoles;
             $item['amount_in_dollars'] = $amountInDollars;
+
             $item['day_work_amount_in_soles'] = $dayWorkAmountInSoles;
             $item['day_work_amount_in_dollars'] = $dayWorkAmountInDollars;
 
@@ -230,7 +233,7 @@ class RecordAttendancesByJobs
                 [
                     'title' => 'Costo Total (Soles)',
                     'key' => 'amount_in_soles',
-                ]
+                ],
             ],
             'body' => $spendings,
         ];

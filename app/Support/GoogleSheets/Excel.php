@@ -125,6 +125,12 @@ class Excel{
                                     return Exchanger::on($date)->convert($amount, $moneyType, MoneyType::PEN);
                                 }
                             })(),
+                            'amount_data' => [
+                                'original' => [
+                                    'amount' => $amount,
+                                    'money_type' => $moneyType
+                                ]
+                            ],
                             'timespan' => [
                                 'start' => Carbon::createFromFormat('m/Y', $paymentMonth)->timezone('America/Lima')->startOfMonth()->format('c'),
                                 'end' => Carbon::createFromFormat('m/Y', $paymentMonth)->timezone('America/Lima')->endOfMonth()->endOfDay()->format('c'),
