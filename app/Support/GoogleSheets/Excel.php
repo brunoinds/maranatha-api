@@ -2,6 +2,7 @@
 
 namespace App\Support\GoogleSheets;
 
+use App\Helpers\Toolbox;
 use Revolution\Google\Sheets\Facades\Sheets;
 
 use Google\Client;
@@ -10,6 +11,10 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Log;
+use App\Helpers\Enums\MoneyType;
+use App\Support\Exchange\Exchanger;
+
+use DateTime;
 
 class Excel{
     public static function updateDBSheet($output):void{
@@ -67,6 +72,7 @@ class Excel{
             $sheet = Sheets::spreadsheet(env('GOOGLE_SHEETS_DB_ID'))->sheet('👷 Workers');
             $workers = $sheet->range('A4:Z600')->all();
             $paymentsMonths = $sheet->range('G3:Z3')->all()[0];
+
         } catch (\Google\Service\Exception $exception) {
             Log::warning('Failed to get Workers from Google Spreadsheet Workers', ['exception' => $exception]);
             return [];
@@ -87,14 +93,38 @@ class Excel{
                     $payments = [];
                     foreach($paymentsMonths as $index => $paymentMonth){
                         $amount = isset($item[$index + 6]) ? $item[$index + 6] : "S/.0.00";
-                        $amount = str_replace('S/.', '', str_replace(',', '', $amount));
+
+
+                        $moneyPrefix = (function() use ($amount){
+                            foreach (Toolbox::moneyPrefixes() as $prefix){
+                                if (str_contains($amount, $prefix)){
+                                    return $prefix;
+                                }
+                            }
+                            return '';
+                        })();
+                        $moneyType = (function() use ($moneyPrefix){
+                            if (strlen($moneyPrefix) === 0){
+                                return MoneyType::PEN;
+                            }
+                            return Toolbox::moneyType($moneyPrefix);
+                        })();
+
+                        $amount = str_replace($moneyPrefix, '', str_replace(',', '', $amount));
                         $amount = floatval($amount);
 
                         $payments[] = [
                             'month_year' => $paymentMonth,
                             'month' => intval(explode('/', $paymentMonth)[0]),
                             'year' => intval(explode('/', $paymentMonth)[1]),
-                            'amount' => $amount,
+                            'amount' => (function() use ($amount, $moneyType, $paymentMonth){
+                                if ($moneyType === MoneyType::PEN){
+                                    return $amount;
+                                }else{
+                                    $date = Carbon::createFromFormat('m/Y', $paymentMonth)->timezone('America/Lima')->startOfMonth()->toDateTime();
+                                    return Exchanger::on($date)->convert($amount, $moneyType, MoneyType::PEN);
+                                }
+                            })(),
                             'timespan' => [
                                 'start' => Carbon::createFromFormat('m/Y', $paymentMonth)->timezone('America/Lima')->startOfMonth()->format('c'),
                                 'end' => Carbon::createFromFormat('m/Y', $paymentMonth)->timezone('America/Lima')->endOfMonth()->endOfDay()->format('c'),
@@ -105,6 +135,7 @@ class Excel{
                 })()
             ];
         })->toArray();
+
 
         //Store for 30 minutes:
         Cache::store('file')->put('Maranatha/Spreadsheets/Workers', $data, 30 * 60);

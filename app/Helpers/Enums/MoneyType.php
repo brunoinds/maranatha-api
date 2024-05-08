@@ -6,12 +6,12 @@ namespace App\Helpers\Enums;
 enum MoneyType: string
 {
     case PEN = 'PEN';
-    case USD = 'USD';
     case BRL = 'BRL';
+    case USD = 'USD';
     case PYG = 'PYG';
 
 
-    public static function toArray(): string
+    public static function toArray():array
     {
         $items = [];
         foreach (self::cases() as $case) {

@@ -2,6 +2,7 @@
 
 namespace App\Helpers;
 
+use App\Helpers\Enums\MoneyType;
 use Brick\Math\BigDecimal;
 
 class Toolbox{
@@ -20,6 +21,35 @@ class Toolbox{
                 return "S/.";
         }
     }
+
+    public static function moneyPrefixes(): array
+    {
+        return collect(MoneyType::toArray())->map(function($item){
+            return Toolbox::moneyPrefix($item);
+        })->toArray();
+    }
+
+    public static function moneyType(string $moneyPrefix, bool $asEnumType = true): string|MoneyType
+    {
+        $types = MoneyType::toArray();
+
+        $indexChosen = 0;
+        foreach (self::moneyPrefixes() as $index => $prefix){
+            if ($prefix === $moneyPrefix){
+                $indexChosen = $index;
+            }
+        }
+
+        $stringValue = $types[$indexChosen];
+
+
+        if ($asEnumType){
+            return MoneyType::from($stringValue);
+        }else{
+            return $stringValue;
+        }
+    }
+
     public static function toObject(array $array): object
     {
         return json_decode(json_encode($array));
