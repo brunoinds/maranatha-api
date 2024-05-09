@@ -146,6 +146,11 @@ class RecordAttendancesByJobsExpenses
 
             foreach ($amountInCurrencies as $currency => $amount){
                 $amount = number_format($amount, 2, '.', '');
+
+                if ($currency === MoneyType::PYG){
+                    $amount = round($amount, 0);
+                }
+
                 $return['parcial_amount_in_' . strtolower($currency)] = $amount;
             }
 

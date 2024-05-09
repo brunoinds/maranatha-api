@@ -11,6 +11,7 @@ use Carbon\Carbon;
 use Illuminate\Support\Collection;
 use App\Models\Attendance;
 use App\Helpers\Enums\AttendanceStatus;
+use App\Helpers\Enums\MoneyType;
 use Illuminate\Support\Facades\Cache;
 
 class WorkersAssistant{
@@ -77,6 +78,10 @@ class WorkersAssistant{
                     if ($payment && $countDaysPresent > 0 && $payment['amount'] > 0){
                         $amountPerDayInMonthYear = $payment['amount'] / $countDaysPresent;
                         $amountPerDayInOriginalCurrencyInMonthYear = $payment['amount_data']['original']['amount'] / $countDaysPresent;
+
+                        if ($payment['amount_data']['original']['money_type'] === MoneyType::PYG->value){
+                            $amountPerDayInOriginalCurrencyInMonthYear = round($amountPerDayInOriginalCurrencyInMonthYear, 0);
+                        }
                     }
 
                     $attendancesWithPaymentAmount = $attendances->map(function($item) use ($monthYear, $payment, $amountPerDayInMonthYear, $amountPerDayInOriginalCurrencyInMonthYear, $worker){
