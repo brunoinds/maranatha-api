@@ -101,6 +101,10 @@ class RecordAttendancesByJobsExpenses
                         return Exchanger::on($date)->convert($spending->amount,MoneyType::PEN, MoneyType::USD);
                     })();
 
+                    $spending->amountOriginalData = (function() use ($spending){
+                        return $spending->payment->amount_data;
+                    })();
+
                     return $spending;
                 })
             ];
@@ -109,6 +113,9 @@ class RecordAttendancesByJobsExpenses
 
         $attendancesByJobExpense = collect($attendancesByJobExpense)->map(function($item){
             $spendings = $item['spendings'];
+
+            $amountInCurrencies = MoneyType::toAssociativeArray(0);
+
 
             $item['totals'] = [
                 'amount_in_soles' => 0,
@@ -123,13 +130,26 @@ class RecordAttendancesByJobsExpenses
                 return $spending->amountInDollars;
             });
 
-            return [
+
+            $spendings->each(function($spending) use (&$amountInCurrencies){
+                $amountInCurrencies[$spending->amountOriginalData->money_type] += $spending->amountOriginalData->amount;
+            });
+
+
+            $return = [
                 'job' => $item['job'],
                 'job_zone' => $item['job_zone'],
                 'expense' => $item['expense'],
                 'amount_in_soles' => $item['totals']['amount_in_soles'],
                 'amount_in_dollars' => $item['totals']['amount_in_dollars'],
             ];
+
+            foreach ($amountInCurrencies as $currency => $amount){
+                $amount = number_format($amount, 2, '.', '');
+                $return['parcial_amount_in_' . strtolower($currency)] = $amount;
+            }
+
+            return $return;
         });
 
         $attendancesByJobExpense = $attendancesByJobExpense->values();
@@ -188,29 +208,42 @@ class RecordAttendancesByJobsExpenses
             return $indexes;
         })();
 
-        return [
-            'headers' => [
-                [
-                    'title' => 'Job',
-                    'key' => 'job',
-                ],
-                [
-                    'title' => 'Expense',
-                    'key' => 'expense',
-                ],
-                [
-                    'title' => 'Zona',
-                    'key' => 'job_zone',
-                ],
-                [
-                    'title' => 'Costo Total (Dólares)',
-                    'key' => 'amount_in_dollars',
-                ],
-                [
-                    'title' => 'Costo Total (Soles)',
-                    'key' => 'amount_in_soles',
-                ]
+        $headers = [
+            [
+                'title' => 'Job',
+                'key' => 'job',
             ],
+            [
+                'title' => 'Expense',
+                'key' => 'expense',
+            ],
+            [
+                'title' => 'Zona',
+                'key' => 'job_zone',
+            ]
+        ];
+
+        foreach (MoneyType::toArray() as $moneyType){
+            $headers[] = [
+                'title' => 'Gasto Parcial (' . $moneyType . ')',
+                'key' => 'parcial_amount_in_' . strtolower($moneyType),
+            ];
+        }
+
+        $headers = [
+            ...$headers,
+            [
+                'title' => 'Costo Total (Dólares)',
+                'key' => 'amount_in_dollars',
+            ],
+            [
+                'title' => 'Costo Total (Soles)',
+                'key' => 'amount_in_soles',
+            ],
+        ];
+
+        return [
+            'headers' => $headers,
             'body' => $spendings,
             'footer' => [
                 'totals' => [

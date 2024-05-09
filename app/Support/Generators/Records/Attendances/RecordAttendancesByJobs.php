@@ -121,6 +121,10 @@ class RecordAttendancesByJobs
                         return Exchanger::on($date)->convert($spending->amount,MoneyType::PEN, MoneyType::USD);
                     })();
 
+                    $spending->amountOriginalData = (function() use ($spending){
+                        return $spending->payment->amount_data;
+                    })();
+
                     return $spending;
                 }),
             ];
@@ -136,6 +140,7 @@ class RecordAttendancesByJobs
             $dayWorkAmountInDollars = 0;
 
 
+            $amountInCurrencies = MoneyType::toAssociativeArray(0);
 
 
             foreach ($item['spendings'] as $spending){
@@ -143,6 +148,8 @@ class RecordAttendancesByJobs
                 $daysNotWorked += $spending->attendance_day->status === AttendanceStatus::Absent->value ? 1 : 0;
                 $amountInSoles += $spending->amountInSoles;
                 $amountInDollars += $spending->amountInDollars;
+
+                $amountInCurrencies[$spending->amountOriginalData->money_type] += $spending->amountOriginalData->amount;
             }
 
 
@@ -159,6 +166,12 @@ class RecordAttendancesByJobs
             $item['day_work_amount_in_soles'] = $dayWorkAmountInSoles;
             $item['day_work_amount_in_dollars'] = $dayWorkAmountInDollars;
 
+
+            foreach ($amountInCurrencies as $currency => $amount){
+                $amount = number_format($amount, 2, '.', '');
+                $item['parcial_amount_in_' . strtolower($currency)] = $amount;
+            }
+
             return $item;
         });
 
@@ -172,69 +185,83 @@ class RecordAttendancesByJobs
         $spendings = array_column($spendings, null);
 
 
-        return [
-            'headers' => [
-                [
-                    'title' => 'Fecha Creación Reporte',
-                    'key' => 'attendance_created_at',
-                ],
-                [
-                    'title' => 'Fecha Inicio Reporte',
-                    'key' => 'attendance_from_date',
-                ],
-                [
-                    'title' => 'Fecha Fin Reporte',
-                    'key' => 'attendance_to_date',
-                ],
-                [
-                    'title' => 'Supervisor',
-                    'key' => 'supervisor',
-                ],
-                [
-                    'title' => 'Trabajador',
-                    'key' => 'worker_name',
-                ],
-                [
-                    'title' => 'DNI Trabajador',
-                    'key' => 'worker_dni',
-                ],
-                [
-                    'title' => 'Dias Asistidos',
-                    'key' => 'days_worked',
-                ],
-                [
-                    'title' => 'Dias Inasistidos',
-                    'key' => 'days_not_worked',
-                ],
-                [
-                    'title' => 'Job',
-                    'key' => 'job_code',
-                ],
-                [
-                    'title' => 'Job Zone',
-                    'key' => 'job_zone',
-                ],
-                [
-                    'title' => 'Expense',
-                    'key' => 'expense_code',
-                ],
-                [
-                    'title' => 'Costo/Día (Dólares)',
-                    'key' => 'day_work_amount_in_dollars',
-                ],
-                [
-                    'title' => 'Costo/Día (Soles)',
-                    'key' => 'day_work_amount_in_soles',
-                ],
-                [
-                    'title' => 'Costo Total (Dólares)',
-                    'key' => 'amount_in_dollars',
-                ],
-                [
-                    'title' => 'Costo Total (Soles)',
-                    'key' => 'amount_in_soles',
-                ],
+        $headers = [
+            [
+                'title' => 'Fecha Creación Reporte',
+                'key' => 'attendance_created_at',
             ],
+            [
+                'title' => 'Fecha Inicio Reporte',
+                'key' => 'attendance_from_date',
+            ],
+            [
+                'title' => 'Fecha Fin Reporte',
+                'key' => 'attendance_to_date',
+            ],
+            [
+                'title' => 'Supervisor',
+                'key' => 'supervisor',
+            ],
+            [
+                'title' => 'Trabajador',
+                'key' => 'worker_name',
+            ],
+            [
+                'title' => 'DNI Trabajador',
+                'key' => 'worker_dni',
+            ],
+            [
+                'title' => 'Dias Asistidos',
+                'key' => 'days_worked',
+            ],
+            [
+                'title' => 'Dias Inasistidos',
+                'key' => 'days_not_worked',
+            ],
+            [
+                'title' => 'Job',
+                'key' => 'job_code',
+            ],
+            [
+                'title' => 'Job Zone',
+                'key' => 'job_zone',
+            ],
+            [
+                'title' => 'Expense',
+                'key' => 'expense_code',
+            ],
+        ];
+
+
+        foreach (MoneyType::toArray() as $moneyType){
+            $headers[] = [
+                'title' => 'Gasto Parcial (' . $moneyType . ')',
+                'key' => 'parcial_amount_in_' . strtolower($moneyType),
+            ];
+        }
+
+        $headers = [
+            ...$headers,
+            [
+                'title' => 'Costo/Día (Dólares)',
+                'key' => 'day_work_amount_in_dollars',
+            ],
+            [
+                'title' => 'Costo/Día (Soles)',
+                'key' => 'day_work_amount_in_soles',
+            ],
+            [
+                'title' => 'Costo Total (Dólares)',
+                'key' => 'amount_in_dollars',
+            ],
+            [
+                'title' => 'Costo Total (Soles)',
+                'key' => 'amount_in_soles',
+            ],
+        ];
+
+        return [
+            'headers' => $headers,
             'body' => $spendings,
         ];
     }
