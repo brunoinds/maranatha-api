@@ -230,6 +230,24 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::get('/chats/users/{user}/messages', [
             InstantMessageController::class, 'messagesInConversation'
         ]);
+
+
+        Route::post('/chats/broadcasting/events', [
+            InstantMessageController::class, 'storeBroadcastingEvent'
+        ]);
+
+        Route::get('/chats/broadcasting/events', [
+            /*
+            Event list:
+            - new-messages: This command will get all the new messages from the server and will mark them as received
+            -
+
+            */
+
+
+
+            InstantMessageController::class, 'messagesInConversation'
+        ]);
     });
 
 

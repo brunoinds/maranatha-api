@@ -5,7 +5,7 @@ use Illuminate\Support\Facades\Artisan;
 use Carbon\Carbon;
 use Carbon\CarbonPeriod;
 use App\Support\Generators\Records\Attendances\RecordAttendancesByJobsExpenses;
-
+use Illuminate\Support\Facades\Storage;
 
 /*
 |--------------------------------------------------------------------------
@@ -29,11 +29,7 @@ Artisan::command('check:environment', function () {
 })->purpose('Check the current environment');
 
 
-Artisan::command('run:lowercase', function () {
-    $users = App\Models\User::all();
-    $users->each(function($user){
-        $user->username = strtolower($user->username);
-        $user->save();
-    });
-    $this->info('All users usernames set to lowercase');
+Artisan::command('run:test', function () {
+    //Create a new folder inside the Google Drive root folder:
+    Storage::drive('google')->makeDirectory('Maranatha/test-folder');
 })->purpose('Set all users usernames to lowercase');
