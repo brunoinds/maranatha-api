@@ -58,7 +58,7 @@ class RecordAttendancesByJobs
             return $workerSpendings['spendings'];
         })->flatten(1);
 
-        $spendingsInSpan = $workersSpendings->where('date', '>=', $this->startDate->format('c'))->where('date', '<=', $this->endDate->format('c'));
+        $spendingsInSpan = $workersSpendings->where('date_day', '>=', $this->startDate->format('Y-m-d'))->where('date_day', '<=', $this->endDate->format('Y-m-d'));
 
         if ($this->workerDni !== null){
             $spendingsInSpan = $spendingsInSpan->where('worker.dni', '=', $this->workerDni);

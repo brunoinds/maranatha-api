@@ -125,6 +125,7 @@ class WorkersAssistant{
                                 'user_id' => null,
                             ],
                             'date' => $item['date'],
+                            'date_day' => Carbon::parse($item['date'])->format('Y-m-d'),
                             'job' => [
                                 'code' => null,
                                 'zone' => null,
