@@ -11,6 +11,12 @@ class Expense extends Model
 
     protected $fillable = [
         'name',
-        'code'
+        'code',
+        'uses'
+    ];
+
+
+    protected $casts = [
+        'uses' => 'array'
     ];
 }
