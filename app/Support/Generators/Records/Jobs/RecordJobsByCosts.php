@@ -25,7 +25,7 @@ class RecordJobsByCosts
     private DateTime $endDate;
     private string|null $jobRegion = null;
     private string|null $expenseCode = null;
-    
+
     /**
      * @param array $options
      * @param DateTime $options['startDate']
@@ -33,7 +33,7 @@ class RecordJobsByCosts
      * @param null|string $options['jobRegion']
      * @param null|string $options['expenseCode']
      */
-    
+
     public function __construct(array $options){
         $this->startDate = $options['startDate'];
         $this->endDate = $options['endDate'];
@@ -53,8 +53,8 @@ class RecordJobsByCosts
                     ->with('report')
                     ->join('reports', 'invoices.report_id', '=', 'reports.id')
                     ->join('jobs', 'invoices.job_code', '=', 'jobs.code')
-                    ->where('invoices.date', '>=', $this->startDate)
-                    ->where('invoices.date', '<=', $this->endDate)
+                    ->whereDate('invoices.date', '>=', $this->startDate->format('Y-m-d'))
+                    ->whereDate('invoices.date', '<=', $this->endDate->format('Y-m-d'))
                     ->where(function($query){
                         $query->where('reports.status', '=', 'Approved')
                                 ->orWhere('reports.status', '=', 'Restituted');
@@ -73,7 +73,7 @@ class RecordJobsByCosts
 
 
 
-        
+
         //Group by invoice->job()->code:
 
         $invoicesInSpan = collect($invoicesInSpan)->groupBy(function($invoice){
@@ -96,7 +96,7 @@ class RecordJobsByCosts
             return $workerSpendings['spendings'];
         })->flatten(1);
 
-        $spendingsInSpan = $workersSpendings->where('date', '>=', $this->startDate->format('c'))->where('date', '<=', $this->endDate->format('c'));
+        $spendingsInSpan = $workersSpendings->where('date_day', '>=', $this->startDate->format('Y-m-d'))->where('date_day', '<=', $this->endDate->format('Y-m-d'));
 
         if ($this->jobRegion !== null){
             $spendingsInSpan = $spendingsInSpan->where('job.zone', '=', $this->jobRegion);
