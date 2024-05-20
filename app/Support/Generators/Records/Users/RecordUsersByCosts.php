@@ -77,8 +77,8 @@ class RecordUsersByCosts
                     }
                 */
 
-                if (   ($this->startDate === null || Carbon::parse($invoice->date)->format('Y-m-c') >= $this->startDate->format('Y-m-c'))
-                    && ($this->endDate === null || Carbon::parse($invoice->date)->format('Y-m-c') <= $this->endDate->format('Y-m-c'))
+                if (   ($this->startDate === null || Carbon::parse($invoice->date)->format('Y-m-d') >= $this->startDate->format('Y-m-d'))
+                    && ($this->endDate === null || Carbon::parse($invoice->date)->format('Y-m-d') <= $this->endDate->format('Y-m-d'))
                     && ($this->jobCode === null || $invoice->job_code === $this->jobCode)
                     && ($this->expenseCode === null || $invoice->expense_code === $this->expenseCode)
                     && ($this->type === null || $this->type === 'Invoices' || $invoice->type === $this->type)) {
@@ -115,7 +115,7 @@ class RecordUsersByCosts
             return $workerSpendings['spendings'];
         })->flatten(1);
 
-        $spendingsInSpan = $workersSpendings->where('date_day', '>=', $this->startDate->format('Y-m-c'))->where('date_day', '<=', $this->endDate->format('Y-m-c'));
+        $spendingsInSpan = $workersSpendings->where('date_day', '>=', $this->startDate->format('Y-m-d'))->where('date_day', '<=', $this->endDate->format('Y-m-d'));
 
         if ($this->jobCode !== null){
             $spendingsInSpan = $spendingsInSpan->where('job.code', '=', $this->jobCode);
