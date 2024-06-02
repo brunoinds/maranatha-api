@@ -2,9 +2,10 @@
 
 namespace App\Http\Requests;
 
+use App\Helpers\Enums\MoneyType;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
-
+use App\Helpers\Enums\MoneyType;
 class StoreReportRequest extends FormRequest
 {
     /**
@@ -29,7 +30,7 @@ class StoreReportRequest extends FormRequest
             'to_date' => ['required', 'date'],
             'status' => ['required', Rule::in(['Draft', 'Submitted'])],
             'type' => ['required', Rule::in(['Bill', 'Facture'])],
-            'money_type' => ['required', Rule::in(['PEN', 'USD', 'PYG', 'BRL'])],
+            'money_type' => ['required', Rule::in(MoneyType::toArray())],
             'country' => ['string', 'max:2'],
             'metadata' => ['array']
         ];

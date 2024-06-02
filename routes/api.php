@@ -17,6 +17,8 @@ use App\Http\Controllers\ManagementBalancesController;
 use App\Http\Controllers\ApplicationNativeController;
 use App\Http\Controllers\ApplicationWebController;
 use App\Http\Controllers\InstantMessageController;
+use App\Http\Controllers\WorkerPaymentController;
+use App\Http\Controllers\WorkerController;
 
 /*
 |--------------------------------------------------------------------------
@@ -248,6 +250,14 @@ Route::middleware(['auth:sanctum'])->group(function () {
 
             InstantMessageController::class, 'messagesInConversation'
         ]);
+    });
+
+    //Workers group:
+    Route::group([], function(){
+        Route::apiResource('workers', WorkerController::class);
+        Route::apiResource('worker-payments', WorkerPaymentController::class);
+        Route::get('workers/{worker}/payments', WorkerPaymentController::class . '@index');
+        Route::post('workers/{worker}/payments', WorkerPaymentController::class . '@store');
     });
 
 
