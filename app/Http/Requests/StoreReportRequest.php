@@ -5,7 +5,6 @@ namespace App\Http\Requests;
 use App\Helpers\Enums\MoneyType;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
-use App\Helpers\Enums\MoneyType;
 class StoreReportRequest extends FormRequest
 {
     /**

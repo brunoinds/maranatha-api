@@ -59,7 +59,7 @@ class Worker extends Model
 
     public function delete(): ?bool
     {
-        //$this->attendanceDays()->delete();
+        $this->attendanceDays()->delete();
         $this->payments()->delete();
         return parent::delete();
     }

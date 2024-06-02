@@ -2,7 +2,6 @@
 
 namespace App\Console;
 
-use App\Models\CronRun;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
 use App\Support\EventLoop\ReportsEventLoop;
@@ -17,8 +16,6 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule): void
     {
-        CronRun::create();
-
         $schedule->command('backup:run')->dailyAt('02:00')->timezone('America/Lima');
         $schedule->command('backup:clean')->dailyAt('02:15')->timezone('America/Lima');
 
