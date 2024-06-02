@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\StoreWorkerPaymentRequest;
 use App\Http\Requests\UpdateWorkerPaymentRequest;
 use App\Models\WorkerPayment;
+use App\Support\Cache\RecordsCache;
 
 class WorkerPaymentController extends Controller
 {
@@ -22,6 +23,7 @@ class WorkerPaymentController extends Controller
     public function store(StoreWorkerPaymentRequest $request)
     {
         $validated = $request->validated();
+        RecordsCache::clearAll();
         return WorkerPayment::create($validated);
     }
 
@@ -41,6 +43,7 @@ class WorkerPaymentController extends Controller
     {
         $validated = $request->validated();
         $workerPayment->update($validated);
+        RecordsCache::clearAll();
         return response()->json(['message' => 'Worker payment updated successfully']);
     }
 
@@ -50,6 +53,7 @@ class WorkerPaymentController extends Controller
     public function destroy(WorkerPayment $workerPayment)
     {
         $workerPayment->delete();
+        RecordsCache::clearAll();
         return response()->noContent();
     }
 }

@@ -21,6 +21,7 @@ use DateTime;
 use App\Support\Creators\Reports\ReportPDFCreator;
 use Illuminate\Support\Facades\Response;
 use Illuminate\Support\Facades\Cache;
+use App\Support\Cache\RecordsCache;
 
 class ReportController extends Controller
 {
@@ -64,6 +65,7 @@ class ReportController extends Controller
     public function store(StoreReportRequest $request)
     {
         $report = Report::create($request->validated());
+        RecordsCache::clearAll();
         return response()->json(['message' => 'Report created', 'report' => $report->toArray()]);
     }
 
@@ -203,7 +205,7 @@ class ReportController extends Controller
                 ]
             );
         }
-
+        RecordsCache::clearAll();
         return response()->json(['message' => 'Report updated', 'report' => $report->toArray()]);
     }
 
@@ -213,6 +215,7 @@ class ReportController extends Controller
     public function destroy(Report $report)
     {
         $report->delete();
+        RecordsCache::clearAll();
         return response()->json(['message' => 'Report deleted']);
     }
 

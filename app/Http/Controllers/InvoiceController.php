@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Intervention\Image\Facades\Image;
 use App\Support\Toolbox\TString;
+use App\Support\Cache\RecordsCache;
 
 
 class InvoiceController extends Controller
@@ -80,6 +81,8 @@ class InvoiceController extends Controller
         $invoice = Invoice::create($validatedData);
         $invoice->report?->updateFromToDates();
 
+        RecordsCache::clearAll();
+
         return response()->json(['message' => 'Invoice created', 'invoice' => $invoice->toArray()]);
     }
 
@@ -147,7 +150,7 @@ class InvoiceController extends Controller
         $invoice->save();
 
         $invoice->report->updateFromToDates();
-
+        RecordsCache::clearAll();
         return response()->json(['message' => 'Invoice updated', 'invoice' => $invoice->toArray()]);
     }
 
@@ -159,7 +162,7 @@ class InvoiceController extends Controller
         $report = $invoice->report;
         $invoice->delete();
         $report->updateFromToDates();
-
+        RecordsCache::clearAll();
         return response()->json(['message' => 'Invoice deleted']);
     }
 

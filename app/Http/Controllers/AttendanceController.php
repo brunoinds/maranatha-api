@@ -9,6 +9,8 @@ use App\Http\Requests\StoreAttendanceWithWorkersRequest;
 use App\Http\Requests\StoreWorkersAttendancesRequest;
 use App\Http\Requests\TransferAttendanceRequest;
 use App\Models\AttendanceDayWorker;
+use App\Support\Cache\RecordsCache;
+
 
 class AttendanceController extends Controller
 {
@@ -41,6 +43,7 @@ class AttendanceController extends Controller
     public function store(StoreAttendanceRequest $request)
     {
         $attendance = Attendance::create($request->validated());
+        RecordsCache::clearAll();
         return response()->json(['message' => 'Attendance created', 'attendance' => $attendance->toArray()]);
     }
 
@@ -54,6 +57,7 @@ class AttendanceController extends Controller
             $attendance->attachWorkerDni($worker_dni);
         }
         $workersCount = count($requestValidated['workers_dni']);
+        RecordsCache::clearAll();
         return response()->json(['message' => 'Attendance created with ' . $workersCount . ' workers.', 'attendance' => $attendance->toArray()]);
     }
     public function storeWorkersAttendances(StoreWorkersAttendancesRequest $request)
@@ -77,6 +81,7 @@ class AttendanceController extends Controller
         foreach ($updates as $status => $ids) {
             AttendanceDayWorker::whereIn('id', $ids)->update(['status' => $status]);
         }
+        RecordsCache::clearAll();
         return response()->json(['message' => 'Workers attendances updated']);
     }
 

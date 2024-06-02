@@ -6,6 +6,7 @@ use App\Http\Requests\StoreAttendanceDayWorkerRequest;
 use App\Http\Requests\UpdateAttendanceDayWorkerRequest;
 use App\Models\Attendance;
 use App\Models\AttendanceDayWorker;
+use App\Support\Cache\RecordsCache;
 
 class AttendanceDayWorkerController extends Controller
 {
@@ -30,6 +31,7 @@ class AttendanceDayWorkerController extends Controller
     public function store(StoreAttendanceDayWorkerRequest $request)
     {
         $attendance = AttendanceDayWorker::create($request->validated());
+        RecordsCache::clearAll();
         return response()->json(['message' => 'Attendance Day-Worker created', 'attendance' => $attendance->toArray()]);
     }
 
@@ -39,6 +41,7 @@ class AttendanceDayWorkerController extends Controller
     public function update(UpdateAttendanceDayWorkerRequest $request, AttendanceDayWorker $attendanceDayWorker)
     {
         $attendanceDayWorker->update($request->validated());
+        RecordsCache::clearAll();
         return response()->json(['message' => 'Attendance Day-Worker updated', 'attendance' => $attendanceDayWorker->toArray()]);
     }
 

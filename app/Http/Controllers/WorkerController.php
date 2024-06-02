@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\StoreWorkerRequest;
 use App\Http\Requests\UpdateWorkerRequest;
 use App\Models\Worker;
+use App\Support\Cache\RecordsCache;
 
 class WorkerController extends Controller
 {
@@ -22,6 +23,7 @@ class WorkerController extends Controller
     public function store(StoreWorkerRequest $request)
     {
         $validated = $request->validated();
+        RecordsCache::clearAll();
         return Worker::create($validated);
     }
 
@@ -42,6 +44,7 @@ class WorkerController extends Controller
         $validated = $request->validated();
         $worker->createHistorySnapshot();
         $worker->update($validated);
+        RecordsCache::clearAll();
         return $worker;
     }
 
@@ -51,6 +54,7 @@ class WorkerController extends Controller
     public function destroy(Worker $worker)
     {
         $worker->delete();
+        RecordsCache::clearAll();
         return response()->noContent();
     }
 }

@@ -11,6 +11,7 @@ use App\Support\Generators\Records\Reports\RecordReportsByTime;
 use App\Support\Generators\Records\Invoices\RecordInvoicesByItems;
 use DateTime;
 use Carbon\Carbon;
+use App\Support\Cache\RecordsCache;
 
 
 class ManagementRecordsController extends Controller
@@ -36,6 +37,10 @@ class ManagementRecordsController extends Controller
 
         $validatedData = array_merge($defaults, $validatedData);
 
+        if (RecordsCache::getRecord('attendancesByWorker', $validatedData)){
+            return response()->json(RecordsCache::getRecord('attendancesByWorker', $validatedData));
+        }
+
         $record = new RecordAttendancesByWorker([
             'startDate' => Carbon::parse(new DateTime($validatedData['start_date']))->startOfDay()->toDateTime(),
             'endDate' => Carbon::parse(new DateTime($validatedData['end_date']))->endOfDay()->toDateTime(),
@@ -46,6 +51,8 @@ class ManagementRecordsController extends Controller
         ]);
 
         $document = $record->generate();
+
+        RecordsCache::storeRecord('attendancesByWorker', $validatedData, $document);
 
         return response()->json($document);
     }
@@ -66,6 +73,10 @@ class ManagementRecordsController extends Controller
 
         $validatedData = array_merge($defaults, $validatedData);
 
+        if (RecordsCache::getRecord('jobsByCosts', $validatedData)){
+            return response()->json(RecordsCache::getRecord('jobsByCosts', $validatedData));
+        }
+
         $record = new RecordJobsByCosts([
             'startDate' => new DateTime($validatedData['start_date']),
             'endDate' => new DateTime($validatedData['end_date']),
@@ -74,6 +85,8 @@ class ManagementRecordsController extends Controller
         ]);
 
         $document = $record->generate();
+
+        RecordsCache::storeRecord('jobsByCosts', $validatedData, $document);
 
         return response()->json($document);
     }
@@ -100,6 +113,10 @@ class ManagementRecordsController extends Controller
 
         $validatedData = array_merge($defaults, $validatedData);
 
+        if (RecordsCache::getRecord('attendancesByJobs', $validatedData)){
+            return response()->json(RecordsCache::getRecord('attendancesByJobs', $validatedData));
+        }
+
         $record = new RecordAttendancesByJobs([
             'startDate' => new DateTime($validatedData['start_date']),
             'endDate' => new DateTime($validatedData['end_date']),
@@ -111,6 +128,8 @@ class ManagementRecordsController extends Controller
         ]);
 
         $document = $record->generate();
+
+        RecordsCache::storeRecord('attendancesByJobs', $validatedData, $document);
 
         return response()->json($document);
     }
@@ -137,6 +156,10 @@ class ManagementRecordsController extends Controller
 
         $validatedData = array_merge($defaults, $validatedData);
 
+        if (RecordsCache::getRecord('attendancesByJobsExpenses', $validatedData)){
+            return response()->json(RecordsCache::getRecord('attendancesByJobsExpenses', $validatedData));
+        }
+
         $record = new RecordAttendancesByJobsExpenses([
             'startDate' => new DateTime($validatedData['start_date']),
             'endDate' => new DateTime($validatedData['end_date']),
@@ -148,6 +171,8 @@ class ManagementRecordsController extends Controller
         ]);
 
         $document = $record->generate();
+
+        RecordsCache::storeRecord('attendancesByJobsExpenses', $validatedData, $document);
 
         return response()->json($document);
     }
@@ -172,6 +197,10 @@ class ManagementRecordsController extends Controller
 
         $validatedData = array_merge($defaults, $validatedData);
 
+        if (RecordsCache::getRecord('usersByCosts', $validatedData)){
+            return response()->json(RecordsCache::getRecord('usersByCosts', $validatedData));
+        }
+
         $record = new RecordUsersByCosts([
             'startDate' => new DateTime($validatedData['start_date']),
             'endDate' => new DateTime($validatedData['end_date']),
@@ -182,6 +211,8 @@ class ManagementRecordsController extends Controller
         ]);
 
         $document = $record->generate();
+
+        RecordsCache::storeRecord('usersByCosts', $validatedData, $document);
 
         return response()->json($document);
     }
@@ -205,6 +236,10 @@ class ManagementRecordsController extends Controller
 
         $validatedData = array_merge($defaults, $validatedData);
 
+        if (RecordsCache::getRecord('reportsByTime', $validatedData)){
+            return response()->json(RecordsCache::getRecord('reportsByTime', $validatedData));
+        }
+
         $record = new RecordReportsByTime([
             'startDate' => new DateTime($validatedData['start_date']),
             'endDate' => new DateTime($validatedData['end_date']),
@@ -214,6 +249,8 @@ class ManagementRecordsController extends Controller
         ]);
 
         $document = $record->generate();
+
+        RecordsCache::storeRecord('reportsByTime', $validatedData, $document);
 
         return response()->json($document);
     }
@@ -255,6 +292,10 @@ class ManagementRecordsController extends Controller
 
         $validatedData = array_merge($defaults, $validatedData);
 
+        if (RecordsCache::getRecord('invoicesByItems', $validatedData)){
+            return response()->json(RecordsCache::getRecord('invoicesByItems', $validatedData));
+        }
+
 
         $record = new RecordInvoicesByItems([
             'startDate' => new DateTime($validatedData['start_date']),
@@ -268,6 +309,8 @@ class ManagementRecordsController extends Controller
         ]);
 
         $document = $record->generate();
+
+        RecordsCache::storeRecord('invoicesByItems', $validatedData, $document);
 
         return response()->json($document);
     }
