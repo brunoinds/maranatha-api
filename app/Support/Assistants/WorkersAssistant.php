@@ -13,17 +13,22 @@ use App\Models\Attendance;
 use App\Helpers\Enums\AttendanceStatus;
 use App\Helpers\Enums\MoneyType;
 use Illuminate\Support\Facades\Cache;
+use App\Models\Worker;
+use App\Models\WorkerPayment;
+use App\Support\Exchange\Exchanger;
+
+
 
 class WorkersAssistant{
     public static function getListWorkers():array
     {
-        $workers = collect(Excel::getWorkersSheet())->map(function($item){
+        $workers = collect(Worker::all())->map(function($item){
             return [
                 'dni' => $item['dni'],
                 'name' => $item['name'],
                 'team' => $item['team'],
                 'supervisor' => $item['supervisor'],
-                'function' => $item['function'],
+                'function' => $item['role'],
                 'is_active' => $item['is_active'],
             ];
         });
@@ -31,17 +36,84 @@ class WorkersAssistant{
     }
     public static function getListWorkersWithPayments():array
     {
-        $workers = collect(Excel::getWorkersSheet())->map(function($item){
+        $workers = collect(Worker::all())->map(function($item){
+            $payments = $item->payments->map(function($payment){
+                $month = str_pad($payment['month'], 2, '0', STR_PAD_LEFT);
+                $monthYear =  $month . '/' . $payment['year'];
+                $amount = $payment['amount'];
+                $moneyType = $payment['currency'];
+                return [
+                    'month_year' => $monthYear,
+                    'month' => $payment['month'],
+                    'year' => $payment['year'],
+                    'amount' => (function() use ($amount, $moneyType, $monthYear){
+                        if ($moneyType === MoneyType::PEN){
+                            return $amount;
+                        }else{
+                            $date = Carbon::createFromFormat('m/Y', $monthYear)->timezone('America/Lima')->startOfMonth()->toDateTime();
+                            return Exchanger::on($date)->convert($amount, $moneyType, MoneyType::PEN);
+                        }
+                    })(),
+                    'amount_data' => [
+                        'original' => [
+                            'amount' => $amount,
+                            'money_type' => $moneyType
+                        ]
+                    ],
+                    'timespan' => [
+                        'start' => Carbon::createFromFormat('m/Y', $monthYear)->timezone('America/Lima')->startOfMonth()->format('c'),
+                        'end' => Carbon::createFromFormat('m/Y', $monthYear)->timezone('America/Lima')->endOfMonth()->endOfDay()->format('c'),
+                    ],
+                ];
+            });
+
+            //Complete the payments with the missing months of 2024:
+            $paymentsMonths = collect($payments)->map(function($payment){
+                return $payment['month_year'];
+            });
+            $months = collect(range(1, 12))->map(function($month){
+                return str_pad($month, 2, '0', STR_PAD_LEFT);
+            });
+            $years = collect(range(2024, 2024));
+            $monthsYears = $years->map(function($year) use ($months){
+                return $months->map(function($month) use ($year){
+                    return $month . '/' . $year;
+                });
+            })->flatten();
+            $missingMonths = $monthsYears->diff($paymentsMonths);
+            $missingPayments = $missingMonths->map(function($monthYear){
+                $month = intval(explode('/', $monthYear)[0]);
+                $year = intval(explode('/', $monthYear)[1]);
+                return [
+                    'month_year' => $monthYear,
+                    'month' => $month,
+                    'year' => $year,
+                    'amount' => 0,
+                    'amount_data' => [
+                        'original' => [
+                            'amount' => 0,
+                            'money_type' => MoneyType::PEN
+                        ]
+                    ],
+                    'timespan' => [
+                        'start' => Carbon::createFromFormat('m/Y', $monthYear)->timezone('America/Lima')->startOfMonth()->format('c'),
+                        'end' => Carbon::createFromFormat('m/Y', $monthYear)->timezone('America/Lima')->endOfMonth()->endOfDay()->format('c'),
+                    ],
+                ];
+            });
+            $payments = collect($payments)->merge($missingPayments);
+
             return [
                 'dni' => $item['dni'],
                 'name' => $item['name'],
                 'team' => $item['team'],
                 'supervisor' => $item['supervisor'],
-                'function' => $item['function'],
-                'payments' => $item['payments'],
+                'function' => $item['role'],
+                'payments' => $payments->toArray(),
                 'is_active' => $item['is_active'],
             ];
         });
+
         return $workers->toArray();
     }
     public static function getWorkerByDNI(string $dni):array
@@ -211,5 +283,37 @@ class WorkersAssistant{
         }
 
         return $workersPaymentDistribution;
+    }
+
+
+
+    public static function getListWorkersLegacy():array
+    {
+        $workers = collect(Excel::getWorkersSheet())->map(function($item){
+            return [
+                'dni' => $item['dni'],
+                'name' => $item['name'],
+                'team' => $item['team'],
+                'supervisor' => $item['supervisor'],
+                'function' => $item['function'],
+                'is_active' => $item['is_active'],
+            ];
+        });
+        return $workers->toArray();
+    }
+    public static function getListWorkersWithPaymentsLegacy():array
+    {
+        $workers = collect(Excel::getWorkersSheet())->map(function($item){
+            return [
+                'dni' => $item['dni'],
+                'name' => $item['name'],
+                'team' => $item['team'],
+                'supervisor' => $item['supervisor'],
+                'function' => $item['function'],
+                'payments' => $item['payments'],
+                'is_active' => $item['is_active'],
+            ];
+        });
+        return $workers->toArray();
     }
 }

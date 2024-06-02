@@ -9,6 +9,7 @@ use App\Support\Generators\Records\Attendances\RecordAttendancesByJobsExpenses;
 use Illuminate\Support\Facades\Storage;
 use App\Models\Worker;
 use App\Models\WorkerPayment;
+use App\Models\AttendanceDayWorker;
 
 /*
 |--------------------------------------------------------------------------
@@ -38,7 +39,7 @@ Artisan::command('run:loadworkers', function () {
     });
 
 
-    foreach (WorkersAssistant::getListWorkersWithPayments() as $worker)
+    foreach (WorkersAssistant::getListWorkersWithPaymentsLegacy() as $worker)
     {
         $workerClass = Worker::create([
             'dni' => $worker['dni'],
@@ -61,4 +62,17 @@ Artisan::command('run:loadworkers', function () {
             ]);
         }
     }
+
+    //Loop through the attendancedayworker and based on worker_dni, get the worker_id and update the attendance_day_worker table on column worker_id:
+
+    AttendanceDayWorker::each(function ($attendance) {
+        $worker = Worker::where('dni', $attendance->worker_dni)->first();
+        if ($worker) {
+            $attendance->worker_id = $worker->id;
+            $attendance->save();
+        }else{
+            dd($attendance->worker_dni, 'not found');
+        }
+    });
+
 })->purpose('Convert all the workers from the old system to the new one');

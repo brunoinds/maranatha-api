@@ -13,6 +13,7 @@ class AttendanceDayWorker extends Model
 
 
     protected $fillable = [
+        'worker_id',
         'worker_dni',
         'attendance_id',
         'date',
