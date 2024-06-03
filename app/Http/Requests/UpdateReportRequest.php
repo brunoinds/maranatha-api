@@ -31,7 +31,7 @@ class UpdateReportRequest extends FormRequest
             'status' => [Rule::in(['Draft', 'Submitted', 'Approved', 'Rejected', 'Restituted'])],
             'rejection_reason' => ['string', 'max:100', 'nullable'],
             'type' => [Rule::in(['Bill', 'Facture'])],
-            'money_type' => ['required', Rule::in(MoneyType::toArray())],
+            'money_type' => [Rule::in(MoneyType::toArray())],
             'country' => ['string', 'max:2'],
             'metadata' => ['array']
         ];

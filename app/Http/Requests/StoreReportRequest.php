@@ -29,7 +29,7 @@ class StoreReportRequest extends FormRequest
             'to_date' => ['required', 'date'],
             'status' => ['required', Rule::in(['Draft', 'Submitted'])],
             'type' => ['required', Rule::in(['Bill', 'Facture'])],
-            'money_type' => ['required', Rule::in(MoneyType::toArray())],
+            'money_type' => [Rule::in(MoneyType::toArray())],
             'country' => ['string', 'max:2'],
             'metadata' => ['array']
         ];
