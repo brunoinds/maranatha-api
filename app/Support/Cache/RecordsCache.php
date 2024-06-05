@@ -35,6 +35,6 @@ class RecordsCache
 
     public static function clearAll(): void
     {
-        Cache::store('file')->forget(RecordsCache::$cacheKey);
+        Cache::flush();
     }
 }
