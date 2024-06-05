@@ -11,13 +11,10 @@ class RecordsCache
     public static function getRecord(string $recordName, array $params): array|null
     {
         $hash = md5(json_encode($params));
-        $cachedValue = Cache::store('file')->get(RecordsCache::$cacheKey);
+        $cachedValue = Cache::store('database')->get(RecordsCache::$cacheKey . '/' . $recordName . '/' . $hash);
 
         if ($cachedValue){
-            $cache = json_decode($cachedValue, true);
-            if (isset($cache[$recordName]) && isset($cache[$recordName][$hash])){
-                return $cache[$recordName][$hash];
-            }
+            return json_decode($cachedValue, true);
         }
 
         return null;
@@ -31,27 +28,13 @@ class RecordsCache
     public static function storeRecord(string $recordName, array $params, array $data): void
     {
         $hash = md5(json_encode($params));
-
-        $cachedValue = Cache::store('file')->get(RecordsCache::$cacheKey);
-
-        $cache = [];
-
-        if ($cachedValue){
-            $cache = json_decode($cachedValue, true);
-        }
-
-        if (isset($cache[$recordName])){
-            $cache[$recordName] = [];
-        }
-
-        $cache[$recordName][$hash] = $data;
-        $data = json_encode($cache);
-        Cache::store('file')->put(RecordsCache::$cacheKey, $data);
+        $data = json_encode($data);
+        Cache::store('database')->put(RecordsCache::$cacheKey . '/' . $recordName . '/' . $hash, $data);
     }
 
 
     public static function clearAll(): void
     {
-        Cache::store('file')->forget(RecordsCache::$cacheKey);
+        Cache::store('database')->forget(RecordsCache::$cacheKey);
     }
 }

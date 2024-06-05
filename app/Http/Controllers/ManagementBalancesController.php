@@ -9,6 +9,8 @@ use App\Support\Generators\Records\Attendances\RecordAttendancesByJobs;
 use App\Support\Generators\Records\Users\RecordUsersByCosts;
 use DateTime;
 use App\Models\User;
+use App\Support\Cache\RecordsCache;
+
 
 
 class ManagementBalancesController extends Controller
@@ -21,6 +23,14 @@ class ManagementBalancesController extends Controller
         ]);
 
 
+        if (RecordsCache::getRecord('usersBalances', $validatedData)){
+            return response()->json([
+                'balances' => RecordsCache::getRecord('usersBalances', $validatedData),
+                'year' => $validatedData['year'],
+                'is_cached' => true
+            ]);
+        }
+
         $balances = User::all()->map(function($user) use ($validatedData){
             $year = $validatedData['year'];
             $userBalance = BalanceAssistant::generateUserBalanceByYear($user, $year);
@@ -31,10 +41,13 @@ class ManagementBalancesController extends Controller
             ];
         });
 
-        
+        RecordsCache::storeRecord('usersBalances', $validatedData, $balances->toArray());
+
+
         return response()->json([
             'balances' => $balances,
             'year' => $validatedData['year'],
+            'is_cached' => false
         ]);
     }
 }

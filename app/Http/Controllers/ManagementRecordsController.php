@@ -38,7 +38,10 @@ class ManagementRecordsController extends Controller
         $validatedData = array_merge($defaults, $validatedData);
 
         if (RecordsCache::getRecord('attendancesByWorker', $validatedData)){
-            return response()->json(RecordsCache::getRecord('attendancesByWorker', $validatedData));
+            return response()->json([
+                ...RecordsCache::getRecord('attendancesByWorker', $validatedData),
+                'is_cached' => true
+            ]);
         }
 
         $record = new RecordAttendancesByWorker([
@@ -54,7 +57,10 @@ class ManagementRecordsController extends Controller
 
         RecordsCache::storeRecord('attendancesByWorker', $validatedData, $document);
 
-        return response()->json($document);
+        return response()->json([
+            ...$document,
+            'is_cached' => false
+        ]);
     }
 
     public function jobsByCosts()
@@ -74,7 +80,10 @@ class ManagementRecordsController extends Controller
         $validatedData = array_merge($defaults, $validatedData);
 
         if (RecordsCache::getRecord('jobsByCosts', $validatedData)){
-            return response()->json(RecordsCache::getRecord('jobsByCosts', $validatedData));
+            return response()->json([
+                ...RecordsCache::getRecord('jobsByCosts', $validatedData),
+                'is_cached' => true
+            ]);
         }
 
         $record = new RecordJobsByCosts([
@@ -88,7 +97,10 @@ class ManagementRecordsController extends Controller
 
         RecordsCache::storeRecord('jobsByCosts', $validatedData, $document);
 
-        return response()->json($document);
+        return response()->json([
+            ...$document,
+            'is_cached' => false
+        ]);
     }
 
     public function attendancesByJobs()
@@ -114,7 +126,10 @@ class ManagementRecordsController extends Controller
         $validatedData = array_merge($defaults, $validatedData);
 
         if (RecordsCache::getRecord('attendancesByJobs', $validatedData)){
-            return response()->json(RecordsCache::getRecord('attendancesByJobs', $validatedData));
+            return response()->json([
+                ...RecordsCache::getRecord('attendancesByJobs', $validatedData),
+                'is_cached' => true
+            ]);
         }
 
         $record = new RecordAttendancesByJobs([
@@ -131,7 +146,10 @@ class ManagementRecordsController extends Controller
 
         RecordsCache::storeRecord('attendancesByJobs', $validatedData, $document);
 
-        return response()->json($document);
+        return response()->json([
+            ...$document,
+            'is_cached' => false
+        ]);
     }
 
     public function attendancesByJobsExpenses()
@@ -157,7 +175,10 @@ class ManagementRecordsController extends Controller
         $validatedData = array_merge($defaults, $validatedData);
 
         if (RecordsCache::getRecord('attendancesByJobsExpenses', $validatedData)){
-            return response()->json(RecordsCache::getRecord('attendancesByJobsExpenses', $validatedData));
+            return response()->json([
+                ...RecordsCache::getRecord('attendancesByJobsExpenses', $validatedData),
+                'is_cached' => true
+            ]);
         }
 
         $record = new RecordAttendancesByJobsExpenses([
@@ -174,7 +195,10 @@ class ManagementRecordsController extends Controller
 
         RecordsCache::storeRecord('attendancesByJobsExpenses', $validatedData, $document);
 
-        return response()->json($document);
+        return response()->json([
+            ...$document,
+            'is_cached' => false
+        ]);
     }
 
     public function usersByCosts()
@@ -198,7 +222,10 @@ class ManagementRecordsController extends Controller
         $validatedData = array_merge($defaults, $validatedData);
 
         if (RecordsCache::getRecord('usersByCosts', $validatedData)){
-            return response()->json(RecordsCache::getRecord('usersByCosts', $validatedData));
+            return response()->json([
+                ...RecordsCache::getRecord('usersByCosts', $validatedData),
+                'is_cached' => true
+            ]);
         }
 
         $record = new RecordUsersByCosts([
@@ -214,7 +241,10 @@ class ManagementRecordsController extends Controller
 
         RecordsCache::storeRecord('usersByCosts', $validatedData, $document);
 
-        return response()->json($document);
+        return response()->json([
+            ...$document,
+            'is_cached' => false
+        ]);
     }
 
 
@@ -237,7 +267,10 @@ class ManagementRecordsController extends Controller
         $validatedData = array_merge($defaults, $validatedData);
 
         if (RecordsCache::getRecord('reportsByTime', $validatedData)){
-            return response()->json(RecordsCache::getRecord('reportsByTime', $validatedData));
+            return response()->json([
+                ...RecordsCache::getRecord('reportsByTime', $validatedData),
+                'is_cached' => true
+            ]);
         }
 
         $record = new RecordReportsByTime([
@@ -252,7 +285,10 @@ class ManagementRecordsController extends Controller
 
         RecordsCache::storeRecord('reportsByTime', $validatedData, $document);
 
-        return response()->json($document);
+        return response()->json([
+            ...$document,
+            'is_cached' => false
+        ]);
     }
 
     public function invoicesByItems()
@@ -293,7 +329,10 @@ class ManagementRecordsController extends Controller
         $validatedData = array_merge($defaults, $validatedData);
 
         if (RecordsCache::getRecord('invoicesByItems', $validatedData)){
-            return response()->json(RecordsCache::getRecord('invoicesByItems', $validatedData));
+            return response()->json([
+                ...RecordsCache::getRecord('invoicesByItems', $validatedData),
+                'is_cached' => true
+            ]);
         }
 
 
@@ -312,6 +351,9 @@ class ManagementRecordsController extends Controller
 
         RecordsCache::storeRecord('invoicesByItems', $validatedData, $document);
 
-        return response()->json($document);
+        return response()->json([
+            ...$document,
+            'is_cached' => false
+        ]);
     }
 }
