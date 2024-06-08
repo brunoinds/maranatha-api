@@ -4,6 +4,7 @@ use Illuminate\Foundation\Inspiring;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Storage;
 use Spatie\TemporaryDirectory\TemporaryDirectory;
+use function Laravel\Prompts\progress;
 
 /*
 |--------------------------------------------------------------------------
@@ -117,15 +118,34 @@ Artisan::command('backup:restore', function(){
         }
     }
 
-    $this->info('📥 Downloading backup file ' . $backupFile['name'] . '...');
-
+    $fileSize = Storage::disk('google')->size($backupFile['name']);
+    $this->info('📥 Downloading backup file ' . $backupFile['name'] . '. 📏 File size: ' . round($fileSize / 1024 / 1024, 2) . ' MB...');
+    $this->writeLine('');
 
     $temporaryDirectory = (new TemporaryDirectory())->create();
     $tempPath = $temporaryDirectory->path('maranatha-backup-recover.zip');
 
-    $stream = Storage::disk('google')->readStream($backupFile['name']);
-    file_put_contents($tempPath, stream_get_contents($stream));
+    /** @var \League\Flysystem\Filesystem $fs */
+    $fs = Storage::disk('google')->getDriver();
+    $stream = $fs->readStream($backupFile['name']);
+
+
+    $chunkSize = 1024;
+    $steps = ceil($fileSize / $chunkSize);
+
+    $handle = fopen($tempPath, 'w');
+    $progress = progress(label: '📦 Downloading backup file', steps: $steps);
+    $progress->start();
+    $sizeRead = 0;
+    while (!feof($stream)) {
+        fwrite($handle, fread($stream, $chunkSize));
+        $progress->advance();
+        $sizeRead += $chunkSize;
+    }
+    fclose($handle);
     fclose($stream);
+    $progress->finish();
+
 
     //Restore the backup file to the local storage:
     $this->info('✨ Restoring backup file to the local storage');
