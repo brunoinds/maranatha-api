@@ -50,6 +50,9 @@ Artisan::command('backup:run-remote-trash-clear', function () {
         return;
     }else{
         $this->info('Found ' . count($filesToBeDeleted) . ' backup files in the trash bin to be deleted');
+        $this->table(['Id', 'File Name'], array_map(function ($file) {
+            return [$file->id, $file->name];
+        }, $filesToBeDeleted));
     }
 
     foreach ($filesToBeDeleted as $file) {
