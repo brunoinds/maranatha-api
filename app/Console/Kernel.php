@@ -18,6 +18,7 @@ class Kernel extends ConsoleKernel
     {
         $schedule->command('backup:run')->dailyAt('02:00')->timezone('America/Lima');
         $schedule->command('backup:clean')->dailyAt('02:15')->timezone('America/Lima');
+        $schedule->command('backup:run-remote-trash-clear')->dailyAt('02:30')->timezone('America/Lima');
 
         $schedule->call(function(){
             Notifications::sendNotificationsToAdministrator(RecordsEventLoop::getNotifications('TrendingOnSpendings'));
