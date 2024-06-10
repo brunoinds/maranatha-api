@@ -252,6 +252,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
         ]);
     });
 
+
     //Workers group:
     Route::group([], function(){
         Route::apiResource('workers', WorkerController::class);
@@ -259,7 +260,6 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::get('workers/{worker}/payments', WorkerPaymentController::class . '@index');
         Route::post('workers/{worker}/payments', WorkerPaymentController::class . '@store');
     });
-
 
 
     //Management group:

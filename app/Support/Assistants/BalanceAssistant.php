@@ -327,6 +327,87 @@ class BalanceAssistant{
             })(),
         ];
 
+
+        $spendingsByJobsAndExpenses = (function() use ($user, $balances){
+            //For each balance, get the report_id and store it in an array, the report_id should be unique, do not repeat it:
+            $uniqueReportIds = [];
+            foreach($balances as $balance){
+                if ($balance->report_id){
+                    if (!in_array($balance->report_id, $uniqueReportIds)){
+                        $uniqueReportIds[] = $balance->report_id;
+                    }
+                }
+            }
+
+            //Now should retrieve all invoices of each report_id, get the job_code, expense_code, and amount, and store it in an array:
+            $items = [];
+            foreach($uniqueReportIds as $reportId){
+                $report = Report::find($reportId);
+                $invoices = $report->invoices;
+                foreach($invoices as $invoice){
+                    $items[] = [
+                        'report_id' => $reportId,
+                        'job_code' => $invoice->job_code,
+                        'expense_code' => $invoice->expense_code,
+                        'amount' => $invoice->amountInSoles(),
+                    ];
+                }
+            }
+
+            //Now should group by job_code and expense_code, and sum the amount:
+            $grouped = [
+                'jobs' => [
+                    //Array of jobs: ["code" => "string", "amount" => float, "count" => int]
+                ],
+                'expenses' => [
+                    //Array of expenses: ["code" => "string", "amount" => float, "count" => int]
+                ]
+            ];
+            foreach($items as $item){
+                //Job:
+                //Check if $grouped['jobs] array has an item with .code = $item['job_code']:
+                $jobIndex = null;
+                for($i = 0; $i < count($grouped['jobs']); $i++){
+                    if ($grouped['jobs'][$i]['code'] === $item['job_code']){
+                        $jobIndex = $i;
+                        break;
+                    }
+                }
+                if ($jobIndex !== null){
+                    $grouped['jobs'][$jobIndex]['amount'] = Toolbox::numberSum($grouped['jobs'][$jobIndex]['amount'], $item['amount']);
+                    $grouped['jobs'][$jobIndex]['count']++;
+                }else{
+                    $grouped['jobs'][] = [
+                        'code' => $item['job_code'],
+                        'amount' => $item['amount'],
+                        'count' => 1,
+                    ];
+                }
+
+                //Expense:
+                //Check if $grouped['expenses] array has an item with .code = $item['expense_code']:
+                $expenseIndex = null;
+                for($i = 0; $i < count($grouped['expenses']); $i++){
+                    if ($grouped['expenses'][$i]['code'] === $item['expense_code']){
+                        $expenseIndex = $i;
+                        break;
+                    }
+                }
+                if ($expenseIndex !== null){
+                    $grouped['expenses'][$expenseIndex]['amount'] = Toolbox::numberSum($grouped['expenses'][$expenseIndex]['amount'], $item['amount']);
+                    $grouped['expenses'][$expenseIndex]['count']++;
+                }else{
+                    $grouped['expenses'][] = [
+                        'code' => $item['expense_code'],
+                        'amount' => $item['amount'],
+                        'count' => 1,
+                    ];
+                }
+            }
+
+            return $grouped;
+        })();
+
         return [
             'period' => [
                 'start' => $timeBounds['start'],
@@ -375,7 +456,11 @@ class BalanceAssistant{
                     'pending_reposition' => $pendingRestitution,
                     'by_status' => $byReportStatus,
                 ],
-            ]
+            ],
+            'spendings' => [
+                'by_jobs' => $spendingsByJobsAndExpenses['jobs'],
+                'by_expenses' => $spendingsByJobsAndExpenses['expenses'],
+            ],
         ];
     }
 
