@@ -1,10 +1,13 @@
 <?php
 
+use App\Support\EventLoop\WalletEventLoop;
 use Illuminate\Foundation\Inspiring;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Storage;
 use Spatie\TemporaryDirectory\TemporaryDirectory;
 use function Laravel\Prompts\progress;
+use App\Support\EventLoop\Notifications\Notifications;
+
 
 /*
 |--------------------------------------------------------------------------
@@ -152,4 +155,10 @@ Artisan::command('backup:restore', function(){
     $this->call('backup:restore-from-file', [
         'file' => $tempPath
     ]);
+});
+
+
+
+Artisan::command('pro', function(){
+    Notifications::sendNotificationsToUsersTargets(WalletEventLoop::getNotifications('FinalMonthTrending'));
 });

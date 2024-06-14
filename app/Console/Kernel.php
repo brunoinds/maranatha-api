@@ -6,6 +6,7 @@ use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
 use App\Support\EventLoop\ReportsEventLoop;
 use App\Support\EventLoop\RecordsEventLoop;
+use App\Support\EventLoop\WalletEventLoop;
 use App\Support\EventLoop\Notifications\Notifications;
 use App\Support\EventLoop\Notifications\Notification;
 
@@ -28,6 +29,19 @@ class Kernel extends ConsoleKernel
             Notifications::sendNotificationsToAdministrator(RecordsEventLoop::getNotifications('TrendingOnTimmingSubmittedAndApproved'));
             Notifications::sendNotificationsToAdministrator(RecordsEventLoop::getNotifications('TrendingOnTimmingApprovedAndRestituted'));
         })->weekly()->sundays()->at('11:30')->timezone('America/Lima');
+
+        $schedule->call(function(){
+            Notifications::sendNotificationsToAdministrator(WalletEventLoop::getNotifications('NegativeBalances'));
+        })->weekly()->thursdays()->at('11:30')->timezone('America/Lima');
+
+        $schedule->call(function(){
+            Notifications::sendNotificationsToUsersTargets(WalletEventLoop::getNotifications('MiddleMonthTrending'));
+        })->monthlyOn(25, '11:45')->timezone('America/Lima');
+
+        $schedule->call(function(){
+            Notifications::sendNotificationsToUsersTargets(WalletEventLoop::getNotifications('FinalMonthTrending'));
+        })->monthlyOn(8, '11:45')->timezone('America/Lima');
+
 
         $schedule->call(function(){
             Notifications::sendNotificationsToAdministrator(ReportsEventLoop::getNotifications());

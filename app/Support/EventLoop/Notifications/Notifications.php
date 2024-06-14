@@ -15,4 +15,10 @@ class Notifications{
             return $notification->sendNotificationToAdministrator();
         });
     }
+    public static function sendNotificationsToUsersTargets(Collection $notifications)
+    {
+        $notifications = $notifications->each(function($notification){
+            return $notification->sendToUserTarget();
+        });
+    }
 }

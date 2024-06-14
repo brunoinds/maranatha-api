@@ -11,11 +11,13 @@ class Notification{
     public string $title;
     public string $message;
     public array|null $data = [];
+    public User|null $userTarget = null;
 
-    public function __construct($title, $message, $data = []){
+    public function __construct($title, $message, $data = [], $userTarget = null){
         $this->title = $title;
         $this->message = $message;
         $this->data = $data;
+        $this->userTarget = $userTarget;
 
         if (count($this->data) === 0){
             $this->data = null;
@@ -43,5 +45,14 @@ class Notification{
             userId: Toolbox::getOneSignalUserId($userId),
             data: $this->data
         );
+    }
+
+    public function sendToUserTarget() :void
+    {
+        if ($this->userTarget === null){
+            return;
+        }
+
+        $this->sendNotificationToUserId($this->userTarget->id);
     }
 }
