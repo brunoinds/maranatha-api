@@ -156,9 +156,3 @@ Artisan::command('backup:restore', function(){
         'file' => $tempPath
     ]);
 });
-
-
-
-Artisan::command('notify:final-month-trending', function(){
-    Notifications::sendNotificationsToUsersTargets(WalletEventLoop::getNotifications('FinalMonthTrending'));
-});

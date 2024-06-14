@@ -53,9 +53,9 @@ class WalletEventLoop{
                     '- 📊 Top 3 expenses: ' . join(', ', array_map(function($expense){
                         return $expense['name'] . ' (S/. ' . number_format($expense['amount'], 2) . ')';
                     }, $item['monthlyBalance']['expenses'])),
-                    '- 🗓️ Acumulado anual: S/. ' . number_format($item['annualBalance']['debtsAccumulated'], 2)
+                    '- 🗓️ Acumulado anual: S/. ' . number_format($item['annualBalance']['debtsAccumulated'], 2),
+                    'Puedes ver más detalles en la sección "Mi Billetera"'
                 ];
-
 
                 $messages[] = [
                     'title' => '📈 Tendencia de gastos en ' . $item['month']['name'],
@@ -75,7 +75,8 @@ class WalletEventLoop{
                     '- 📊 Top 3 expenses: ' . join(', ', array_map(function($expense){
                         return $expense['name'] . ' (S/. ' . number_format($expense['amount'], 2) . ')';
                     }, $item['monthlyBalance']['expenses'])),
-                    '- 🗓️ Acumulado anual: S/. ' . number_format($item['annualBalance']['debtsAccumulated'], 2)
+                    '- 🗓️ Acumulado anual: S/. ' . number_format($item['annualBalance']['debtsAccumulated'], 2),
+                    'Puedes ver más detalles en la sección "Mi Billetera"'
                 ];
 
 
