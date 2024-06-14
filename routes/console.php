@@ -159,6 +159,6 @@ Artisan::command('backup:restore', function(){
 
 
 
-Artisan::command('pro', function(){
+Artisan::command('notify:final-month-trending', function(){
     Notifications::sendNotificationsToUsersTargets(WalletEventLoop::getNotifications('FinalMonthTrending'));
 });

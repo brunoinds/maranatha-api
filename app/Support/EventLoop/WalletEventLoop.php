@@ -50,10 +50,10 @@ class WalletEventLoop{
                     'Hasta ahora estos son tus gastos en ' . $item['month']['name'] . ':',
                     '- 📅 Total mensual: S/. ' . number_format($item['monthlyBalance']['debtsAccummulated'], 2),
                     '- 🌞 Promedio diario: S/. ' . number_format($item['monthlyBalance']['averageDaily'], 2),
-                    '- 📊 Tipos de gastos: ' . join(', ', array_map(function($expense){
+                    '- 📊 Top 3 expenses: ' . join(', ', array_map(function($expense){
                         return $expense['name'] . ' (S/. ' . number_format($expense['amount'], 2) . ')';
                     }, $item['monthlyBalance']['expenses'])),
-                    '- 🗓️ Total anual: S/. ' . number_format($item['annualBalance']['debtsAccumulated'], 2)
+                    '- 🗓️ Acumulado anual: S/. ' . number_format($item['annualBalance']['debtsAccumulated'], 2)
                 ];
 
 
@@ -72,15 +72,12 @@ class WalletEventLoop{
                     'Estos han sido tus gastos en el mes anterior:',
                     '- 📅 Total mensual: S/. ' . number_format($item['monthlyBalance']['debtsAccummulated'], 2),
                     '- 🌞 Promedio diario: S/. ' . number_format($item['monthlyBalance']['averageDaily'], 2),
-                    '- 📊 Tipos de gastos: ' . join(', ', array_map(function($expense){
+                    '- 📊 Top 3 expenses: ' . join(', ', array_map(function($expense){
                         return $expense['name'] . ' (S/. ' . number_format($expense['amount'], 2) . ')';
                     }, $item['monthlyBalance']['expenses'])),
-                    '- 🗓️ Total anual: S/. ' . number_format($item['annualBalance']['debtsAccumulated'], 2)
+                    '- 🗓️ Acumulado anual: S/. ' . number_format($item['annualBalance']['debtsAccumulated'], 2)
                 ];
 
-                if (!$item['user']->isAdmin()){
-                    return;
-                }
 
                 $messages[] = [
                         'title' => '📈 Tendencia de gastos en ' . $item['month']['name'],
