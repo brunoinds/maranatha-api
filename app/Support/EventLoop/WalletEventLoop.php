@@ -39,7 +39,10 @@ class WalletEventLoop{
             $messages[] = [
                 'title' => 'Billeteras en negativo 💵',
                 'message' => '⚠️ Hay ' . $negativeBalances->count() . ' billeteras en negativo. Ellas pertenencen a ' .  $names . '. Revísalas en la sección "Billeteras"',
-                'type' => 'NegativeBalances'
+                'type' => 'NegativeBalances',
+                'data' => [
+                    'deepLink' =>  env('APP_WEB_URL') . '/management?goTo=wallets'
+                ]
             ];
         }
 
@@ -61,7 +64,10 @@ class WalletEventLoop{
                     'title' => '📈 Tendencia de gastos en ' . $item['month']['name'],
                     'message' => join("\n", $messageLines),
                     'type' => 'MiddleMonthTrending',
-                    'user' => $item['user']
+                    'user' => $item['user'],
+                    'data' => [
+                        'deepLink' =>  env('APP_WEB_URL') . '/my-wallet'
+                    ]
                 ];
             });
         }
@@ -84,7 +90,10 @@ class WalletEventLoop{
                         'title' => '📈 Tendencia de gastos en ' . $item['month']['name'],
                         'message' => join("\n", $messageLines),
                         'type' => 'FinalMonthTrending',
-                        'user' => $item['user']
+                        'user' => $item['user'],
+                        'data' => [
+                            'deepLink' =>  env('APP_WEB_URL') . '/my-wallet'
+                        ]
                     ];
                 });
             }
@@ -96,7 +105,7 @@ class WalletEventLoop{
         return collect(self::getMessages())->filter(function($message) use ($ofType){
             return $ofType === null || $message['type'] === $ofType;
         })->map(function($message){
-            $notification = new Notification($message['title'], $message['message'], [], $message['user'] ? $message['user'] : null);
+            $notification = new Notification($message['title'], $message['message'], isset($message['data']) ? $message['data'] : [], isset($message['user']) ? $message['user'] : null);
             return $notification;
         });
     }
