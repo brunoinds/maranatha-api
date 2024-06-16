@@ -38,7 +38,7 @@ class ReportsEventLoop{
             $names = $getNames($slowWaitingApprovalReports);
             $messages[] = [
                 'title' => 'Esperando Aprobación 📥',
-                'message' => '⚠️ ' . $slowWaitingApprovalReports->count() . ' reportes de ' . $names . ' están esperando por su aprobación por más de ' . self::MAXIMUM_WAITING_HOURS_APPROVAL . ' horas. Revísalos en la sección de reportes.',
+                'message' => '⚠️ Hay ' . $slowWaitingApprovalReports->count() . ' reportes esperando por su aprobación por más de ' . self::MAXIMUM_WAITING_HOURS_APPROVAL . ' horas. ' . $names . ' están esperando su aprobación. Revísalos en la sección de reportes.',
                 'type' => 'WaitingApprovalReports'
             ];
         }
@@ -48,7 +48,7 @@ class ReportsEventLoop{
 
             $messages[] = [
                 'title' => 'Esperando Reembolso 💸',
-                'message' => '⚠️ ' . $slowWaitingRestitutedReports->count() . ' reportes aprobados de ' . $names . ' están esperando reembolso por más de ' . self::MAXIMUM_WAITING_HOURS_RESTITUTION . ' horas. Revísalos en la sección de reportes.',
+                'message' => '⚠️ Hay ' . $slowWaitingRestitutedReports->count() . ' reportes esperando reembolso por más de ' . self::MAXIMUM_WAITING_HOURS_RESTITUTION . ' horas. ' . $names . ' están esperando su reembolso. Revísalos en la sección de reportes.',
                 'type' => 'WaitingRestitutedReports'
             ];
         }
@@ -58,7 +58,7 @@ class ReportsEventLoop{
 
             $messages[] = [
                 'title' => 'Esperando Corrección 🛠️',
-                'message' => '⚠️ ' . $slowWaitingFixRejectedReports->count() . ' reportes rechazados ' . $names . ' están esperando corrección por más de ' . self::MAXIMUM_WAITING_HOURS_FIX_REJECTED . ' horas. Revísalos en la sección de reportes.',
+                'message' => '⚠️ Hay ' . $slowWaitingFixRejectedReports->count() . ' reportes rechazados que están esperando corrección por más de ' . self::MAXIMUM_WAITING_HOURS_FIX_REJECTED . ' horas. Avisa a ' . $names . ' que revíselos en la sección de reportes.',
                 'type' => 'WaitingFixRejectedReports'
             ];
         }
