@@ -37,8 +37,8 @@ class WalletEventLoop{
         if($negativeBalances->count() > 0){
             $names = $getNames($negativeBalances);
             $messages[] = [
-                'title' => 'Billeteras en negativo 💵',
-                'message' => '⚠️ Hay ' . $negativeBalances->count() . ' billeteras en negativo. Ellas pertenencen a ' .  $names . '. Revísalas en la sección "Billeteras"',
+                'title' => '⚠️ Billeteras en negativo 💵',
+                'message' => 'Hay ' . $negativeBalances->count() . ' billeteras en negativo. Ellas pertenencen a ' .  $names . '. Revísalas en la sección "Billeteras"',
                 'type' => 'NegativeBalances',
                 'data' => [
                     'deepLink' =>  env('APP_WEB_URL') . '/management?goTo=wallets'

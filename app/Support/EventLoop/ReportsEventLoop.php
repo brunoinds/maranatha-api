@@ -12,8 +12,8 @@ use App\Support\EventLoop\Notifications\Notification;
 
 
 class ReportsEventLoop{
-    const MAXIMUM_WAITING_HOURS_APPROVAL = 48;
-    const MAXIMUM_WAITING_HOURS_RESTITUTION = 48;
+    const MAXIMUM_WAITING_HOURS_APPROVAL = 72;
+    const MAXIMUM_WAITING_HOURS_RESTITUTION = 72;
     const MAXIMUM_WAITING_HOURS_FIX_REJECTED = 72;
 
     public static function getMessages(): array{
@@ -37,8 +37,8 @@ class ReportsEventLoop{
         if($slowWaitingApprovalReports->count() > 0){
             $names = $getNames($slowWaitingApprovalReports);
             $messages[] = [
-                'title' => 'Esperando Aprobación 📥',
-                'message' => '⚠️ Hay ' . $slowWaitingApprovalReports->count() . ' reportes esperando por su aprobación por más de ' . self::MAXIMUM_WAITING_HOURS_APPROVAL . ' horas. ' . $names . ' están esperando su aprobación. Revísalos en la sección de reportes.',
+                'title' => '⚠️ Esperando Aprobación 📥',
+                'message' => 'Hay ' . $slowWaitingApprovalReports->count() . ' reportes esperando por su aprobación por más de ' . self::MAXIMUM_WAITING_HOURS_APPROVAL . ' horas. Revisa los reportes de ' . $names . '.',
                 'type' => 'WaitingApprovalReports'
             ];
         }
@@ -47,8 +47,8 @@ class ReportsEventLoop{
             $names = $getNames($slowWaitingRestitutedReports);
 
             $messages[] = [
-                'title' => 'Esperando Reembolso 💸',
-                'message' => '⚠️ Hay ' . $slowWaitingRestitutedReports->count() . ' reportes esperando reembolso por más de ' . self::MAXIMUM_WAITING_HOURS_RESTITUTION . ' horas. ' . $names . ' están esperando su reembolso. Revísalos en la sección de reportes.',
+                'title' => '⚠️ Esperando Reembolso 💸',
+                'message' => 'Hay ' . $slowWaitingRestitutedReports->count() . ' reportes esperando reembolso por más de ' . self::MAXIMUM_WAITING_HOURS_RESTITUTION . ' horas. Revisa los reportes de ' . $names . '.',
                 'type' => 'WaitingRestitutedReports'
             ];
         }
@@ -57,8 +57,8 @@ class ReportsEventLoop{
             $names = $getNames($slowWaitingFixRejectedReports);
 
             $messages[] = [
-                'title' => 'Esperando Corrección 🛠️',
-                'message' => '⚠️ Hay ' . $slowWaitingFixRejectedReports->count() . ' reportes rechazados que están esperando corrección por más de ' . self::MAXIMUM_WAITING_HOURS_FIX_REJECTED . ' horas. Avisa a ' . $names . ' que revíselos en la sección de reportes.',
+                'title' => '⚠️ Esperando Corrección 🛠️',
+                'message' => 'Hay ' . $slowWaitingFixRejectedReports->count() . ' reportes rechazados que están esperando corrección por más de ' . self::MAXIMUM_WAITING_HOURS_FIX_REJECTED . ' horas. Avisa a ' . $names . ' que revíselos en la sección de reportes.',
                 'type' => 'WaitingFixRejectedReports'
             ];
         }
