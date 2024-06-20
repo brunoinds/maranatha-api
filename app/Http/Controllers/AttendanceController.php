@@ -122,6 +122,7 @@ class AttendanceController extends Controller
         if (isset($request->validated()['workers_dnis'])) {
             $attendance->updateWorkersDnis($request->validated()['workers_dnis']);
         }
+        RecordsCache::clearAll();
         return response()->json(['message' => 'Attendance updated', 'attendance' => $attendance->toArray()]);
     }
 
