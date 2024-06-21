@@ -259,6 +259,9 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::apiResource('worker-payments', WorkerPaymentController::class);
         Route::get('workers/{worker}/payments', WorkerPaymentController::class . '@index');
         Route::post('workers/{worker}/payments', WorkerPaymentController::class . '@store');
+
+        Route::post('workers-payments', WorkerPaymentController::class . '@storeMultiple');
+
     });
 
 

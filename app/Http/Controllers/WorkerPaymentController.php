@@ -3,9 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreWorkerPaymentRequest;
+use App\Http\Requests\StoreMultipleWorkerPaymentRequest;
 use App\Http\Requests\UpdateWorkerPaymentRequest;
 use App\Models\WorkerPayment;
 use App\Support\Cache\RecordsCache;
+use App\Models\Worker;
 
 class WorkerPaymentController extends Controller
 {
@@ -25,6 +27,51 @@ class WorkerPaymentController extends Controller
         $validated = $request->validated();
         RecordsCache::clearAll();
         return WorkerPayment::create($validated);
+    }
+
+
+    public function storeMultiple(StoreMultipleWorkerPaymentRequest $request)
+    {
+        $validated = $request->validated();
+        /*
+        public function rules(): array
+        {
+            return [
+                'workers_dni' => 'required|array',
+                'workers_dni.*' => 'required|exists:workers,dni',
+                'amount' => 'required|numeric',
+                'month' => 'required|date_format:m',
+                'year' => 'required|date_format:Y',
+                'currency' => ['required', Rule::in(MoneyType::toArray())],
+                'description' => 'string|nullable'
+            ];
+        }
+        */
+
+        //Check each one if WorkerPayment has been already created, if not, create it, if yes, update it:
+        foreach ($validated['workers_dni'] as $dni) {
+            $worker = Worker::where('dni', $dni)->first();
+
+            if (!$worker) {
+                return response()->json(['message' => 'Worker not found'], 404);
+            }
+
+
+            $workerPayment = WorkerPayment::where('worker_id', $worker->id)
+                ->where('month', $validated['month'])
+                ->where('year', $validated['year'])
+                ->first();
+
+            if ($workerPayment) {
+                $workerPayment->update($validated);
+            } else {
+                $validated['worker_id'] = $worker->id;
+                WorkerPayment::create($validated);
+            }
+        }
+
+        RecordsCache::clearAll();
+        return  response()->json(['message' => 'Worker payments created successfully']);
     }
 
     /**
