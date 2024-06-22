@@ -33,22 +33,7 @@ class WorkerPaymentController extends Controller
     public function storeMultiple(StoreMultipleWorkerPaymentRequest $request)
     {
         $validated = $request->validated();
-        /*
-        public function rules(): array
-        {
-            return [
-                'workers_dni' => 'required|array',
-                'workers_dni.*' => 'required|exists:workers,dni',
-                'amount' => 'required|numeric',
-                'month' => 'required|date_format:m',
-                'year' => 'required|date_format:Y',
-                'currency' => ['required', Rule::in(MoneyType::toArray())],
-                'description' => 'string|nullable'
-            ];
-        }
-        */
 
-        //Check each one if WorkerPayment has been already created, if not, create it, if yes, update it:
         foreach ($validated['workers_dni'] as $dni) {
             $worker = Worker::where('dni', $dni)->first();
 

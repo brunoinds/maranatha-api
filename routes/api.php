@@ -16,7 +16,6 @@ use App\Http\Controllers\ManagementRecordsController;
 use App\Http\Controllers\ManagementBalancesController;
 use App\Http\Controllers\ApplicationNativeController;
 use App\Http\Controllers\ApplicationWebController;
-use App\Http\Controllers\InstantMessageController;
 use App\Http\Controllers\WorkerPaymentController;
 use App\Http\Controllers\WorkerController;
 
@@ -220,36 +219,6 @@ Route::middleware(['auth:sanctum'])->group(function () {
                 ReportController::class, 'checkProgressDownloadPDF'
             ]);
         });
-    });
-
-
-    //Chat group:
-    Route::group([], function(){
-        Route::post('/chats/users/{user}/messages', [
-            InstantMessageController::class, 'store'
-        ]);
-
-        Route::get('/chats/users/{user}/messages', [
-            InstantMessageController::class, 'messagesInConversation'
-        ]);
-
-
-        Route::post('/chats/broadcasting/events', [
-            InstantMessageController::class, 'storeBroadcastingEvent'
-        ]);
-
-        Route::get('/chats/broadcasting/events', [
-            /*
-            Event list:
-            - new-messages: This command will get all the new messages from the server and will mark them as received
-            -
-
-            */
-
-
-
-            InstantMessageController::class, 'messagesInConversation'
-        ]);
     });
 
 

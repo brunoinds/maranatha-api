@@ -156,3 +156,25 @@ Artisan::command('backup:restore', function(){
         'file' => $tempPath
     ]);
 });
+
+
+Artisan::command('remove:model {model}', function ($model) {
+    $files = [
+        'app/Models/' . $model . '.php',
+        'app/Http/Requests/Store' . $model . 'Request.php',
+        'app/Http/Requests/Update' . $model . 'Request.php',
+        'app/Http/Controllers/' . $model . 'Controller.php',
+        'app/Policies/' . $model . 'Policy.php',
+        'database/factories/' . $model . 'Factory.php',
+        'database/seeders/' . $model . 'Seeder.php',
+    ];
+
+    collect($files)->each(function($file){
+        if (file_exists($file)) {
+            unlink($file);
+            $this->info('File ' . $file . ' removed ✅');
+        }else{
+            $this->error('File ' . $file . ' not removed beacuse it does not exist ❌');
+        }
+    });
+})->purpose('Remove Model, Controller, Policy, Factory, Migration, Seeder');
