@@ -29,7 +29,7 @@ class UpdateReportRequest extends FormRequest
             'from_date' => ['date'],
             'to_date' => ['date'],
             'status' => [Rule::in(['Draft', 'Submitted', 'Approved', 'Rejected', 'Restituted'])],
-            'rejection_reason' => ['string', 'max:100', 'nullable'],
+            'rejection_reason' => ['string', 'max:1000', 'nullable'],
             'type' => [Rule::in(['Bill', 'Facture'])],
             'money_type' => [Rule::in(MoneyType::toArray())],
             'country' => ['string', 'max:2'],

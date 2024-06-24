@@ -24,7 +24,7 @@ class StoreInvoiceRequest extends FormRequest
         return [
             'report_id' => ['required', 'integer'],
             'type' => ['required', Rule::in(['Facture', 'Bill'])],
-            'description' => ['required', 'string', 'max:100'],
+            'description' => ['required', 'string', 'max:1000'],
             'ticket_number' => ['required', 'string', 'max:100'],
             'commerce_number' => ['required', 'string', 'max:100'],
             'date' => ['required', 'date'],

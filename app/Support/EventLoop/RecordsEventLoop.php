@@ -23,12 +23,18 @@ class RecordsEventLoop{
         $messages = [];
         if($trendingOnReportsSpendings !== null && ($trendingOnReportsSpendings['difference']['percentage'] >= self::MINIMAL_DIFFERENCE_TO_NOTIFY_ON_SPENDINGS || $trendingOnReportsSpendings['difference']['percentage'] <= -self::MINIMAL_DIFFERENCE_TO_NOTIFY_ON_SPENDINGS)){
             $messages[] = [
-                'title' => '💸 Gastos con Reportes',
+                'title' => (function() use ($trendingOnReportsSpendings){
+                    if ($trendingOnReportsSpendings['difference']['percentage'] < 0){
+                        return '📉 Disminución en gastos';
+                    } else {
+                        return '📈 Aumento en gastos';
+                    }
+                })(),
                 'message' => (function() use ($trendingOnReportsSpendings){
                     if ($trendingOnReportsSpendings['difference']['percentage'] < 0){
-                        return '📉 Los gastos con boletas/facturas han disminuido en un ' . number_format(abs($trendingOnReportsSpendings['difference']['percentage']), 1) . '% en comparación al mes pasado. Hasta ahora, se han gastado $' . number_format($trendingOnReportsSpendings['current']['amount'], 2) . ', siendo que, en el mismo periodo en el mes anterior, se habían gastado $' . number_format($trendingOnReportsSpendings['previous']['amount'], 2) . '.';
+                        return 'Gastos con boletas/facturas: disminución del ' . number_format(abs($trendingOnReportsSpendings['difference']['percentage']), 1) . '%. Gastado este mes: $' . number_format($trendingOnReportsSpendings['current']['amount'], 2) . ', mes anterior: $' . number_format($trendingOnReportsSpendings['previous']['amount'], 2) . '.';
                     } else {
-                        return '📈 Los gastos con boletas/facturas han aumentado en un ' . number_format($trendingOnReportsSpendings['difference']['percentage'], 1) . '% en comparación al mes pasado. Hasta ahora, se han gastado $' . number_format($trendingOnReportsSpendings['current']['amount'], 2) . ', siendo que, en el mismo periodo en el mes anterior, se habían gastado $' . number_format($trendingOnReportsSpendings['previous']['amount'], 2) . '.';
+                        return 'Gastos con boletas/facturas: aumento del ' . number_format($trendingOnReportsSpendings['difference']['percentage'], 1) . '%. Gastado este mes: $' . number_format($trendingOnReportsSpendings['current']['amount'], 2) . ', mes anterior: $' . number_format($trendingOnReportsSpendings['previous']['amount'], 2) . '.';
                     }
                 })(),
                 'type' => 'TrendingOnSpendings'
@@ -37,12 +43,18 @@ class RecordsEventLoop{
 
         if ($trendingOnReportsTimmingSubmittedAndApproved !== null && ($trendingOnReportsTimmingSubmittedAndApproved['difference']['percentage'] >= self::MINIMAL_DIFFERENCE_TO_NOTIFY_ON_TIMMING || $trendingOnReportsTimmingSubmittedAndApproved['difference']['percentage'] <= -self::MINIMAL_DIFFERENCE_TO_NOTIFY_ON_TIMMING)){
             $messages[] = [
-                'title' => '⏰ Tiempo de Aprobación de Reportes',
+                'title' => (function() use ($trendingOnReportsTimmingSubmittedAndApproved){
+                    if ($trendingOnReportsTimmingSubmittedAndApproved['difference']['percentage'] < 0){
+                        return '⬆️⏰ Tiempo aprobación de reportes';
+                    } else {
+                        return '⬇️⏰ Tiempo aprobación de reportes';
+                    }
+                })(),
                 'message' => (function() use ($trendingOnReportsTimmingSubmittedAndApproved){
                     if ($trendingOnReportsTimmingSubmittedAndApproved['difference']['percentage'] < 0){
-                        return '📉 El tiempo promedio entre la presentación y la aprobación de reportes ha disminuido en un ' . number_format(abs($trendingOnReportsTimmingSubmittedAndApproved['difference']['percentage']), 0) . '% en comparación al mes pasado. Hasta ahora, el tiempo promedio ha sido de ' . number_format($trendingOnReportsTimmingSubmittedAndApproved['current']['amount'], 0) . ' horas, siendo que en el mismo periodo en el mes anterior fue de ' . number_format($trendingOnReportsTimmingSubmittedAndApproved['previous']['amount'], 0) . ' horas.';
+                        return 'El tiempo promedio de aprobación de reportes ha disminuido en un ' . number_format(abs($trendingOnReportsTimmingSubmittedAndApproved['difference']['percentage']), 0) . '% en comparación al mes pasado. Hasta ahora, el tiempo promedio ha sido de ' . number_format($trendingOnReportsTimmingSubmittedAndApproved['current']['amount'], 0) . ' horas, siendo que en el mismo periodo en el mes anterior fue de ' . number_format($trendingOnReportsTimmingSubmittedAndApproved['previous']['amount'], 0) . ' horas.';
                     } else {
-                        return '📈 El tiempo promedio entre la presentación y la aprobación de reportes ha aumentado en un ' . number_format($trendingOnReportsTimmingSubmittedAndApproved['difference']['percentage'], 0) . '% en comparación al mes pasado. Hasta ahora, el tiempo promedio ha sido de ' . number_format($trendingOnReportsTimmingSubmittedAndApproved['current']['amount'], 0) . ' horas, siendo que en el mismo periodo en el mes anterior fue de ' . number_format($trendingOnReportsTimmingSubmittedAndApproved['previous']['amount'], 0) . ' horas.';
+                        return 'El tiempo promedio de aprobación de reportes ha aumentado en un ' . number_format($trendingOnReportsTimmingSubmittedAndApproved['difference']['percentage'], 0) . '% en comparación al mes pasado. Hasta ahora, el tiempo promedio ha sido de ' . number_format($trendingOnReportsTimmingSubmittedAndApproved['current']['amount'], 0) . ' horas, siendo que en el mismo periodo en el mes anterior fue de ' . number_format($trendingOnReportsTimmingSubmittedAndApproved['previous']['amount'], 0) . ' horas.';
                     }
                 })(),
                 'type' => 'TrendingOnTimmingSubmittedAndApproved'
@@ -51,12 +63,18 @@ class RecordsEventLoop{
 
         if ($trendingOnReportsTimmingApprovedAndRestituted !== null && ($trendingOnReportsTimmingApprovedAndRestituted['difference']['percentage'] >= self::MINIMAL_DIFFERENCE_TO_NOTIFY_ON_TIMMING || $trendingOnReportsTimmingApprovedAndRestituted['difference']['percentage'] <= -self::MINIMAL_DIFFERENCE_TO_NOTIFY_ON_TIMMING)){
             $messages[] = [
-                'title' => '⏰ Tiempo de Reembolso de Reportes',
+                'title' => (function() use ($trendingOnReportsTimmingApprovedAndRestituted){
+                    if ($trendingOnReportsTimmingApprovedAndRestituted['difference']['percentage'] < 0){
+                        return '⬆️⏰ Tiempo reembolso de reportes';
+                    } else {
+                        return '⬇️⏰ Tiempo reembolso de reportes';
+                    }
+                })(),
                 'message' => (function() use ($trendingOnReportsTimmingApprovedAndRestituted){
                     if ($trendingOnReportsTimmingApprovedAndRestituted['difference']['percentage'] < 0){
-                        return '📉 El tiempo promedio entre la aprobación y el reembolso de reportes ha disminuido en un ' . number_format(abs($trendingOnReportsTimmingApprovedAndRestituted['difference']['percentage']), 0) . '% en comparación al mes pasado. Hasta ahora, el tiempo promedio ha sido de ' . number_format($trendingOnReportsTimmingApprovedAndRestituted['current']['amount'], 0) . ' horas, siendo que en el mismo periodo en el mes anterior fue de ' . number_format($trendingOnReportsTimmingApprovedAndRestituted['previous']['amount'], 0) . ' horas.';
+                        return 'El tiempo promedio entre la aprobación y el reembolso de reportes ha disminuido en un ' . number_format(abs($trendingOnReportsTimmingApprovedAndRestituted['difference']['percentage']), 0) . '% en comparación al mes pasado. Hasta ahora, el tiempo promedio ha sido de ' . number_format($trendingOnReportsTimmingApprovedAndRestituted['current']['amount'], 0) . ' horas, siendo que en el mismo periodo en el mes anterior fue de ' . number_format($trendingOnReportsTimmingApprovedAndRestituted['previous']['amount'], 0) . ' horas.';
                     } else {
-                        return '📈 El tiempo promedio entre la aprobación y el reembolso de reportes ha aumentado en un ' . number_format($trendingOnReportsTimmingApprovedAndRestituted['difference']['percentage'], 0) . '% en comparación al mes pasado. Hasta ahora, el tiempo promedio ha sido de ' . number_format($trendingOnReportsTimmingApprovedAndRestituted['current']['amount'], 0) . ' horas, siendo que en el mismo periodo en el mes anterior fue de ' . number_format($trendingOnReportsTimmingApprovedAndRestituted['previous']['amount'], 0) . ' horas.';
+                        return 'El tiempo promedio entre la aprobación y el reembolso de reportes ha aumentado en un ' . number_format($trendingOnReportsTimmingApprovedAndRestituted['difference']['percentage'], 0) . '% en comparación al mes pasado. Hasta ahora, el tiempo promedio ha sido de ' . number_format($trendingOnReportsTimmingApprovedAndRestituted['current']['amount'], 0) . ' horas, siendo que en el mismo periodo en el mes anterior fue de ' . number_format($trendingOnReportsTimmingApprovedAndRestituted['previous']['amount'], 0) . ' horas.';
                     }
                 })(),
                 'type' => 'TrendingOnTimmingApprovedAndRestituted'
