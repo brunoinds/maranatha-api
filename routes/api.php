@@ -18,6 +18,11 @@ use App\Http\Controllers\ApplicationNativeController;
 use App\Http\Controllers\ApplicationWebController;
 use App\Http\Controllers\WorkerPaymentController;
 use App\Http\Controllers\WorkerController;
+use App\Http\Controllers\InventoryProductController;
+use App\Http\Controllers\InventoryWarehouseController;
+use App\Http\Controllers\InventoryProductItemController;
+use App\Http\Controllers\InventoryProductsPackController;
+
 
 /*
 |--------------------------------------------------------------------------
@@ -250,6 +255,19 @@ Route::middleware(['auth:sanctum'])->group(function () {
             Route::get('users', ManagementBalancesController::class . '@usersBalances');
             Route::get('users/{user}/years/{year}', BalanceController::class . '@userBalanceYear');
         });
+    });
+
+
+    //Inventory group:
+    Route::group([], function(){
+        Route::apiResource('inventory/products', InventoryProductController::class);
+
+        Route::apiResource('inventory/warehouses', InventoryWarehouseController::class);
+        Route::apiResource('inventory/products/items', InventoryProductItemController::class);
+        Route::apiResource('inventory/products/packs', InventoryProductsPackController::class);
+        Route::apiResource('inventory/products/packs/items', InventoryProductsPackItemController::class);
+        Route::apiResource('inventory/warehouse-incomes', InventoryWarehouseIncomeController::class);
+        Route::apiResource('inventory/warehouse-outcomes', InventoryWarehouseOutcomeController::class);
     });
 });
 
