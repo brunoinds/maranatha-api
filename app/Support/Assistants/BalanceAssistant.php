@@ -13,6 +13,7 @@ use Carbon\Carbon;
 use DateTime;
 use DateTimeInterface;
 use App\Helpers\Toolbox;
+use Brick\Math\BigDecimal;
 
 
 class BalanceAssistant{
@@ -51,12 +52,15 @@ class BalanceAssistant{
         $totalDebit = 0;
         $items = [];
 
+        $totalChain = BigDecimal::of(0);
         foreach($balances as $balance){
             if ($balance->type === BalanceType::Credit){
                 $totalCredit = Toolbox::numberSum($totalCredit, $balance->amount);
             }elseif ($balance->type === BalanceType::Debit){
                 $totalDebit = Toolbox::numberSum($totalDebit, $balance->amount);
             }
+
+            $totalChain = $total->plus($balance->amount);
 
 
             $items[] = [
@@ -72,7 +76,7 @@ class BalanceAssistant{
                 'receipt_image_url' => $balance->getReceiptImageUrl(),
             ];
         }
-        $total = Toolbox::numberSub($totalCredit, $totalDebit);
+        $total = $totalChain->toFloat();
 
         $notApprovedReports = (function() use ($user, $timeBounds){
             //Where  ReportStatus::Submitted or ReportStatus::Rejected or ReportStatus::Draft:
