@@ -72,7 +72,7 @@ class BalanceAssistant{
                 'receipt_image_url' => $balance->getReceiptImageUrl(),
             ];
         }
-        $total = $totalCredit - $totalDebit;
+        $total = Toolbox::numberSub($totalCredit, $totalDebit);
 
         $notApprovedReports = (function() use ($user, $timeBounds){
             //Where  ReportStatus::Submitted or ReportStatus::Rejected or ReportStatus::Draft:
@@ -460,7 +460,7 @@ class BalanceAssistant{
             'spendings' => [
                 'by_jobs' => $spendingsByJobsAndExpenses['jobs'],
                 'by_expenses' => $spendingsByJobsAndExpenses['expenses'],
-            ],
+            ]
         ];
     }
 
