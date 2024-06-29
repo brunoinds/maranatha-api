@@ -60,7 +60,7 @@ class BalanceAssistant{
                 $totalDebit = Toolbox::numberSum($totalDebit, $balance->amount);
             }
 
-            $totalChain = $total->plus($balance->amount);
+            $totalChain = $totalChain->plus($balance->amount);
 
 
             $items[] = [
