@@ -29,7 +29,11 @@ class UpdateWorkerPaymentRequest extends FormRequest
             'month' => 'required|date_format:m',
             'year' => 'required|date_format:Y',
             'currency' => ['required', Rule::in(MoneyType::toArray())],
-            'description' => 'string|nullable'
+            'description' => 'string|nullable',
+            'divisions' => 'array',
+            'divisions.*.id' => 'required|string',
+            'divisions.*.name' => 'required|string',
+            'divisions.*.amount' => 'required|numeric',
         ];
     }
 }

@@ -17,12 +17,14 @@ class WorkerPayment extends Model
         'year',
         'amount',
         'currency',
-        'description'
+        'description',
+        'divisions'
     ];
 
 
     protected $casts = [
-        'currency' => MoneyType::class
+        'currency' => MoneyType::class,
+        'divisions' => 'array'
     ];
 
     public function worker(): \Illuminate\Database\Eloquent\Relations\BelongsTo

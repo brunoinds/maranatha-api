@@ -6,6 +6,7 @@ use App\Support\Generators\Records\Attendances\RecordAttendancesByWorker;
 use App\Support\Generators\Records\Jobs\RecordJobsByCosts;
 use App\Support\Generators\Records\Attendances\RecordAttendancesByJobs;
 use App\Support\Generators\Records\Attendances\RecordAttendancesByJobsExpenses;
+use App\Support\Generators\Records\Attendances\RecordAttendancesByWorkersJobsExpenses;
 use App\Support\Generators\Records\Users\RecordUsersByCosts;
 use App\Support\Generators\Records\Reports\RecordReportsByTime;
 use App\Support\Generators\Records\Invoices\RecordInvoicesByItems;
@@ -194,6 +195,55 @@ class ManagementRecordsController extends Controller
         $document = $record->generate();
 
         RecordsCache::storeRecord('attendancesByJobsExpenses', $validatedData, $document);
+
+        return response()->json([
+            ...$document,
+            'is_cached' => false
+        ]);
+    }
+
+    public function attendancesByWorkersJobsExpenses()
+    {
+        $validatedData = request()->validate([
+            'start_date' => 'required|date',
+            'end_date' => 'required|date',
+            'job_code' => 'nullable|string',
+            'expense_code' => 'nullable|string',
+            'supervisor' => 'nullable|string',
+            'worker_dni' => 'nullable|string',
+            'job_zone' => 'nullable|string',
+        ]);
+
+        $defaults = [
+            'job_code' => null,
+            'expense_code' => null,
+            'supervisor' => null,
+            'worker_dni' => null,
+            'job_zone' => null
+        ];
+
+        $validatedData = array_merge($defaults, $validatedData);
+
+        /*if (RecordsCache::getRecord('attendancesByWorkersJobsExpenses', $validatedData)){
+            return response()->json([
+                ...RecordsCache::getRecord('attendancesByWorkersJobsExpenses', $validatedData),
+                'is_cached' => true
+            ]);
+        }*/
+
+        $record = new RecordAttendancesByWorkersJobsExpenses([
+            'startDate' => new DateTime($validatedData['start_date']),
+            'endDate' => new DateTime($validatedData['end_date']),
+            'jobCode' => $validatedData['job_code'],
+            'expenseCode' => $validatedData['expense_code'],
+            'supervisor' => $validatedData['supervisor'],
+            'workerDni' => $validatedData['worker_dni'],
+            'jobZone' => $validatedData['job_zone'],
+        ]);
+
+        $document = $record->generate();
+
+        RecordsCache::storeRecord('attendancesByWorkersJobsExpenses', $validatedData, $document);
 
         return response()->json([
             ...$document,

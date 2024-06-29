@@ -64,6 +64,13 @@ class WorkersAssistant{
                         'start' => Carbon::createFromFormat('m/Y', $monthYear)->timezone('America/Lima')->startOfMonth()->format('c'),
                         'end' => Carbon::createFromFormat('m/Y', $monthYear)->timezone('America/Lima')->endOfMonth()->endOfDay()->format('c'),
                     ],
+                    'divisions' => collect($payment->divisions)->map(function($division){
+                        return [
+                            'id' => $division['id'],
+                            'name' => $division['name'],
+                            'amount' => $division['amount'],
+                        ];
+                    })->toArray(),
                 ];
             });
 
@@ -99,6 +106,7 @@ class WorkersAssistant{
                         'start' => Carbon::createFromFormat('m/Y', $monthYear)->timezone('America/Lima')->startOfMonth()->format('c'),
                         'end' => Carbon::createFromFormat('m/Y', $monthYear)->timezone('America/Lima')->endOfMonth()->endOfDay()->format('c'),
                     ],
+                    'divisions' => [],
                 ];
             });
             $payments = collect($payments)->merge($missingPayments);
@@ -147,6 +155,8 @@ class WorkersAssistant{
                     $countDaysPresent = $attendances->where('status', '=', AttendanceStatus::Present->value)->count();
                     $amountPerDayInMonthYear = 0;
                     $amountPerDayInOriginalCurrencyInMonthYear = 0;
+                    $amountPerDayEachDivision = [];
+
                     if ($payment && $countDaysPresent > 0 && $payment['amount'] > 0){
                         $amountPerDayInMonthYear = $payment['amount'] / $countDaysPresent;
                         $amountPerDayInOriginalCurrencyInMonthYear = $payment['amount_data']['original']['amount'] / $countDaysPresent;
@@ -154,16 +164,25 @@ class WorkersAssistant{
                         if ($payment['amount_data']['original']['money_type'] === MoneyType::PYG->value){
                             $amountPerDayInOriginalCurrencyInMonthYear = round($amountPerDayInOriginalCurrencyInMonthYear, 0);
                         }
+
+                        foreach ($payment['divisions'] as $division){
+                            $amountPerDayEachDivision[] = [
+                                'id' => $division['id'],
+                                'name' => $division['name'],
+                                'amount' => $division['amount'] / $countDaysPresent,
+                            ];
+                        }
                     }
 
-                    $attendancesWithPaymentAmount = $attendances->map(function($item) use ($monthYear, $payment, $amountPerDayInMonthYear, $amountPerDayInOriginalCurrencyInMonthYear, $worker){
+                    $attendancesWithPaymentAmount = $attendances->map(function($item) use ($monthYear, $payment, $amountPerDayInMonthYear, $amountPerDayInOriginalCurrencyInMonthYear, $worker, $countDaysPresent, $amountPerDayEachDivision){
                         if ($item['status'] == AttendanceStatus::Present->value){
                             $item['payment'] = [
                                 'period' => $monthYear,
                                 'amount' => $amountPerDayInMonthYear,
                                 'amount_data' => [
                                     'amount' => $amountPerDayInOriginalCurrencyInMonthYear,
-                                    'money_type' => $payment['amount_data']['original']['money_type']
+                                    'money_type' => $payment['amount_data']['original']['money_type'],
+                                    'divisions' => $amountPerDayEachDivision
                                 ]
                             ];
                         }else{
@@ -172,7 +191,8 @@ class WorkersAssistant{
                                 'amount' => 0,
                                 'amount_data' => [
                                     'amount' => 0,
-                                    'money_type' => $payment['amount_data']['original']['money_type']
+                                    'money_type' => $payment['amount_data']['original']['money_type'],
+                                    'divisions' => []
                                 ]
                             ];
                         }
@@ -212,6 +232,8 @@ class WorkersAssistant{
                                     'end' => $payment['timespan']['end'],
                                     'amount' => $payment['amount'],
                                     'amount_per_day' => $amountPerDayInMonthYear,
+                                    'days_present' => $countDaysPresent,
+                                    'divisions' => $payment['divisions']
                                 ],
                                 'amount' => $item['payment']['amount'],
                                 'amount_data' => $item['payment']['amount_data']

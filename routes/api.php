@@ -245,6 +245,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
             Route::get('attendances/by-worker', ManagementRecordsController::class . '@attendancesByWorker');
             Route::get('attendances/by-jobs', ManagementRecordsController::class . '@attendancesByJobs');
             Route::get('attendances/by-jobs-expenses', ManagementRecordsController::class . '@attendancesByJobsExpenses');
+            Route::get('attendances/by-workers-jobs-expenses', ManagementRecordsController::class . '@attendancesByWorkersJobsExpenses');
 
             Route::get('jobs/by-costs', ManagementRecordsController::class . '@jobsByCosts');
             Route::get('users/by-costs', ManagementRecordsController::class . '@usersByCosts');
