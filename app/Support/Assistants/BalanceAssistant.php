@@ -56,11 +56,13 @@ class BalanceAssistant{
         foreach($balances as $balance){
             if ($balance->type === BalanceType::Credit){
                 $totalCredit = Toolbox::numberSum($totalCredit, $balance->amount);
+                $totalChain = $totalChain->plus($balance->amount);
             }elseif ($balance->type === BalanceType::Debit){
                 $totalDebit = Toolbox::numberSum($totalDebit, $balance->amount);
+                $totalChain = $totalChain->minus($balance->amount);
             }
 
-            $totalChain = $totalChain->plus($balance->amount);
+
 
 
             $items[] = [
