@@ -22,6 +22,9 @@ use App\Http\Controllers\InventoryProductController;
 use App\Http\Controllers\InventoryWarehouseController;
 use App\Http\Controllers\InventoryProductItemController;
 use App\Http\Controllers\InventoryProductsPackController;
+use App\Http\Controllers\InventoryProductsPackItemController;
+use App\Http\Controllers\InventoryWarehouseIncomeController;
+use App\Http\Controllers\InventoryWarehouseOutcomeController;
 
 
 /*

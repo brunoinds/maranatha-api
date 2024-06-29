@@ -25,10 +25,10 @@ class StoreInventoryWarehouseIncomeRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'description' => ['required', 'string', 'max:1000'],
+            'description' => ['string', 'max:1000'],
             'date' => ['required', 'date'],
-            'ticket_number' => ['required', 'string', 'max:255'],
-            'commerce_number' => ['required', 'string', 'max:255'],
+            'ticket_number' => ['string', 'max:255'],
+            'commerce_number' => ['string', 'max:255'],
             'qrcode_data' => ['nullable', 'string', 'max:1000'],
             'image' => ['nullable', 'string'],
             'amount' => ['required', 'numeric'],

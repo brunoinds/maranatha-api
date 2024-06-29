@@ -62,9 +62,6 @@ class BalanceAssistant{
                 $totalChain = $totalChain->minus($balance->amount);
             }
 
-
-
-
             $items[] = [
                 'id' => $balance->id,
                 'description' => $balance->description,
@@ -469,7 +466,6 @@ class BalanceAssistant{
             ]
         ];
     }
-
     public static function createBalanceExpenseFromReport(Report $report, float|null $amountOverride = null):Balance{
         $balance = Balance::create([
             'description' => 'Gastos del reporte "' . $report->title . '"',
