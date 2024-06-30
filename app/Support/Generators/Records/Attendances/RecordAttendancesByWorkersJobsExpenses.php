@@ -49,7 +49,6 @@ class RecordAttendancesByWorkersJobsExpenses
 
     private function getWorkersData():array
     {
-
         $workersSpendings = collect(WorkersAssistant::getWorkersSpendings())->map(function($workerSpendings){
             return $workerSpendings['spendings'];
         })->flatten(1);

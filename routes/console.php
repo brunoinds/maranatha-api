@@ -7,6 +7,8 @@ use Illuminate\Support\Facades\Storage;
 use Spatie\TemporaryDirectory\TemporaryDirectory;
 use function Laravel\Prompts\progress;
 use App\Support\EventLoop\Notifications\Notifications;
+use League\Flysystem\Filesystem;
+use League\Flysystem\Local\LocalFilesystemAdapter;
 
 
 /*
@@ -68,6 +70,7 @@ Artisan::command('backup:run-remote-trash-clear', function () {
     }
 })->purpose('Clear the backup trash bin of the remote storage');
 
+
 Artisan::command('backup:restore', function(){
     $this->info('🔍 Looking for backup files in the remote storage...');
 
@@ -123,7 +126,7 @@ Artisan::command('backup:restore', function(){
 
     $fileSize = Storage::disk('google')->size($backupFile['name']);
     $this->info('📥 Downloading backup file ' . $backupFile['name'] . '. 📏 File size: ' . round($fileSize / 1024 / 1024, 2) . ' MB...');
-    $this->writeLine('');
+    $this->line('');
 
     $temporaryDirectory = (new TemporaryDirectory())->create();
     $tempPath = $temporaryDirectory->path('maranatha-backup-recover.zip');
@@ -156,7 +159,6 @@ Artisan::command('backup:restore', function(){
         'file' => $tempPath
     ]);
 });
-
 
 Artisan::command('remove:model {model}', function ($model) {
     $files = [

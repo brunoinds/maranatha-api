@@ -272,6 +272,8 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::apiResource('inventory/products/packs/items', InventoryProductsPackItemController::class);
         Route::apiResource('inventory/warehouse-incomes', InventoryWarehouseIncomeController::class);
         Route::apiResource('inventory/warehouse-outcomes', InventoryWarehouseOutcomeController::class);
+
+        Route::get('inventory/warehouse-incomes/{inventoryWarehouseIncome}/products', InventoryWarehouseIncomeController::class . '@listProductsItems');
     });
 });
 
