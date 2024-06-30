@@ -54,6 +54,9 @@ class Toolbox{
     {
         return json_decode(json_encode($array));
     }
+    public static function toFixed(float $number, int $decimals = 2) {
+        return floatval(number_format($number, $decimals, '.', ""));
+    }
     public static function validateImageBase64(string|null $base64Image, int|null $maxSizeInBytes = null)
     {
         $maxSizeInBytes = $maxSizeInBytes ?? env('APP_MAXIMUM_UPLOAD_SIZE') ?? 2048 * 1024;

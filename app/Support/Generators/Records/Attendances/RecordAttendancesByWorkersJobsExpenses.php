@@ -3,10 +3,7 @@
 namespace App\Support\Generators\Records\Attendances;
 
 use App\Helpers\Enums\MoneyType;
-use App\Support\Exchange\Exchanger;
-
 use App\Helpers\Toolbox;
-
 use App\Support\Assistants\WorkersAssistant;
 use DateTime;
 use App\Models\Job;
@@ -104,12 +101,12 @@ class RecordAttendancesByWorkersJobsExpenses
 
                 $spendings->each(function($spending) use (&$spendingsCosts){
                     $spendingsCosts['days_present']++;
-                    $spendingsCosts['payments_money'][$spending['payment']['amount_data']['money_type']->value] += round($spending['payment']['amount_data']['amount'], 2);
+                    $spendingsCosts['payments_money'][$spending['payment']['amount_data']['money_type']->value] += $spending['payment']['amount_data']['amount'];
 
                     collect($spending['payment']['amount_data']['divisions'])->each(function ($division) use (&$spendingsCosts, $spending) {
                         $divisionName = $division['name'];
                         $moneyType = $spending['payment']['amount_data']['money_type']->value;
-                        $amount = round($division['amount'], 2);
+                        $amount = $division['amount'];
 
                         $index = collect($spendingsCosts['divisions_money'])->search(function ($item) use ($divisionName) {
                             return $item['name'] === $divisionName;
@@ -152,7 +149,7 @@ class RecordAttendancesByWorkersJobsExpenses
                         foreach($jobAndExpenseSpendings['spendings']['payments_money'] as $moneyType => $amount){
                             $total[$moneyType] += $amount;
 
-                            $total[$moneyType] = round($total[$moneyType], 2);
+                            $total[$moneyType] = $total[$moneyType];
                         }
                     }
                     return $total;
@@ -164,16 +161,16 @@ class RecordAttendancesByWorkersJobsExpenses
                         foreach($jobAndExpenseSpendings['spendings']['payments_money'] as $moneyType => $amount){
                             $total[$moneyType] += $amount;
 
-                            $total[$moneyType] = round($total[$moneyType], 2);
+                            $total[$moneyType] = $total[$moneyType];
                         }
                     }
 
                     if ($workerTotalization['days_present'] === 0){
-                        return round($total, 2);
+                        return $total;
                     }
 
                     foreach ($total as $moneyType => $amount){
-                        $total[$moneyType] = round($amount / $workerTotalization['days_present']);
+                        $total[$moneyType] = $amount / $workerTotalization['days_present'];
                     }
                     return $total;
                 })();
@@ -196,7 +193,7 @@ class RecordAttendancesByWorkersJobsExpenses
                                             $carry[$moneyType] = 0;
                                         }
                                         $carry[$moneyType] += $amount;
-                                        $carry[$moneyType] = round($carry[$moneyType], 2);
+                                        $carry[$moneyType] = $carry[$moneyType];
                                     }
                                     return $carry;
                                 }, MoneyType::toAssociativeArray(0))
@@ -334,8 +331,6 @@ class RecordAttendancesByWorkersJobsExpenses
             })();
             $footers = (function() use ($body, $headers){
                 $footers = [];
-
-
                 foreach ($headers as $header){
                      //Check if line  ends with '_money', if not, skip iteration:
                     if (strpos($header['key'], '_money') === false){
@@ -349,7 +344,7 @@ class RecordAttendancesByWorkersJobsExpenses
                             $sum += $line[$key];
                         }
                     }
-                    $footers[$key] = $sum;
+                    $footers[$key] = Toolbox::toFixed($sum, 2);
                 }
                 return $footers;
             })();
@@ -526,7 +521,7 @@ class RecordAttendancesByWorkersJobsExpenses
                             $sum += $line[$key];
                         }
                     }
-                    $footers[$key] = $sum;
+                    $footers[$key] = Toolbox::toFixed($sum, 2);
                 }
                 return $footers;
             })();
