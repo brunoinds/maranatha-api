@@ -260,22 +260,7 @@ class RecordAttendancesByWorkersJobsExpenses
                     ]
                 ];
 
-                collect(MoneyType::toArray())->map(function($moneyType){
-                    return [
-                        'title' => 'Sueldo en ' . $moneyType,
-                        'key' => 'worker_total_amount_in_' . $moneyType . '_money',
-                    ];
-                })->each(function($header) use (&$headers){
-                    $headers[] = $header;
-                });
-                collect(MoneyType::toArray())->map(function($moneyType){
-                    return [
-                        'title' => 'Sueldo Diário en ' . $moneyType,
-                        'key' => 'worker_daily_total_amount_in_' . $moneyType . '_money',
-                    ];
-                })->each(function($header) use (&$headers){
-                    $headers[] = $header;
-                });
+
 
                 $divisionsAvailable = [];
 
@@ -297,6 +282,24 @@ class RecordAttendancesByWorkersJobsExpenses
                 })->flatten(1)->each(function($header) use (&$headers){
                     $headers[] = $header;
                 });
+
+                collect(MoneyType::toArray())->map(function($moneyType){
+                    return [
+                        'title' => 'Sueldo en ' . $moneyType,
+                        'key' => 'worker_total_amount_in_' . $moneyType . '_money',
+                    ];
+                })->each(function($header) use (&$headers){
+                    $headers[] = $header;
+                });
+                collect(MoneyType::toArray())->map(function($moneyType){
+                    return [
+                        'title' => 'Sueldo Diário en ' . $moneyType,
+                        'key' => 'worker_daily_total_amount_in_' . $moneyType . '_money',
+                    ];
+                })->each(function($header) use (&$headers){
+                    $headers[] = $header;
+                });
+
                 return $headers;
             })();
             $body = (function() use ($workers){

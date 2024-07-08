@@ -47,6 +47,8 @@ class Notification{
         );
     }
 
+
+
     public function sendToUserTarget() :void
     {
         if ($this->userTarget === null){

@@ -28,6 +28,8 @@ class UpdateUserRequest extends FormRequest
             'username' => ['string', 'max:255', Rule::unique('users')],
             'email' => ['email', 'max:255', Rule::unique('users')],
             'password' => [Password::defaults()],
+            'roles' => ['array'],
+            'permissions' => ['array'],
         ];
     }
 }

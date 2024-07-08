@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Http\Requests\StoreInventoryProductRequest;
 use App\Http\Requests\UpdateInventoryProductRequest;
 use App\Models\InventoryProduct;
+use Illuminate\Http\Request;
+use  App\Support\Search\BingImages\BingImageSearch;
 
 class InventoryProductController extends Controller
 {
@@ -14,6 +16,20 @@ class InventoryProductController extends Controller
     public function index()
     {
         return InventoryProduct::all();
+    }
+
+
+    public function queryImageSearch()
+    {
+        $validated = request()->validate([
+            'query' => 'required|string'
+        ]);
+
+        $query = $validated['query'];
+
+        $response = BingImageSearch::search($query);
+
+        return response()->json($response);
     }
 
     /**
@@ -38,20 +54,20 @@ class InventoryProductController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(UpdateInventoryProductRequest $request, InventoryProduct $inventoryProduct)
+    public function update(UpdateInventoryProductRequest $request, InventoryProduct $product)
     {
         $validated = $request->validated();
-        $inventoryProduct->update($validated);
+        $product->update($validated);
 
-        return response()->json(['message' => 'Product updated', 'product' => $inventoryProduct->toArray()]);
+        return response()->json(['message' => 'Product updated', 'product' => $product->toArray()]);
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(InventoryProduct $inventoryProduct)
+    public function destroy(InventoryProduct $product)
     {
-        $inventoryProduct->delete();
+        $product->delete();
         return response()->json(['message' => 'Product deleted successfully']);
     }
 }

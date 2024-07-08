@@ -6,6 +6,10 @@ use App\Http\Requests\StoreInventoryWarehouseIncomeRequest;
 use App\Http\Requests\UpdateInventoryWarehouseIncomeRequest;
 use App\Models\InventoryWarehouseIncome;
 use App\Models\InventoryProductItem;
+use App\Helpers\Toolbox;
+use Illuminate\Support\Facades\Storage;
+
+
 
 class InventoryWarehouseIncomeController extends Controller
 {
@@ -20,7 +24,7 @@ class InventoryWarehouseIncomeController extends Controller
 
     public function listProductsItems(InventoryWarehouseIncome $inventoryWarehouseIncome)
     {
-        return response()->json(['products' => $inventoryWarehouseIncome->products], 200);
+        return response()->json($inventoryWarehouseIncome->items, 200);
     }
 
     /**
@@ -30,19 +34,46 @@ class InventoryWarehouseIncomeController extends Controller
     {
         $validated = $request->validated();
 
+
+        if ($validated['image'] !== null){
+            $imageValidation = Toolbox::validateImageBase64($validated['image']);
+            if ($imageValidation->isImage){
+                if (!$imageValidation->isValid){
+                    return response()->json([
+                        'error' => [
+                            'message' => $imageValidation->message,
+                        ]
+                    ], 400);
+                }
+            }
+        }
+
+
         $inventoryWarehouseIncome = InventoryWarehouseIncome::create([
             'description' => $validated['description'],
             'date' => $validated['date'],
+            'ticket_type' => $validated['ticket_type'],
             'ticket_number' => $validated['ticket_number'],
             'commerce_number' => $validated['commerce_number'],
             'qrcode_data' => $validated['qrcode_data'],
-            'image' => $validated['image'],
-            'amount' => $validated['amount'],
+            'image' => null,
             'currency' => $validated['currency'],
             'job_code' => $validated['job_code'],
             'expense_code' => $validated['expense_code'],
             'inventory_warehouse_id' => $validated['inventory_warehouse_id'],
         ]);
+
+        if ($validated['image'] !== null){
+            $wasSuccessfull = $inventoryWarehouseIncome->setImageFromBase64($validated['image']);
+            if (!$wasSuccessfull) {
+                $inventoryWarehouseIncome->delete();
+                return response()->json([
+                    'error' => [
+                        'message' => 'Image upload failed',
+                    ]
+                ], 500);
+            }
+        }
 
         foreach ($validated['products'] as $product) {
             $lastOrder = InventoryProductItem::orderBy('order', 'desc')->first();
@@ -67,34 +98,88 @@ class InventoryWarehouseIncomeController extends Controller
     }
 
     /**
-     * Display the specified resource.
+     * Show image
      */
-    public function show(InventoryWarehouseIncome $inventoryWarehouseIncome)
+    public function showImage(InventoryWarehouseIncome $inventoryWarehouseIncome)
     {
-        //
+        $imageId = $inventoryWarehouseIncome->image;
+        if (!$imageId){
+            return response()->json([
+                'error' => [
+                    'message' => 'Image not uploaded yet',
+                ]
+            ], 400);
+        }
+
+        $path = 'warehouse-incomes/' . $imageId;
+        $imageExists = Storage::disk('public')->exists($path);
+        if (!$imageExists){
+            return response()->json([
+                'error' => [
+                    'message' => 'Image missing',
+                ]
+            ], 400);
+        }
+
+        $image = Storage::disk('public')->get($path);
+
+        //Send back as base64 encoded image:
+        return response()->json(['image' => base64_encode($image)]);
     }
 
     /**
-     * Show the form for editing the specified resource.
+     * Display the specified resource.
      */
-    public function edit(InventoryWarehouseIncome $inventoryWarehouseIncome)
+    public function show(InventoryWarehouseIncome $warehouseIncome)
     {
-        //
+        return response()->json($warehouseIncome, 200);
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(UpdateInventoryWarehouseIncomeRequest $request, InventoryWarehouseIncome $inventoryWarehouseIncome)
+    public function update(UpdateInventoryWarehouseIncomeRequest $request, InventoryWarehouseIncome $warehouseIncome)
     {
-        //
+        $validated = $request->validated();
+
+        $imageBase64 = null;
+        if ($validated['image'] !== null){
+            $imageValidation = Toolbox::validateImageBase64($validated['image']);
+            $imageBase64 = $validated['image'];
+            unset($validated['image']);
+            if ($imageValidation->isImage){
+                if (!$imageValidation->isValid){
+                    return response()->json([
+                        'error' => [
+                            'message' => $imageValidation->message,
+                        ]
+                    ], 400);
+                }
+            }
+        }
+
+        $warehouseIncome->update($validated);
+        if ($imageBase64 !== null){
+            $warehouseIncome->deleteImage();
+            $wasSuccessfull = $warehouseIncome->setImageFromBase64($imageBase64);
+            if (!$wasSuccessfull) {
+                return response()->json([
+                    'error' => [
+                        'message' => 'Image upload failed',
+                    ]
+                ], 500);
+            }
+        }
+
+        return response()->json(['message' => 'Inventory warehouse income updated', 'income' => $warehouseIncome], 200);
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(InventoryWarehouseIncome $inventoryWarehouseIncome)
+    public function destroy(InventoryWarehouseIncome $warehouseIncome)
     {
-        //
+        $warehouseIncome->delete();
+        return response()->json(['message' => 'Inventory warehouse income deleted'], 200);
     }
 }

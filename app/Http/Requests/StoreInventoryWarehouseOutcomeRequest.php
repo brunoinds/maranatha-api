@@ -12,7 +12,7 @@ class StoreInventoryWarehouseOutcomeRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return auth()->user()->isAdmin();
+        return true;
     }
 
     /**
@@ -23,12 +23,14 @@ class StoreInventoryWarehouseOutcomeRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'description' => ['required', 'string', 'max:1000'],
+            'description' => ['nullable', 'string', 'max:1000'],
             'date' => ['required', 'date'],
-            'user_id' => ['nullable', 'integer'],
-            'job_code' => ['nullable', 'string'],
-            'expense_code' => ['nullable', 'string'],
-            'inventory_warehouse_id' => ['required', 'integer', 'exists:inventory_warehouses,id']
+            'job_code' => ['nullable', 'string', 'max:255'],
+            'expense_code' => ['nullable', 'string', 'max:255'],
+            'inventory_warehouse_id' => ['required', 'integer', 'exists:inventory_warehouses,id'],
+            'products_items' => ['required', 'array'],
+            'products_items.*.id' => ['required', 'integer', 'exists:inventory_product_items,id'],
+            'outcome_request_id' => ['nullable', 'integer', 'exists:inventory_warehouse_outcome_requests,id'],
         ];
     }
 }

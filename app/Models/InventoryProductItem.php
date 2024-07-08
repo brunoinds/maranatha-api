@@ -36,7 +36,7 @@ class InventoryProductItem extends Model
 
     public function product()
     {
-        return $this->belongsTo(InventoryProduct::class);
+        return $this->belongsTo(InventoryProduct::class, 'inventory_product_id', 'id');
     }
 
     public function unit()
@@ -46,7 +46,7 @@ class InventoryProductItem extends Model
 
     public function warehouse()
     {
-        return $this->belongsTo(InventoryWarehouse::class);
+        return $this->belongsTo(InventoryWarehouse::class, 'inventory_warehouse_id', 'id');
     }
 
     public function income()

@@ -11,7 +11,7 @@ class StoreInventoryProductsPackRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return auth()->user()->isAdmin();
+        return true;
     }
 
     /**
@@ -23,8 +23,8 @@ class StoreInventoryProductsPackRequest extends FormRequest
     {
         return [
             'name' => ['required', 'string', 'max:1000'],
-            'inventory_products_ids' => ['required', 'array'],
-            'inventory_products_ids.*' => ['integer', 'exists:inventory_products,id']
+            'products.*.product_id' => ['required', 'integer', 'exists:inventory_products,id'],
+            'products.*.quantity' => ['required', 'integer', 'min:1'],
         ];
     }
 }

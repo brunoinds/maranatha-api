@@ -13,6 +13,7 @@
         "brunoinds/frankfurter-laravel": "^1.0",
         "brunoinds/paraguay-dolar-laravel": "^1.0",
         "brunoinds/sunat-dolar-laravel": "^1.0.2",
+        "chillerlan/php-qrcode": "^5.0",
         "codedge/laravel-fpdf": "^1.12",
         "doctrine/dbal": "^3.6",
         "dompdf/dompdf": "^2.0",

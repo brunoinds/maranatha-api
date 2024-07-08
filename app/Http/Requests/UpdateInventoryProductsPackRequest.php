@@ -11,7 +11,7 @@ class UpdateInventoryProductsPackRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -22,7 +22,10 @@ class UpdateInventoryProductsPackRequest extends FormRequest
     public function rules(): array
     {
         return [
-            //
+            'name' => ['required', 'string', 'max:1000'],
+            'products' => ['required', 'array'],
+            'products.*.product_id' => ['required', 'integer', 'exists:inventory_products,id'],
+            'products.*.quantity' => ['required', 'integer', 'min:1']
         ];
     }
 }

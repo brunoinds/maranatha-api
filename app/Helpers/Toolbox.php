@@ -50,6 +50,14 @@ class Toolbox{
         }
     }
 
+    public static function moneyFormat(float $amount, string|null $moneyType = null): string
+    {
+        if (is_null($moneyType)){
+            return number_format($amount, 2);
+        }
+        return self::moneyPrefix($moneyType) . number_format($amount, 2);
+    }
+
     public static function toObject(array $array): object
     {
         return json_decode(json_encode($array));

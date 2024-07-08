@@ -21,7 +21,8 @@ class User extends Authenticatable
         'email',
         'username',
         'password',
-        'roles'
+        'roles',
+        'permissions'
     ];
 
     /**
@@ -41,7 +42,9 @@ class User extends Authenticatable
      */
     protected $casts = [
         'email_verified_at' => 'datetime',
-        'password' => 'hashed'
+        'password' => 'hashed',
+        'roles' => 'array',
+        'permissions' => 'array'
     ];
     public function isAdmin(): bool
     {
@@ -49,11 +52,7 @@ class User extends Authenticatable
     }
 
     public function roles(): array{
-        if ($this->username === 'admin'){
-            return ['admin'];
-        }else{
-            return [];
-        }
+        return $this->roles;
     }
     public function hasRole(string $role): bool
     {
@@ -61,12 +60,67 @@ class User extends Authenticatable
     }
     public function addRole(string $role): void
     {
-        
+        //Check if the role is already added:
+        if (!$this->hasRole($role)){
+            $roles = $this->roles();
+            $roles[] = $role;
+            $this->roles = $roles;
+            $this->save();
+        }
     }
     public function removeRole(string $role): void
     {
-        
+        if ($this->hasRole($role)){
+            $roles = $this->roles();
+            $roles = array_filter($roles, function($r) use ($role){
+                return $r !== $role;
+            });
+            $this->roles = $roles;
+            $this->save();
+        }
     }
+
+    public function hasPermissionTo(string $permission): bool
+    {
+        if ($this->hasPermission('all')){
+            return true;
+        }
+
+        return $this->hasPermission($permission);
+    }
+
+    public function hasPermission(string $permission): bool
+    {
+        return in_array($permission, $this->permissions);
+    }
+
+    public function addPermission(string $permission): void
+    {
+        if (!$this->hasPermission($permission)){
+            $permissions = $this->permissions;
+            $permissions[] = $permission;
+            $this->permissions = $permissions;
+            $this->save();
+        }
+    }
+
+    public function removePermission(string $permission): void
+    {
+        if ($this->hasPermission($permission)){
+            $permissions = $this->permissions;
+            $permissions = array_filter($permissions, function($p) use ($permission){
+                return $p !== $permission;
+            });
+            $this->permissions = $permissions;
+            $this->save();
+        }
+    }
+    public function permissions(): array{
+        return $this->permissions;
+    }
+
+
+
     public function reports()
     {
         return $this->hasMany(Report::class);

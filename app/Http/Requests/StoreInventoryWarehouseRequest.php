@@ -26,6 +26,8 @@ class StoreInventoryWarehouseRequest extends FormRequest
             'name' => ['required', 'string', 'max:255'],
             'zone' => ['required', 'string', 'max:255'],
             'country' => ['required', 'string', 'max:2'],
+            'owners' => ['required', 'array'],
+            'owners.*' => ['required', 'integer', 'exists:users,id']
         ];
     }
 }

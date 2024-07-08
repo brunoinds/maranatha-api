@@ -14,7 +14,7 @@ class StoreInventoryWarehouseIncomeRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return auth()->user()->isAdmin();
+        return true;
     }
 
     /**
@@ -27,11 +27,11 @@ class StoreInventoryWarehouseIncomeRequest extends FormRequest
         return [
             'description' => ['nullable', 'string', 'max:1000'],
             'date' => ['required', 'date'],
+            'ticket_type' => ['nullable', 'string', 'in:Facture,Bill'],
             'ticket_number' => ['nullable', 'string', 'max:255'],
             'commerce_number' => ['nullable', 'string', 'max:255'],
             'qrcode_data' => ['nullable', 'string', 'max:1000'],
             'image' => ['nullable', 'string'],
-            'amount' => ['required', 'numeric'],
             'currency' => ['required', Rule::in(MoneyType::toArray())],
             'job_code' => ['nullable', 'string'],
             'expense_code' => ['nullable', 'string'],

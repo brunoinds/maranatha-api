@@ -7,6 +7,8 @@ use Illuminate\Database\Eloquent\Model;
 use App\Models\InventoryProductItem;
 use App\Models\InventoryWarehouseIncome;
 use App\Models\InventoryWarehouseOutcome;
+use App\Support\Assistants\InventoryAssistant;
+use App\Models\InventoryWarehouseOutcomeRequest;
 
 
 
@@ -17,7 +19,12 @@ class InventoryWarehouse extends Model
     protected $fillable = [
         'name',
         'zone',
-        'country'
+        'country',
+        'owners'
+    ];
+
+    protected $casts = [
+        'owners' => 'array'
     ];
 
     public function products()
@@ -35,11 +42,29 @@ class InventoryWarehouse extends Model
         return $this->hasMany(InventoryWarehouseOutcome::class);
     }
 
+
+    public function outcomeRequests()
+    {
+        return $this->hasMany(InventoryWarehouseOutcomeRequest::class);
+    }
+
+    public function stock(): array
+    {
+        return InventoryAssistant::getWarehouseStock($this)->toArray();
+    }
+
+    public function isOwner(User $user): bool
+    {
+        if ($user->isAdmin()) return true;
+        return in_array($user->id, $this->owners);
+    }
+
     public function delete()
     {
         $this->products()->delete();
         $this->outcomes()->delete();
         $this->incomes()->delete();
+        $this->outcomeRequests()->delete();
         return parent::delete();
     }
 }

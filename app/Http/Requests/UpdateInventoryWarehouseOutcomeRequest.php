@@ -11,7 +11,7 @@ class UpdateInventoryWarehouseOutcomeRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -22,7 +22,10 @@ class UpdateInventoryWarehouseOutcomeRequest extends FormRequest
     public function rules(): array
     {
         return [
-            //
+            'description' => ['nullable', 'string', 'max:1000'],
+            'date' => ['required', 'date'],
+            'job_code' => ['nullable', 'string', 'max:255'],
+            'expense_code' => ['nullable', 'string', 'max:255']
         ];
     }
 }

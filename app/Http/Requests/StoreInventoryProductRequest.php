@@ -14,7 +14,7 @@ class StoreInventoryProductRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return auth()->user()->isAdmin();
+        return true;
     }
 
     /**
@@ -33,7 +33,7 @@ class StoreInventoryProductRequest extends FormRequest
             'unit' => ['string', Rule::in(InventoryProductUnit::toArray())],
             'code' => ['string','nullable', 'max:500'],
             'status' => ['string', Rule::in(InventoryProductStatus::toArray())],
-            'image' => ['nullable', 'string']
+            'image' => ['nullable', 'url:http,https']
         ];
     }
 }

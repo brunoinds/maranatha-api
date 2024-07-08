@@ -22,9 +22,9 @@ use App\Http\Controllers\InventoryProductController;
 use App\Http\Controllers\InventoryWarehouseController;
 use App\Http\Controllers\InventoryProductItemController;
 use App\Http\Controllers\InventoryProductsPackController;
-use App\Http\Controllers\InventoryProductsPackItemController;
 use App\Http\Controllers\InventoryWarehouseIncomeController;
 use App\Http\Controllers\InventoryWarehouseOutcomeController;
+use App\Http\Controllers\InventoryWarehouseOutcomeRequestController;
 
 
 /*
@@ -136,10 +136,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
 
     //Users group:
     Route::group([], function(){
-        Route::get('/users/{user}/roles', UserController::class . '@roles');
-        Route::post('/users/{user}/roles', UserController::class . '@addRole');
-        Route::delete('/users/{user}/roles/{role}', UserController::class . '@removeRole');
-        Route::get('/users/{user}/roles/{role}', UserController::class . '@hasRole');
+
     });
 
 
@@ -254,6 +251,9 @@ Route::middleware(['auth:sanctum'])->group(function () {
             Route::get('users/by-costs', ManagementRecordsController::class . '@usersByCosts');
             Route::get('reports/by-time', ManagementRecordsController::class . '@reportsByTime');
             Route::get('invoices/by-items', ManagementRecordsController::class . '@invoicesByItems');
+            Route::get('inventory/by-products-kardex', ManagementRecordsController::class . '@inventoryProductsKardex');
+            Route::get('inventory/by-products-balance', ManagementRecordsController::class . '@inventoryProductsBalance');
+            Route::get('inventory/by-products-stock', ManagementRecordsController::class . '@inventoryProductsStock');
         });
         Route::group(['prefix' => 'balances'], function () {
             Route::get('users', ManagementBalancesController::class . '@usersBalances');
@@ -264,16 +264,40 @@ Route::middleware(['auth:sanctum'])->group(function () {
 
     //Inventory group:
     Route::group([], function(){
+        Route::get('inventory/product-image-search', InventoryProductController::class . '@queryImageSearch');
+
+        Route::get('inventory/me/outcome-requests', InventoryWarehouseOutcomeRequestController::class . '@listMeOutcomeRequests');
+
         Route::apiResource('inventory/products', InventoryProductController::class);
 
         Route::apiResource('inventory/warehouses', InventoryWarehouseController::class);
         Route::apiResource('inventory/products/items', InventoryProductItemController::class);
-        Route::apiResource('inventory/products/packs', InventoryProductsPackController::class);
-        Route::apiResource('inventory/products/packs/items', InventoryProductsPackItemController::class);
+        Route::apiResource('inventory/products-packs', InventoryProductsPackController::class);
         Route::apiResource('inventory/warehouse-incomes', InventoryWarehouseIncomeController::class);
         Route::apiResource('inventory/warehouse-outcomes', InventoryWarehouseOutcomeController::class);
+        Route::apiResource('inventory/warehouse-outcome-requests', InventoryWarehouseOutcomeRequestController::class);
+
+
+        Route::get('inventory/warehouse-outcomes/{warehouseOutcome}/download-pdf', [
+            InventoryWarehouseOutcomeController::class, 'downloadPDF'
+        ]);
+
+
+        Route::get('inventory/warehouses/{warehouse}/incomes', InventoryWarehouseController::class . '@listIncomes');
+        Route::get('inventory/warehouses/{warehouse}/outcomes', InventoryWarehouseController::class . '@listOutcomes');
+        Route::get('inventory/warehouses/{warehouse}/outcome-requests', InventoryWarehouseController::class . '@listOutcomeRequests');
+
+        Route::get('inventory/warehouses/{warehouse}/products', InventoryWarehouseController::class . '@listProducts');
+        Route::get('inventory/warehouses/{warehouse}/stock', InventoryWarehouseController::class . '@listStock');
+
+        Route::get('inventory/warehouse-outcome-requests/{warehouseOutcomeRequest}/chat', InventoryWarehouseOutcomeRequestController::class . '@listChatMessages');
+        Route::post('inventory/warehouse-outcome-requests/{warehouseOutcomeRequest}/chat', InventoryWarehouseOutcomeRequestController::class . '@storeChatMessage');
+        Route::get('inventory/chat-images/{chatImageId}', InventoryWarehouseOutcomeRequestController::class . '@showChatImage');
+
+        Route::get('inventory/warehouse-outcomes/{inventoryWarehouseOutcome}/products', InventoryWarehouseOutcomeController::class . '@listProductsItems');
 
         Route::get('inventory/warehouse-incomes/{inventoryWarehouseIncome}/products', InventoryWarehouseIncomeController::class . '@listProductsItems');
+        Route::get('inventory/warehouse-incomes/{inventoryWarehouseIncome}/image', InventoryWarehouseIncomeController::class . '@showImage');
     });
 });
 

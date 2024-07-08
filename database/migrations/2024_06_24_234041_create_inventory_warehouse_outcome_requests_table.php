@@ -14,23 +14,28 @@ return new class extends Migration
         Schema::create('inventory_warehouse_outcome_requests', function (Blueprint $table) {
             $table->id();
             $table->timestamps();
-            $table->integer('warehouse_id');
+            $table->integer('inventory_warehouse_id');
             $table->integer('inventory_warehouse_outcome_id')->nullable()->default(null);
             $table->integer('user_id');
 
 
             $table->string('description')->nullable(true)->default(null);
             $table->json('requested_products')->default('[]');
-            $table->json('observations')->default('[]');
+            $table->json('received_products')->default('[]');
+
+            $table->json('messages')->default('[]');
+            $table->string('status')->default('Draft');
 
             $table->timestamp('requested_at')->nullable()->default(null);
             $table->timestamp('rejected_at')->nullable()->default(null);
-
             $table->timestamp('approved_at')->nullable()->default(null);
             $table->timestamp('dispatched_at')->nullable()->default(null);
+            $table->timestamp('on_the_way_at')->nullable()->default(null);
             $table->timestamp('delivered_at')->nullable()->default(null);
+            $table->timestamp('finished_at')->nullable()->default(null);
 
-            $table->string('status')->default('Draft');
+            $table->string('job_code')->nullable(true);
+            $table->string('expense_code')->nullable(true);
         });
     }
 

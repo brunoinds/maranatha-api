@@ -13,15 +13,7 @@ class InventoryProductsPackController extends Controller
      */
     public function index()
     {
-        //
-    }
-
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
+        return response()->json(InventoryProductsPack::all());
     }
 
     /**
@@ -29,38 +21,34 @@ class InventoryProductsPackController extends Controller
      */
     public function store(StoreInventoryProductsPackRequest $request)
     {
-        //
+        $data = $request->validated();
+        $inventoryProductsPack = InventoryProductsPack::create($data);
+        return response()->json(['message' => 'Product Pack created', 'inventoryProductsPack' => $inventoryProductsPack->toArray()]);
     }
 
     /**
      * Display the specified resource.
      */
-    public function show(InventoryProductsPack $inventoryProductsPack)
+    public function show(InventoryProductsPack $productsPack)
     {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(InventoryProductsPack $inventoryProductsPack)
-    {
-        //
+        return response()->json($productsPack);
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(UpdateInventoryProductsPackRequest $request, InventoryProductsPack $inventoryProductsPack)
+    public function update(UpdateInventoryProductsPackRequest $request, InventoryProductsPack $productsPack)
     {
-        //
+        $productsPack->update($request->validated());
+        return response()->json(['message' => 'ProductsPack updated', 'productsPack' => $productsPack->toArray()]);
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(InventoryProductsPack $inventoryProductsPack)
+    public function destroy(InventoryProductsPack $productsPack)
     {
-        //
+        $productsPack->delete();
+        return response()->json(['message' => 'InventoryProductsPack deleted']);
     }
 }

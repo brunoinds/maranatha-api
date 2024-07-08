@@ -17,6 +17,7 @@ return new class extends Migration
             $table->string('name');
             $table->string('zone')->nullable(true);
             $table->string('country');
+            $table->json('owners')->default('[]');
         });
     }
 

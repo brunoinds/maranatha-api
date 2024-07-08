@@ -10,6 +10,9 @@ use App\Support\Generators\Records\Attendances\RecordAttendancesByWorkersJobsExp
 use App\Support\Generators\Records\Users\RecordUsersByCosts;
 use App\Support\Generators\Records\Reports\RecordReportsByTime;
 use App\Support\Generators\Records\Invoices\RecordInvoicesByItems;
+use App\Support\Generators\Records\Inventory\RecordInventoryProductsKardex;
+use App\Support\Generators\Records\Inventory\RecordInventoryProductsBalance;
+use App\Support\Generators\Records\Inventory\RecordInventoryProductsStock;
 use DateTime;
 use Carbon\Carbon;
 use App\Support\Cache\RecordsCache;
@@ -400,6 +403,139 @@ class ManagementRecordsController extends Controller
         $document = $record->generate();
 
         RecordsCache::storeRecord('invoicesByItems', $validatedData, $document);
+
+        return response()->json([
+            ...$document,
+            'is_cached' => false
+        ]);
+    }
+
+    public function inventoryProductsKardex()
+    {
+        $validatedData = request()->validate([
+            'money_type' => 'nullable|string',
+            'warehouse_id' => 'nullable|string',
+            'expense_code' => 'nullable|string',
+            'job_code' => 'nullable|string',
+            'product_id' => 'nullable|string',
+        ]);
+
+        $defaults = [
+            'money_type' => null,
+            'warehouse_id' => null,
+            'expense_code' => null,
+            'job_code' => null,
+            'product_id' => null,
+            'start_date' => null,
+            'end_date' => null,
+        ];
+
+        $validatedData = array_merge($defaults, $validatedData);
+
+        /*if (RecordsCache::getRecord('inventoryProductsKardex', $validatedData)){
+            return response()->json([
+                ...RecordsCache::getRecord('inventoryProductsKardex', $validatedData),
+                'is_cached' => true
+            ]);
+        }*/
+
+        $record = new RecordInventoryProductsKardex([
+            'startDate' => ($validatedData['start_date']) ? new DateTime($validatedData['start_date']) : null,
+            'endDate' => ($validatedData['end_date']) ? new DateTime($validatedData['end_date']) : null,
+            'moneyType' => $validatedData['money_type'],
+            'warehouseId' => $validatedData['warehouse_id'],
+            'expenseCode' => $validatedData['expense_code'],
+            'jobCode' => $validatedData['job_code'],
+            'productId' => $validatedData['product_id'],
+        ]);
+
+        $document = $record->generate();
+
+        RecordsCache::storeRecord('inventoryProductsKardex', $validatedData, $document);
+
+        return response()->json([
+            ...$document,
+            'is_cached' => false
+        ]);
+    }
+
+    public function inventoryProductsBalance()
+    {
+        $validatedData = request()->validate([
+            'money_type' => 'nullable|string',
+            'warehouse_id' => 'nullable|string',
+            'product_id' => 'nullable|string',
+        ]);
+
+        $defaults = [
+            'money_type' => null,
+            'warehouse_id' => null,
+            'product_id' => null,
+        ];
+
+        $validatedData = array_merge($defaults, $validatedData);
+
+        /*if (RecordsCache::getRecord('inventoryProductsBalance', $validatedData)){
+            return response()->json([
+                ...RecordsCache::getRecord('inventoryProductsBalance', $validatedData),
+                'is_cached' => true
+            ]);
+        }*/
+
+        $record = new RecordInventoryProductsBalance([
+            'moneyType' => $validatedData['money_type'],
+            'warehouseId' => $validatedData['warehouse_id'],
+            'productId' => $validatedData['product_id'],
+        ]);
+
+        $document = $record->generate();
+
+        RecordsCache::storeRecord('inventoryProductsBalance', $validatedData, $document);
+
+        return response()->json([
+            ...$document,
+            'is_cached' => false
+        ]);
+    }
+
+    public function inventoryProductsStock()
+    {
+        $validatedData = request()->validate([
+            'warehouse_id' => 'nullable|string',
+            'product_id' => 'nullable|string',
+            'brand' => 'nullable|string',
+            'category' => 'nullable|string',
+            'status' => 'nullable|string',
+        ]);
+
+        $defaults = [
+            'warehouse_id' => null,
+            'product_id' => null,
+            'brand' => null,
+            'category' => null,
+            'status' => null,
+        ];
+
+        $validatedData = array_merge($defaults, $validatedData);
+
+        /*if (RecordsCache::getRecord('inventoryProductsStock', $validatedData)){
+            return response()->json([
+                ...RecordsCache::getRecord('inventoryProductsStock', $validatedData),
+                'is_cached' => true
+            ]);
+        }*/
+
+        $record = new RecordInventoryProductsStock([
+            'warehouseId' => $validatedData['warehouse_id'],
+            'productId' => $validatedData['product_id'],
+            'brand' => $validatedData['brand'],
+            'category' => $validatedData['category'],
+            'status' => $validatedData['status'],
+        ]);
+
+        $document = $record->generate();
+
+        RecordsCache::storeRecord('inventoryProductsStock', $validatedData, $document);
 
         return response()->json([
             ...$document,

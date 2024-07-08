@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->timestamps();
             $table->string('name');
-            $table->json('inventory_products_ids')->default('[]');
+            $table->json('products')->default('[]');
         });
     }
 

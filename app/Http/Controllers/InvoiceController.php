@@ -233,7 +233,8 @@ class InvoiceController extends Controller
     /**
      * Show image
      */
-    public function showImage(Request $request, Invoice $invoice){
+    public function showImage(Request $request, Invoice $invoice)
+    {
         $imageId = $invoice->image;
         if (!$imageId){
             return response()->json([

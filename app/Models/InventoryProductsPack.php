@@ -11,15 +11,16 @@ class InventoryProductsPack extends Model
 
     protected $fillable = [
         'name',
-        'inventory_products_ids'
+        'products'
     ];
 
     protected $casts = [
-        'inventory_products_ids' => 'array'
+        'products' => 'array'
     ];
 
     public function products()
     {
-        return $this->hasMany(InventoryProduct::class, 'id', 'inventory_products_ids');
+        return $this->hasMany(InventoryProduct::class, 'id', 'products.product_id');
     }
+
 }

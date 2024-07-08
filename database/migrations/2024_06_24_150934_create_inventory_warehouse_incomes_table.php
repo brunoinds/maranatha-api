@@ -16,13 +16,13 @@ return new class extends Migration
             $table->timestamps();
             $table->string('description')->nullable(true)->default(null);
             $table->timestamp('date');
+            $table->string('ticket_type')->nullable(true)->default(null);
             $table->string('ticket_number')->nullable(true)->default(null);
             $table->string('commerce_number')->nullable(true)->default(null);
 
             $table->string('qrcode_data', 1000)->nullable(true)->default(null);
             $table->string('image', 100)->nullable(true)->default(null);
 
-            $table->float(column: 'amount', total: 8, places: 2);
             $table->string('currency');
 
             $table->string('job_code')->nullable(true)->default(null);

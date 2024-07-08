@@ -51,11 +51,26 @@ class InventoryProduct extends Model
     {
         $this->items()->delete();
 
-        //Delete product on ProductPacks that contains this product:
-        $productPacks = InventoryProductsPack::whereJsonContains('inventory_products_ids', $this->id)->get();
+        //Delete product on InventoryProductsPack that contains this product, that has an attribute products that is an array of objects like: [{product_id: 1, quantity: 1}]'
+        $productPacks = InventoryProductsPack::all();
         foreach ($productPacks as $productPack) {
-            $productPack->inventory_products_ids = array_diff($productPack->inventory_products_ids, [$this->id]);
+            $productPack->products = array_filter($productPack->products, function($productPack){
+                return $productPack['product_id'] !== $this->id;
+            });
             $productPack->save();
+        }
+
+
+        //Delete product on OutcomeRequest that contains this product, that has an attribute requested_products that is an array of objects like: [{product_id: 1, amount: 2, unit: 'kg'}]'
+        $outcomeRequests = InventoryWarehouseOutcomeRequest::all();
+        foreach ($outcomeRequests as $outcomeRequest) {
+            $outcomeRequest->requested_products = array_filter($outcomeRequest->requested_products, function($requestedProduct){
+                return $requestedProduct['product_id'] !== $this->id;
+            });
+            $outcomeRequest->received_products = array_filter($outcomeRequest->received_products, function($receivedProduct){
+                return $receivedProduct['product_id'] !== $this->id;
+            });
+            $outcomeRequest->save();
         }
 
         return parent::delete();

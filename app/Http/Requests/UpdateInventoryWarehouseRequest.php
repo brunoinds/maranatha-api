@@ -11,7 +11,7 @@ class UpdateInventoryWarehouseRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        return auth()->user()->isAdmin();
     }
 
     /**
@@ -22,7 +22,11 @@ class UpdateInventoryWarehouseRequest extends FormRequest
     public function rules(): array
     {
         return [
-            //
+            'name' => ['required', 'string', 'max:255'],
+            'zone' => ['required', 'string', 'max:255'],
+            'country' => ['required', 'string', 'max:2'],
+            'owners' => ['required', 'array'],
+            'owners.*' => ['required', 'integer', 'exists:users,id']
         ];
     }
 }
