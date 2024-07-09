@@ -6,10 +6,6 @@ use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Storage;
 use Spatie\TemporaryDirectory\TemporaryDirectory;
 use function Laravel\Prompts\progress;
-use App\Support\EventLoop\Notifications\Notifications;
-use League\Flysystem\Filesystem;
-use League\Flysystem\Local\LocalFilesystemAdapter;
-use App\Support\Search\GoogleImages\GoogleImageSearch;
 
 /*
 |--------------------------------------------------------------------------
@@ -180,10 +176,3 @@ Artisan::command('remove:model {model}', function ($model) {
         }
     });
 })->purpose('Remove Model, Controller, Policy, Factory, Migration, Seeder');
-
-
-Artisan::command('search', function () {
-    $results = GoogleImageSearch::search('dog');
-
-    dd($results);
-})->purpose('Check the current environment');
