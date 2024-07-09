@@ -15,6 +15,7 @@
         "brunoinds/sunat-dolar-laravel": "^1.0.2",
         "chillerlan/php-qrcode": "^5.0",
         "codedge/laravel-fpdf": "^1.12",
+        "devdojo/google-image-search": "^0.2.0",
         "doctrine/dbal": "^3.6",
         "dompdf/dompdf": "^2.0",
         "google/apiclient": "^2.15",

@@ -6,7 +6,7 @@ use App\Http\Requests\StoreInventoryProductRequest;
 use App\Http\Requests\UpdateInventoryProductRequest;
 use App\Models\InventoryProduct;
 use Illuminate\Http\Request;
-use  App\Support\Search\BingImages\BingImageSearch;
+use  App\Support\Search\GoogleImages\GoogleImageSearch;
 
 class InventoryProductController extends Controller
 {
@@ -27,7 +27,7 @@ class InventoryProductController extends Controller
 
         $query = $validated['query'];
 
-        $response = BingImageSearch::search($query);
+        $response = GoogleImageSearch::search($query);
 
         return response()->json($response);
     }
