@@ -56,19 +56,44 @@ class InventoryWarehouseOutcomeRequestController extends Controller
     {
         $validated = request()->validate([
             'text' => 'nullable|string',
-            'image' => 'nullable|string',
+            'image' => 'nullable|array',
+            'image.data' => 'nullable|string',
+            'image.size' => 'integer',
+
+            'document' => 'nullable|array',
+            'document.data' => 'nullable|string',
+            'document.size' => 'integer',
+            'document.type' => 'string',
+            'document.name' => 'string',
+
+            'video' => 'nullable|array',
+            'video.data' => 'nullable|string',
+            'video.size' => 'integer',
+            'video.type' => 'string',
+            'video.duration' => 'integer',
+
+            'audio' => 'nullable|array',
+            'audio.data' => 'nullable|string',
+            'audio.size' => 'integer',
+            'audio.type' => 'string',
+            'audio.duration' => 'integer',
+
+            'location' => 'nullable|string',
+            'reply_to' => 'nullable|string',
+            'react_to' => 'nullable|string',
+
             'written_at' => 'required|date',
             'sent_at' => 'nullable|date',
             'received_at' => 'nullable|date',
-            'read_at' => 'nullable|date'
+            'read_at' => 'nullable|date',
         ]);
 
         $validated['id'] = Str::uuid();
         $validated['sent_at'] = now();
         $validated['user_id'] = auth()->id();
 
-        if ($validated['image'] !== null){
-            $imageValidation = Toolbox::validateImageBase64($validated['image']);
+        if (isset($validated['image'])){
+            $imageValidation = Toolbox::validateImageBase64($validated['image']['data']);
             if ($imageValidation->isImage){
                 if (!$imageValidation->isValid){
                     return response()->json([
@@ -78,16 +103,55 @@ class InventoryWarehouseOutcomeRequestController extends Controller
                     ], 400);
                 }
 
-                $imageResource = Image::make($validated['image']);
+                $imageResource = Image::make($validated['image']['data']);
                 $imageEncoded = $imageResource->encode('png')->getEncoded();
 
-                $imageId = hash('sha256', $validated['id']);
+                $imageId = Str::uuid();
                 $path = 'warehouse-chat/' . $imageId;
 
                 Storage::disk('public')->put($path, $imageEncoded);
 
-                $validated['image'] = $imageId;
+                $validated['image'] = [
+                    'data' => $imageId,
+                    'size' => strlen($imageEncoded),
+                ];
             }
+        }
+        if (isset($validated['document'])){
+            $documentDecoded = base64_decode($validated['document']['data']);
+            $documentId = Str::uuid();
+            $path = 'warehouse-chat/' . $documentId;
+            Storage::disk('public')->put($path, $documentDecoded);
+            $validated['document'] = [
+                'data' => $documentId,
+                'size' => $validated['document']['size'],
+                'type' => $validated['document']['type'],
+                'name' => $validated['document']['name'],
+            ];
+        }
+        if (isset($validated['video'])){
+            $documentDecoded = base64_decode($validated['video']['data']);
+            $documentId = Str::uuid();
+            $path = 'warehouse-chat/' . $documentId;
+            Storage::disk('public')->put($path, $documentDecoded);
+            $validated['video'] = [
+                'data' => $documentId,
+                'size' => $validated['video']['size'],
+                'duration' => $validated['video']['duration'],
+                'type' => $validated['video']['type'],
+            ];
+        }
+        if (isset($validated['audio'])){
+            $documentDecoded = base64_decode($validated['audio']['data']);
+            $documentId = Str::uuid();
+            $path = 'warehouse-chat/' . $documentId;
+            Storage::disk('public')->put($path, $documentDecoded);
+            $validated['audio'] = [
+                'data' => $documentId,
+                'size' => $validated['audio']['size'],
+                'duration' => $validated['audio']['duration'],
+                'type' => $validated['audio']['type'],
+            ];
         }
 
 
@@ -114,9 +178,9 @@ class InventoryWarehouseOutcomeRequestController extends Controller
         $notifications[] = [
             'headings' => '💬 Chat Pedido #00' . $warehouseOutcomeRequest->id,
             'message' => (function() use ($user, $validated){
-                if ($validated['image'] !== null && $validated['text'] !== null){
+                if (isset($validated['image']) && $validated['text'] !== null){
                     return $user->name . ' envió una imagen 🌅: "' . $validated['text'] . '"';
-                }elseif ($validated['image'] !== null){
+                }elseif (isset($validated['image'])){
                     return $user->name . ' envió una imagen 🌅.';
                 }elseif ($validated['text'] !== null){
                     return $user->name . ' envió: "' . $validated['text'] . '"';
@@ -187,31 +251,29 @@ class InventoryWarehouseOutcomeRequestController extends Controller
     }
 
 
-    public function showChatImage(string $chatImageId)
+    public function showChatAttachment(string $chatAttachmentId)
     {
-        $imageId = $chatImageId;
-        if (!$imageId){
+        $attachmentId = $chatAttachmentId;
+        if (!$attachmentId){
             return response()->json([
                 'error' => [
-                    'message' => 'Image not uploaded yet',
+                    'message' => 'Attachment not uploaded yet',
                 ]
             ], 400);
         }
 
-        $path = 'warehouse-chat/' . $imageId;
-        $imageExists = Storage::disk('public')->exists($path);
-        if (!$imageExists){
+        $path = 'warehouse-chat/' . $attachmentId;
+        $attachmentExists = Storage::disk('public')->exists($path);
+        if (!$attachmentExists){
             return response()->json([
                 'error' => [
-                    'message' => 'Image missing',
+                    'message' => 'Attachment missing',
                 ]
             ], 400);
         }
 
-        $image = Storage::disk('public')->get($path);
-
-        //Send back as base64 encoded image:
-        return response()->json(['image' => base64_encode($image)]);
+        $attachment = Storage::disk('public')->get($path);
+        return response()->json(['attachment' => base64_encode($attachment)]);
     }
 
     /**

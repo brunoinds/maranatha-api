@@ -292,7 +292,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
 
         Route::get('inventory/warehouse-outcome-requests/{warehouseOutcomeRequest}/chat', InventoryWarehouseOutcomeRequestController::class . '@listChatMessages');
         Route::post('inventory/warehouse-outcome-requests/{warehouseOutcomeRequest}/chat', InventoryWarehouseOutcomeRequestController::class . '@storeChatMessage');
-        Route::get('inventory/chat-images/{chatImageId}', InventoryWarehouseOutcomeRequestController::class . '@showChatImage');
+        Route::get('inventory/chat-attachments/{chatAttachmentId}', InventoryWarehouseOutcomeRequestController::class . '@showChatAttachment');
 
         Route::get('inventory/warehouse-outcomes/{inventoryWarehouseOutcome}/products', InventoryWarehouseOutcomeController::class . '@listProductsItems');
 
