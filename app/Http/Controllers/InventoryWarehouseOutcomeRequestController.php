@@ -11,6 +11,10 @@ use App\Helpers\Toolbox;
 use Illuminate\Support\Facades\Storage;
 use Intervention\Image\Facades\Image;
 use OneSignal;
+use App\Support\Creators\Inventory\WarehouseOutcomeRequest\PDFCreator;
+use Spatie\TemporaryDirectory\TemporaryDirectory;
+
+
 
 
 
@@ -319,5 +323,24 @@ class InventoryWarehouseOutcomeRequestController extends Controller
 
         $warehouseOutcomeRequest->delete();
         return response()->json(['message' => 'Warehouse outcome request deleted']);
+    }
+
+    public function downloadPDF(InventoryWarehouseOutcomeRequest $warehouseOutcomeRequest)
+    {
+        $pdf = PDFCreator::new($warehouseOutcomeRequest);
+        $content = $pdf->create([])->output();
+
+        $documentName = Str::slug($warehouseOutcomeRequest->id, '-') . '.pdf';
+
+        $temporaryDirectory = (new TemporaryDirectory())->create();
+        $tempPath = $temporaryDirectory->path($documentName);
+
+        file_put_contents($tempPath, $content);
+
+        return response()
+            ->download($tempPath, $documentName, [
+                'Content-Encoding' => 'base64',
+                'Content-Length' => filesize($tempPath),
+            ])->deleteFileAfterSend(true);
     }
 }

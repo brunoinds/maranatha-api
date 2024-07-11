@@ -281,6 +281,9 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::get('inventory/warehouse-outcomes/{warehouseOutcome}/download-pdf', [
             InventoryWarehouseOutcomeController::class, 'downloadPDF'
         ]);
+        Route::get('inventory/warehouse-outcome-requests/{warehouseOutcomeRequest}/download-pdf', [
+            InventoryWarehouseOutcomeRequestController::class, 'downloadPDF'
+        ]);
 
 
         Route::get('inventory/warehouses/{warehouse}/incomes', InventoryWarehouseController::class . '@listIncomes');
