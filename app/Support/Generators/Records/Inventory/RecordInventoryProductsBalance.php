@@ -62,7 +62,7 @@ class RecordInventoryProductsBalance
                 'warehouse' => $productItems->first()->warehouse->name,
                 'income_quantity' => $productItems->count(),
                 'outcome_quantity' => $productItems->where('status', InventoryProductItemStatus::Sold)->count(),
-                'outcome_amount' => $productItems->where('status', InventoryProductItemStatus::Sold)->first()->buy_amount,
+                'outcome_amount' => $productItems->where('status', InventoryProductItemStatus::Sold)->first()?->buy_amount ?? 0,
                 'balance_quantity' => $productItems->count() - $productItems->where('status', InventoryProductItemStatus::Sold)->count(),
                 'balance_total_amount' => ($productItems->count() - $productItems->where('status', InventoryProductItemStatus::Sold)->count()) * $productItems->first()->buy_amount
             ];
