@@ -45,9 +45,9 @@ class RecordsEventLoop{
             $messages[] = [
                 'title' => (function() use ($trendingOnReportsTimmingSubmittedAndApproved){
                     if ($trendingOnReportsTimmingSubmittedAndApproved['difference']['percentage'] < 0){
-                        return '⬆️⏰ Tiempo aprobación de reportes';
-                    } else {
                         return '⬇️⏰ Tiempo aprobación de reportes';
+                    } else {
+                        return '⬆️⏰ Tiempo aprobación de reportes';
                     }
                 })(),
                 'message' => (function() use ($trendingOnReportsTimmingSubmittedAndApproved){
@@ -65,9 +65,9 @@ class RecordsEventLoop{
             $messages[] = [
                 'title' => (function() use ($trendingOnReportsTimmingApprovedAndRestituted){
                     if ($trendingOnReportsTimmingApprovedAndRestituted['difference']['percentage'] < 0){
-                        return '⬆️⏰ Tiempo reembolso de reportes';
-                    } else {
                         return '⬇️⏰ Tiempo reembolso de reportes';
+                    } else {
+                        return '⬆️⏰ Tiempo reembolso de reportes';
                     }
                 })(),
                 'message' => (function() use ($trendingOnReportsTimmingApprovedAndRestituted){
