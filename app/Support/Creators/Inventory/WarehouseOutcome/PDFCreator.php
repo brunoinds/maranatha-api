@@ -126,7 +126,7 @@ class PDFCreator
         if ($this->outcome->request === null){
             $link = env('APP_URL') . '/app/inventory/warehouses/' . $this->outcome->inventory_warehouse_id;
         }else{
-            $link = env('APP_URL') . '/app/inventory/outcome-requests/' . $this->outcome->request->id;
+            $link = env('APP_URL') . '/app/inventory/outcome-requests/' . $this->outcome->request->id. '?view-mode=Dispacher';
         }
         $qrcode = (new QRCode)->render($link);
         $this->html = str_replace('{{$qrCode}}', $qrcode, $this->html);
