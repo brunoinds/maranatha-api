@@ -19,7 +19,8 @@ class Kernel extends ConsoleKernel
     {
         $schedule->command('backup:run')->dailyAt('02:00')->timezone('America/Lima');
         $schedule->command('backup:clean')->dailyAt('02:15')->timezone('America/Lima');
-        $schedule->command('backup:run-remote-trash-clear')->dailyAt('02:30')->timezone('America/Lima');
+        $schedule->command('backup:sync-remote')->dailyAt('02:30')->timezone('America/Lima');
+        $schedule->command('backup:clear-remote-trash-bin')->dailyAt('02:45')->timezone('America/Lima');
 
         $schedule->call(function(){
             Notifications::sendNotificationsToAdministrator(RecordsEventLoop::getNotifications('TrendingOnSpendings'));
@@ -41,7 +42,6 @@ class Kernel extends ConsoleKernel
         $schedule->call(function(){
             Notifications::sendNotificationsToUsersTargets(WalletEventLoop::getNotifications('FinalMonthTrending'));
         })->monthlyOn(8, '11:45')->timezone('America/Lima');
-
 
         $schedule->call(function(){
             Notifications::sendNotificationsToAdministrator(ReportsEventLoop::getNotifications());

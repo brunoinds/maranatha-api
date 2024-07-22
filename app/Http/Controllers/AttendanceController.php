@@ -14,9 +14,6 @@ use App\Support\Cache\RecordsCache;
 
 class AttendanceController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
     public function index()
     {
         if (!auth()->user()->isAdmin()) {
@@ -37,16 +34,12 @@ class AttendanceController extends Controller
         return response()->json($myAttendances->toArray());
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(StoreAttendanceRequest $request)
     {
         $attendance = Attendance::create($request->validated());
         RecordsCache::clearAll();
         return response()->json(['message' => 'Attendance created', 'attendance' => $attendance->toArray()]);
     }
-
 
     public function storeWithWorkers(StoreAttendanceWithWorkersRequest $request)
     {
@@ -85,9 +78,6 @@ class AttendanceController extends Controller
         return response()->json(['message' => 'Workers attendances updated']);
     }
 
-    /**
-     * Display the specified resource.
-     */
     public function show(Attendance $attendance)
     {
         return response()->json($attendance->toArray());
@@ -111,9 +101,6 @@ class AttendanceController extends Controller
         ]);
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
     public function update(UpdateAttendanceRequest $request, Attendance $attendance)
     {
         $attendance->update($request->validated());
@@ -132,9 +119,6 @@ class AttendanceController extends Controller
         return response()->json(['message' => 'Attendance ownership transfered', 'attendance' => $attendance->toArray()]);
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
     public function destroy(Attendance $attendance)
     {
         $attendance->delete();

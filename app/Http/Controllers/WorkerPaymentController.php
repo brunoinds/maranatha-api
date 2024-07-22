@@ -11,17 +11,11 @@ use App\Models\Worker;
 
 class WorkerPaymentController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
     public function index()
     {
         return WorkerPayment::all();
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(StoreWorkerPaymentRequest $request)
     {
         $validated = $request->validated();
@@ -59,18 +53,11 @@ class WorkerPaymentController extends Controller
         return  response()->json(['message' => 'Worker payments created successfully']);
     }
 
-    /**
-     * Display the specified resource.
-     */
     public function show(WorkerPayment $workerPayment)
     {
         return $workerPayment;
     }
 
-
-    /**
-     * Update the specified resource in storage.
-     */
     public function update(UpdateWorkerPaymentRequest $request, WorkerPayment $workerPayment)
     {
         $validated = $request->validated();
@@ -79,9 +66,6 @@ class WorkerPaymentController extends Controller
         return response()->json(['message' => 'Worker payment updated successfully']);
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
     public function destroy(WorkerPayment $workerPayment)
     {
         $workerPayment->delete();

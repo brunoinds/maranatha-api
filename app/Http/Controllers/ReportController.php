@@ -25,9 +25,6 @@ use App\Support\Cache\RecordsCache;
 
 class ReportController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
     public function index()
     {
 
@@ -51,17 +48,11 @@ class ReportController extends Controller
         return response()->json($allReports->toArray());
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
     public function create()
     {
         //
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(StoreReportRequest $request)
     {
         $report = Report::create($request->validated());
@@ -69,9 +60,6 @@ class ReportController extends Controller
         return response()->json(['message' => 'Report created', 'report' => $report->toArray()]);
     }
 
-    /**
-     * Display the specified resource.
-     */
     public function show(Report $report)
     {
         return response()->json($report->toArray());
@@ -89,10 +77,6 @@ class ReportController extends Controller
         return response()->json($myReports->toArray());
     }
 
-
-    /**
-     * Update the specified resource in storage.
-     */
     public function update(UpdateReportRequest $request, Report $report)
     {
         $notificationUrlOnManagmentReports = env('APP_WEB_URL') . '/management?showReportId=' . $report->id;
@@ -209,9 +193,6 @@ class ReportController extends Controller
         return response()->json(['message' => 'Report updated', 'report' => $report->toArray()]);
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
     public function destroy(Report $report)
     {
         $report->delete();
@@ -225,10 +206,6 @@ class ReportController extends Controller
         return response()->json(collect($invoices)->toArray());
     }
 
-
-    /**
-     * Upload report PDF
-     */
     public function uploadReportPDF(Request $request, Report $report)
     {
         $base64PDF = $request->input('pdf');
@@ -258,7 +235,6 @@ class ReportController extends Controller
             ]
         ]);
     }
-
 
     public function checkProgressDownloadPDF(Request $request)
     {

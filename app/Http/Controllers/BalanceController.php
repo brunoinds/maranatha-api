@@ -20,26 +20,16 @@ use Illuminate\Support\Facades\Storage;
 
 class BalanceController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
     public function index()
     {
         //
     }
 
-
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(StoreBalanceRequest $request)
     {
         //
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
     public function update(UpdateBalanceRequest $request, Balance $balance)
     {
         $validatedData = $request->validated();
@@ -65,7 +55,7 @@ class BalanceController extends Controller
                 ], 500);
             }
         }
-    
+
         unset($validatedData['receipt_base64']);
 
         $balance->update($validatedData);
@@ -76,9 +66,6 @@ class BalanceController extends Controller
         ]);
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
     public function destroy(Balance $balance)
     {
         if (!auth()->user()->isAdmin()){
@@ -101,7 +88,6 @@ class BalanceController extends Controller
         return response()->json(['message' => 'Balance deleted']);
     }
 
-
     public function userBalanceYear(User $user, string $year)
     {
         if (!auth()->user()->isAdmin()){
@@ -115,16 +101,13 @@ class BalanceController extends Controller
         $report = BalanceAssistant::generateUserBalanceByYear($user, (int) $year);
         return response()->json($report);
     }
+
     public function meBalanceYear(string $year)
     {
         $user = auth()->user();
         $report = BalanceAssistant::generateUserBalanceByYear($user, (int) $year);
         return response()->json($report);
     }
-
-
-
-
 
     public function userBalanceAddCredit(User $user, AddDirectCreditBalanceRequest $request)
     {
@@ -198,7 +181,7 @@ class BalanceController extends Controller
     }
 
     public function getBalancesFromReport(Report $report)
-    {   
+    {
         $balances = Balance::where('report_id', $report->id);
 
         if ($balances->count() === 0) {
@@ -326,7 +309,9 @@ class BalanceController extends Controller
             'message' => 'Image deleted',
         ]);
     }
-    public function getReceiptImage(Balance $balance){
+
+    public function getReceiptImage(Balance $balance)
+    {
         $image = $balance->getReceiptImageInBase64();
         return response()->json([
             'image' => $image,

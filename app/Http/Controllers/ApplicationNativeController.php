@@ -29,6 +29,7 @@ class ApplicationNativeController extends Controller
             ]
         ], 200);
     }
+
     public function bundle()
     {
         $version = request()->route('version');
@@ -52,10 +53,8 @@ class ApplicationNativeController extends Controller
 
     public function receiveBundle()
     {
-        //The request receives 2 things: secret_key and the file:
         $secretKey = request()->input('secret_key');
 
-        //Check if the secret key is valid:
         if ($secretKey !== env('APP_PRIVATE_KEY')){
             return response()->json([
                 'message' => 'Invalid secret key',
@@ -70,7 +69,6 @@ class ApplicationNativeController extends Controller
             ], 400);
         }
 
-        //Check name:
         $bundleFileName = $file->getClientOriginalName();
 
         if (str_contains($bundleFileName, '(m') === false){
@@ -91,20 +89,7 @@ class ApplicationNativeController extends Controller
             ], 400);
         }
 
-        //$previousBundleFile = ApplicationNativeAssistant::bundleFile();
-
         $bundleFile = ApplicationNativeAssistant::setBundleFile($file->getPathname(), $file->getClientOriginalName());
-
-        /*if ($previousBundleFile && $previousBundleFile->version < $bundleFile->version){
-            OneSignal::sendNotificationToExternalUser(
-                headings: "Nuevo reporte recibido 📥",
-                message: 'Hay una nueva actualización en la aplicación',
-                userId: Toolbox::getOneSignalUserId($adminUser->id),
-                data: [
-                    'deepLink' => $notificationUrlOnUserReports
-                ]
-            );
-        }*/
 
         return response()->json([
             'message' => 'Bundle received successfully',

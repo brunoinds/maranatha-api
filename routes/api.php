@@ -38,7 +38,6 @@ use App\Http\Controllers\InventoryWarehouseOutcomeRequestController;
 |
 */
 
-
 Route::group(['prefix' => 'cd'], function () {
     Route::get('config-cache', function(){
         $commandLine = 'cd .. && php artisan config:clear && php artisan cache:clear';
@@ -133,12 +132,9 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::apiResource('balances', BalanceController::class);
 
 
-
     //Users group:
     Route::group([], function(){
-
     });
-
 
 
     //Account group:
@@ -148,14 +144,12 @@ Route::middleware(['auth:sanctum'])->group(function () {
     });
 
 
-
     //Me group:
     Route::group([], function(){
         Route::get('/me/reports', ReportController::class . '@myReports');
         Route::get('/me/attendances', AttendanceController::class . '@myAttendances');
         Route::delete('/me/account', UserController::class . '@deleteMyAccount');
     });
-
 
 
     //Balance group:
@@ -175,7 +169,6 @@ Route::middleware(['auth:sanctum'])->group(function () {
     });
 
 
-
     //Attendance group:
     Route::group([], function(){
         Route::post('attendances-with-workers', AttendanceController::class . '@storeWithWorkers');
@@ -190,7 +183,6 @@ Route::middleware(['auth:sanctum'])->group(function () {
     });
 
 
-
     //Invoice group:
     Route::group([], function(){
         Route::get('invoices/ticket-number/check', InvoiceController::class . '@checkTicketNumber');
@@ -201,7 +193,6 @@ Route::middleware(['auth:sanctum'])->group(function () {
             InvoiceController::class, 'showImage'
         ]);
     });
-
 
 
     //Report group:
@@ -303,7 +294,6 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::get('inventory/warehouse-incomes/{inventoryWarehouseIncome}/image', InventoryWarehouseIncomeController::class . '@showImage');
     });
 });
-
 
 
 //Public routes:

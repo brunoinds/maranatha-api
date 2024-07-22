@@ -20,7 +20,6 @@ use App\Support\Cache\RecordsCache;
 
 class ManagementRecordsController extends Controller
 {
-
     public function attendancesByWorker()
     {
         $validatedData = request()->validate([

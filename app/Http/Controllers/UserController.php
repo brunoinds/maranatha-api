@@ -11,12 +11,8 @@ use Illuminate\Support\Facades\Auth;
 
 class UserController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
     public function index(Request $request)
     {
-
         return User::all();
     }
 
@@ -25,9 +21,6 @@ class UserController extends Controller
         return response()->json($user);
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(StoreUserRequest $request)
     {
         $data = $request->validated();
@@ -44,18 +37,12 @@ class UserController extends Controller
         return response()->json(['message' => 'User created', 'user' => $user->toArray()]);
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
     public function update(UpdateUserRequest $request, User $user)
     {
         $user->update($request->validated());
         return response()->json(['message' => 'User updated', 'user' => $user->toArray()]);
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
     public function destroy(User $user)
     {
         if ($user->username === 'admin'){
@@ -85,16 +72,17 @@ class UserController extends Controller
         return response()->json(['message' => 'User deleted']);
     }
 
-
     public function addRole(Request $request, User $user)
     {
         return response()->json(['message' => 'Role added']);
     }
+
     public function removeRole(Request $request, User $user)
     {
         $user->removeRole($request->role_id);
         return response()->json(['message' => 'Role removed']);
     }
+
     public function hasRole(Request $request, User $user)
     {
         if ($user->hasRole($request->role_id)){

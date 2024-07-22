@@ -15,7 +15,6 @@ use App\Support\Cache\RecordsCache;
 
 class ManagementBalancesController extends Controller
 {
-
     public function usersBalances()
     {
         $validatedData = request()->validate([

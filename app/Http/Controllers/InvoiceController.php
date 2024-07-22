@@ -15,23 +15,16 @@ use App\Support\Cache\RecordsCache;
 
 class InvoiceController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
     public function index()
     {
         return Invoice::all();
     }
-
 
     public function show(Invoice $invoice)
     {
         return response()->json($invoice->toArray());
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(StoreInvoiceRequest $request)
     {
         $validatedData = $request->validated();
@@ -104,9 +97,6 @@ class InvoiceController extends Controller
         }
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
     public function update(UpdateInvoiceRequest $request, Invoice $invoice)
     {
         $validatedData = $request->validated();
@@ -154,9 +144,6 @@ class InvoiceController extends Controller
         return response()->json(['message' => 'Invoice updated', 'invoice' => $invoice->toArray()]);
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
     public function destroy(Invoice $invoice)
     {
         $report = $invoice->report;
@@ -166,9 +153,6 @@ class InvoiceController extends Controller
         return response()->json(['message' => 'Invoice deleted']);
     }
 
-    /**
-     * Upload image
-     */
     public function uploadImage(Request $request, Invoice $invoice)
     {
         $maxSizeInBytes = $maxSizeInBytes ?? env('APP_MAXIMUM_UPLOAD_SIZE') ?? 2048 * 1024;
@@ -229,10 +213,6 @@ class InvoiceController extends Controller
         ]);
     }
 
-
-    /**
-     * Show image
-     */
     public function showImage(Request $request, Invoice $invoice)
     {
         $imageId = $invoice->image;

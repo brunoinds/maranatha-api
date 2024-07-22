@@ -13,27 +13,19 @@ use Illuminate\Support\Facades\Storage;
 
 class InventoryWarehouseIncomeController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
     public function index()
     {
         //
     }
-
 
     public function listProductsItems(InventoryWarehouseIncome $inventoryWarehouseIncome)
     {
         return response()->json($inventoryWarehouseIncome->items, 200);
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(StoreInventoryWarehouseIncomeRequest $request)
     {
         $validated = $request->validated();
-
 
         if ($validated['image'] !== null){
             $imageValidation = Toolbox::validateImageBase64($validated['image']);
@@ -97,9 +89,6 @@ class InventoryWarehouseIncomeController extends Controller
         return response()->json(['message' => 'Inventory warehouse income created', 'income' => $inventoryWarehouseIncome], 200);
     }
 
-    /**
-     * Show image
-     */
     public function showImage(InventoryWarehouseIncome $inventoryWarehouseIncome)
     {
         $imageId = $inventoryWarehouseIncome->image;
@@ -127,17 +116,11 @@ class InventoryWarehouseIncomeController extends Controller
         return response()->json(['image' => base64_encode($image)]);
     }
 
-    /**
-     * Display the specified resource.
-     */
     public function show(InventoryWarehouseIncome $warehouseIncome)
     {
         return response()->json($warehouseIncome, 200);
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
     public function update(UpdateInventoryWarehouseIncomeRequest $request, InventoryWarehouseIncome $warehouseIncome)
     {
         $validated = $request->validated();
@@ -174,9 +157,6 @@ class InventoryWarehouseIncomeController extends Controller
         return response()->json(['message' => 'Inventory warehouse income updated', 'income' => $warehouseIncome], 200);
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
     public function destroy(InventoryWarehouseIncome $warehouseIncome)
     {
         $warehouseIncome->delete();

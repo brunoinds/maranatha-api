@@ -11,7 +11,6 @@ return [
         'name' => env('APP_NAME', 'laravel-backup'),
 
         'source' => [
-
             'files' => [
                 /*
                  * The list of directories and files that will be included in the backup.
@@ -145,8 +144,7 @@ return [
              * The disk names on which the backups will be stored.
              */
             'disks' => [
-                'backup',
-                'google'
+                'backup'
             ],
         ],
 

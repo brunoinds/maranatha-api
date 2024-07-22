@@ -15,17 +15,11 @@ use Spatie\TemporaryDirectory\TemporaryDirectory;
 use Illuminate\Support\Facades\Storage;
 class InventoryWarehouseOutcomeController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
     public function index()
     {
         //
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
     public function create()
     {
         //
@@ -85,17 +79,11 @@ class InventoryWarehouseOutcomeController extends Controller
         return response()->json(['message' => 'Inventory warehouse outcome created', 'outcome' => $inventoryWarehouseOutcome], 200);
     }
 
-    /**
-     * Display the specified resource.
-     */
     public function show(InventoryWarehouseOutcome $warehouseOutcome)
     {
         return response()->json($warehouseOutcome, 200);
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
     public function update(UpdateInventoryWarehouseOutcomeRequest $request, InventoryWarehouseOutcome $warehouseOutcome)
     {
         $validated = $request->validated();
@@ -125,9 +113,6 @@ class InventoryWarehouseOutcomeController extends Controller
             ])->deleteFileAfterSend(true);
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
     public function destroy(InventoryWarehouseOutcome $warehouseOutcome)
     {
         $warehouseOutcome->delete();

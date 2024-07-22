@@ -20,14 +20,10 @@ use Spatie\TemporaryDirectory\TemporaryDirectory;
 
 class InventoryWarehouseOutcomeRequestController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
     public function index()
     {
         //
     }
-
 
     public function listMeOutcomeRequests()
     {
@@ -35,7 +31,6 @@ class InventoryWarehouseOutcomeRequestController extends Controller
         $outcomeRequests = InventoryWarehouseOutcomeRequest::where('user_id', $meUser)->get();
         return response()->json($outcomeRequests->toArray());
     }
-
 
     public function listChatMessages(InventoryWarehouseOutcomeRequest $warehouseOutcomeRequest)
     {
@@ -53,8 +48,6 @@ class InventoryWarehouseOutcomeRequestController extends Controller
 
         return response()->json($warehouseOutcomeRequest->messages);
     }
-
-
 
     public function storeChatMessage(InventoryWarehouseOutcomeRequest $warehouseOutcomeRequest)
     {
@@ -228,9 +221,6 @@ class InventoryWarehouseOutcomeRequestController extends Controller
         return response()->json($warehouseOutcomeRequest->messages);
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(StoreInventoryWarehouseOutcomeRequestRequest $request)
     {
         $validated = $request->validated();
@@ -253,7 +243,6 @@ class InventoryWarehouseOutcomeRequestController extends Controller
 
         return response()->json(['message' => 'Warehouse outcome request created', 'warehouse_outcome_request' => $inventoryWarehouseOutcomeRequest->toArray()]);
     }
-
 
     public function showChatAttachment(string $chatAttachmentId)
     {
@@ -280,18 +269,11 @@ class InventoryWarehouseOutcomeRequestController extends Controller
         return response()->json(['attachment' => base64_encode($attachment)]);
     }
 
-    /**
-     * Display the specified resource.
-     */
     public function show(InventoryWarehouseOutcomeRequest $warehouseOutcomeRequest)
     {
         return response()->json($warehouseOutcomeRequest->toArray());
     }
 
-
-    /**
-     * Update the specified resource in storage.
-     */
     public function update(UpdateInventoryWarehouseOutcomeRequestRequest $request, InventoryWarehouseOutcomeRequest $warehouseOutcomeRequest)
     {
         $validated = $request->validated();
@@ -307,9 +289,6 @@ class InventoryWarehouseOutcomeRequestController extends Controller
         return response()->json(['message' => 'Warehouse outcome request updated', 'warehouse_outcome_request' => $warehouseOutcomeRequest->toArray()]);
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
     public function destroy(InventoryWarehouseOutcomeRequest $warehouseOutcomeRequest)
     {
         //Check if the request is in a deletable status:
