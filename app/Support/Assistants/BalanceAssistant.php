@@ -48,17 +48,43 @@ class BalanceAssistant{
         ];
 
         $balances = Balance::query()->where('user_id', $user->id)->where('date', '>=', $timeBounds['start'])->where('date', '<=', $timeBounds['end'])->orderBy('date', 'asc')->get();
-        $totalCredit = 0;
-        $totalDebit = 0;
+        $totalCredit = BigDecimal::of(0);
+        $totalDebit = BigDecimal::of(0);
         $items = [];
+
+
+        $balances = collect($balances)->sort(function($a, $b){
+             //Balance should be ordered by date, from the oldest to the newest. But thats a caveat, if item.type is 'Credit' and has item.report_id, it always be after the item with the same report_id and type 'Debit':
+            if ($a->date === $b->date){
+                if ($a->type === BalanceType::Credit && $a->report_id){
+                    return 1;
+                }
+                if ($b->type === BalanceType::Credit && $b->report_id){
+                    return -1;
+                }
+            }
+            //Now, besides same report_id and date, always if has same report_id, the Debit should be first:
+            if ($a->report_id === $b->report_id){
+                if ($a->type === BalanceType::Debit){
+                    return -1;
+                }
+                if ($b->type === BalanceType::Debit){
+                    return 1;
+                }
+            }
+            return $a->date <=> $b->date;
+        });
+
+        $balances = $balances->values()->all();
+
 
         $totalChain = BigDecimal::of(0);
         foreach($balances as $balance){
             if ($balance->type === BalanceType::Credit){
-                $totalCredit = Toolbox::numberSum($totalCredit, $balance->amount);
+                $totalCredit =  $totalCredit->plus($balance->amount);
                 $totalChain = $totalChain->plus($balance->amount);
             }elseif ($balance->type === BalanceType::Debit){
-                $totalDebit = Toolbox::numberSum($totalDebit, $balance->amount);
+                $totalDebit = $totalDebit->plus($balance->amount);
                 $totalChain = $totalChain->minus($balance->amount);
             }
 
@@ -71,7 +97,7 @@ class BalanceAssistant{
                 'type' => $balance->type,
                 'model' => $balance->model,
                 'amount' => $balance->amount,
-                'balance_here' => Toolbox::numberSub($totalCredit, $totalDebit),
+                'balance_here' => $totalChain->toFloat(),
                 'receipt_image_url' => $balance->getReceiptImageUrl(),
             ];
         }
@@ -442,8 +468,8 @@ class BalanceAssistant{
                 'username' => $user->username,
             ],
             'totals' => [
-                'credit' => $totalCredit,
-                'debit' => $totalDebit,
+                'credit' => $totalCredit->toFloat(),
+                'debit' => $totalDebit->toFloat(),
                 'balance' => $total
             ],
             'items' => $items,
