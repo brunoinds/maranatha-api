@@ -31,6 +31,7 @@ class Invoice extends Model
             return Exchanger::on($date)->convert($this->amount, $moneyType, $currency);
         }
     }
+
     public function amountInAll()
     {
         $instance = $this;
@@ -43,12 +44,14 @@ class Invoice extends Model
     }
 
     //! This method should be removed soon
-    public function amountInSoles(){
+    public function amountInSoles()
+    {
         return $this->amountIn(MoneyType::PEN);
     }
 
     //! This method should be removed soon
-    public function amountInDollars(){
+    public function amountInDollars()
+    {
         return $this->amountIn(MoneyType::USD);
     }
 
@@ -76,7 +79,8 @@ class Invoice extends Model
         return $imageSize;
     }
 
-    public function report(){
+    public function report()
+    {
         return $this->belongsTo(Report::class);
     }
 
@@ -91,11 +95,13 @@ class Invoice extends Model
     }
 
 
-    public function hasImage(){
+    public function hasImage()
+    {
         return $this->image !== null;
     }
 
-    public function deleteImage(){
+    public function deleteImage()
+    {
         if (!$this->hasImage()){
             return;
         }
@@ -111,7 +117,9 @@ class Invoice extends Model
         $this->image = null;
         $this->save();
     }
-    public function setImageFromBase64(string $base64Image):bool{
+
+    public function setImageFromBase64(string $base64Image):bool
+    {
         $this->deleteImage();
 
         $imageResource = Image::make($base64Image);

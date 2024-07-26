@@ -12,8 +12,6 @@
 */
 if (!function_exists('ddh')) {
     function ddh(mixed ...$vars) {
-        // Now we can set our access control policy to
-        // accept all...
         header('Access-Control-Allow-Origin: http://localhost:8100');
         header('Access-Control-Allow-Credentials: true');
         header('Access-Control-Allow-Methods: *');

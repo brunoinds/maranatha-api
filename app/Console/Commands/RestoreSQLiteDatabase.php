@@ -7,25 +7,11 @@ use Illuminate\Support\Facades\DB;
 
 class RestoreSQLiteDatabase extends Command
 {
-    /**
-     * The name and signature of the console command.
-     *
-     * @var string
-     */
+
     protected $signature = 'db:restore {file}';
 
-    /**
-     * The console command description.
-     *
-     * @var string
-     */
     protected $description = 'Restore SQLite database from a SQL dump file';
 
-    /**
-     * Execute the console command.
-     *
-     * @return int
-     */
     public function handle()
     {
         $file = $this->argument('file');

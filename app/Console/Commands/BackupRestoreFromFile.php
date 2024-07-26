@@ -11,23 +11,10 @@ use League\Flysystem\Local\LocalFilesystemAdapter;
 
 class BackupRestoreFromFile extends Command
 {
-    /**
-     * The name and signature of the console command.
-     *
-     * @var string
-     */
     protected $signature = 'backup:restore-from-file {file}';
 
-    /**
-     * The console command description.
-     *
-     * @var string
-     */
     protected $description = 'Restore the backup image';
 
-    /**
-     * Execute the console command.
-     */
     public function handle()
     {
 

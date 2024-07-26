@@ -10,7 +10,6 @@ enum MoneyType: string
     case USD = 'USD';
     case PYG = 'PYG';
 
-
     public static function toArray():array
     {
         $items = [];
