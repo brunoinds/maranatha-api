@@ -8,11 +8,8 @@ jobs:
     name: Cron Job
     runs-on: ubuntu-latest
     steps:
-      - name: executing remote ssh commands using password
-        uses: appleboy/ssh-action@v1.0.3
-        with:
-          host: ${{ secrets.SSH_IP }}
-          username: ${{ secrets.SSH_USERNAME }}
-          key: ${{ secrets.SSH_PRIVATE_KEY }}
-          port: ${{ secrets.SSH_PORT }}
-          script: whoami
+        - name: Checkout repository
+          uses: actions/checkout@v2
+
+        - name: List directory contents
+          run: ls -la
