@@ -8,13 +8,11 @@ jobs:
     name: Cron Job
     runs-on: ubuntu-latest
     steps:
-    - name: Install SSH key
-      uses: shimataro/ssh-key-action@v2
+      - name: executing remote ssh commands using password
+      uses: appleboy/ssh-action@v1.0.3
       with:
+        host: ${{ secrets.SSH_IP }}
+        username: ${{ secrets.SSH_USERNAME }}
         key: ${{ secrets.SSH_PRIVATE_KEY }}
-        name: id_rsa # optional
-        known_hosts: ${{ secrets.SSH_PUBLIC_KEY }}
-        if_key_exists: fail # replace / ignore / fail; optional (defaults to fail)
-    - name: Run SSH command
-      run: |
-        ssh ${{secrets.SSH_USERNAME}}@${{secrets.SSH_IP}} "ls -la"
+        port: ${{ secrets.SSH_PORT }}
+        script: whoami
