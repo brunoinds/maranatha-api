@@ -17,7 +17,7 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule): void
     {
-        //$schedule->command('attachments:clear-unreachable')->dailyAt('01:45')->timezone('America/Lima');
+        $schedule->command('attachments:clear-unreachable')->dailyAt('01:45')->timezone('America/Lima');
         $schedule->command('backup:run')->dailyAt('02:00')->timezone('America/Lima');
         $schedule->command('backup:clean')->dailyAt('02:15')->timezone('America/Lima');
         $schedule->command('backup:sync-remote')->dailyAt('02:30')->timezone('America/Lima');
