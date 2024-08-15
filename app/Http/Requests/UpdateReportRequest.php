@@ -24,7 +24,7 @@ class UpdateReportRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'user_id' => ['integer'],
+            //'user_id' => ['integer'],
             'title' => ['string', 'max:100'],
             'from_date' => ['date'],
             'to_date' => ['date'],
