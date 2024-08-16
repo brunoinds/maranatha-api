@@ -33,6 +33,7 @@ class UpdateInvoiceRequest extends FormRequest
             'amount' => ['required', 'numeric', 'max:99999999999999.99'],
             'qrcode_data' => ['nullable', 'string', 'max:1000'],
             'image_base64' => ['nullable', 'string'],
+            'pdf_base64' => ['nullable', 'string'],
         ];
     }
 }

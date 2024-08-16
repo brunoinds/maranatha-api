@@ -11,6 +11,130 @@ use Carbon\Carbon;
 use Dompdf\Dompdf;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Cache;
+use Spatie\TemporaryDirectory\TemporaryDirectory;
+use Illuminate\Support\Str;
+
+class CustomPDF extends \setasign\Fpdi\Fpdi {
+    function RoundedRect($x, $y, $w, $h, $r, $corners = '1234', $style = '')
+    {
+        $k = $this->k;
+        $hp = $this->h;
+        if($style=='F')
+            $op='f';
+        elseif($style=='FD' || $style=='DF')
+            $op='B';
+        else
+            $op='S';
+        $MyArc = 4/3 * (sqrt(2) - 1);
+        $this->_out(sprintf('%.2F %.2F m',($x+$r)*$k,($hp-$y)*$k ));
+
+        $xc = $x+$w-$r;
+        $yc = $y+$r;
+        $this->_out(sprintf('%.2F %.2F l', $xc*$k,($hp-$y)*$k ));
+        if (strpos($corners, '2')===false)
+            $this->_out(sprintf('%.2F %.2F l', ($x+$w)*$k,($hp-$y)*$k ));
+        else
+            $this->_Arc($xc + $r*$MyArc, $yc - $r, $xc + $r, $yc - $r*$MyArc, $xc + $r, $yc);
+
+        $xc = $x+$w-$r;
+        $yc = $y+$h-$r;
+        $this->_out(sprintf('%.2F %.2F l',($x+$w)*$k,($hp-$yc)*$k));
+        if (strpos($corners, '3')===false)
+            $this->_out(sprintf('%.2F %.2F l',($x+$w)*$k,($hp-($y+$h))*$k));
+        else
+            $this->_Arc($xc + $r, $yc + $r*$MyArc, $xc + $r*$MyArc, $yc + $r, $xc, $yc + $r);
+
+        $xc = $x+$r;
+        $yc = $y+$h-$r;
+        $this->_out(sprintf('%.2F %.2F l',$xc*$k,($hp-($y+$h))*$k));
+        if (strpos($corners, '4')===false)
+            $this->_out(sprintf('%.2F %.2F l',($x)*$k,($hp-($y+$h))*$k));
+        else
+            $this->_Arc($xc - $r*$MyArc, $yc + $r, $xc - $r, $yc + $r*$MyArc, $xc - $r, $yc);
+
+        $xc = $x+$r ;
+        $yc = $y+$r;
+        $this->_out(sprintf('%.2F %.2F l',($x)*$k,($hp-$yc)*$k ));
+        if (strpos($corners, '1')===false)
+        {
+            $this->_out(sprintf('%.2F %.2F l',($x)*$k,($hp-$y)*$k ));
+            $this->_out(sprintf('%.2F %.2F l',($x+$r)*$k,($hp-$y)*$k ));
+        }
+        else
+            $this->_Arc($xc - $r, $yc - $r*$MyArc, $xc - $r*$MyArc, $yc - $r, $xc, $yc - $r);
+        $this->_out($op);
+    }
+
+    function _Arc($x1, $y1, $x2, $y2, $x3, $y3)
+    {
+        $h = $this->h;
+        $this->_out(sprintf('%.2F %.2F %.2F %.2F %.2F %.2F c ', $x1*$this->k, ($h-$y1)*$this->k,
+            $x2*$this->k, ($h-$y2)*$this->k, $x3*$this->k, ($h-$y3)*$this->k));
+    }
+    protected $extgstates = array();
+
+    // alpha: real value from 0 (transparent) to 1 (opaque)
+    // bm:    blend mode, one of the following:
+    //          Normal, Multiply, Screen, Overlay, Darken, Lighten, ColorDodge, ColorBurn,
+    //          HardLight, SoftLight, Difference, Exclusion, Hue, Saturation, Color, Luminosity
+    function SetAlpha($alpha, $bm='Normal')
+    {
+        // set alpha for stroking (CA) and non-stroking (ca) operations
+        $gs = $this->AddExtGState(array('ca'=>$alpha, 'CA'=>$alpha, 'BM'=>'/'.$bm));
+        $this->SetExtGState($gs);
+    }
+
+    function AddExtGState($parms)
+    {
+        $n = count($this->extgstates)+1;
+        $this->extgstates[$n]['parms'] = $parms;
+        return $n;
+    }
+
+    function SetExtGState($gs)
+    {
+        $this->_out(sprintf('/GS%d gs', $gs));
+    }
+
+    function _enddoc()
+    {
+        if(!empty($this->extgstates) && $this->PDFVersion<'1.4')
+            $this->PDFVersion='1.4';
+        parent::_enddoc();
+    }
+
+    function _putextgstates()
+    {
+        for ($i = 1; $i <= count($this->extgstates); $i++)
+        {
+            $this->_newobj();
+            $this->extgstates[$i]['n'] = $this->n;
+            $this->_put('<</Type /ExtGState');
+            $parms = $this->extgstates[$i]['parms'];
+            $this->_put(sprintf('/ca %.3F', $parms['ca']));
+            $this->_put(sprintf('/CA %.3F', $parms['CA']));
+            $this->_put('/BM '.$parms['BM']);
+            $this->_put('>>');
+            $this->_put('endobj');
+        }
+    }
+
+    function _putresourcedict()
+    {
+        parent::_putresourcedict();
+        $this->_put('/ExtGState <<');
+        foreach($this->extgstates as $k=>$extgstate)
+            $this->_put('/GS'.$k.' '.$extgstate['n'].' 0 R');
+        $this->_put('>>');
+    }
+
+    function _putresources()
+    {
+        $this->_putextgstates();
+        parent::_putresources();
+    }
+}
+
 
 
 class ReportPDFCreator
@@ -18,6 +142,8 @@ class ReportPDFCreator
     private $html = '';
 
     private Report $report;
+
+    private array $pdfsToMerge = [];
 
     private function __construct(Report $report)
     {
@@ -110,31 +236,48 @@ class ReportPDFCreator
         $instance = $this;
         $this->report->invoices()->orderBy('date', 'asc')->each(function($invoice, $i) use (&$listSrcs){
             $imageId = $invoice->image;
-            if (!$imageId){
+            $pdfId = $invoice->pdf;
+            if (!$imageId && !$pdfId){
                 return;
             }
-            $path = 'invoices/' . $imageId;
-            $imageExists = Storage::disk('public')->exists($path);
-            if (!$imageExists){
-                return;
+
+            if ($imageId){
+                $path = 'invoices/' . $imageId;
+                $imageExists = Storage::disk('public')->exists($path);
+                if (!$imageExists){
+                    return;
+                }
+                $srcUrl = Storage::disk('public')->path($path);
+                $listSrcs[] = [
+                    'src' => $srcUrl,
+                    'invoice' => $invoice,
+                    'type' => 'image'
+                ];
             }
-            $srcUrl = Storage::disk('public')->path($path);
-            $listSrcs[] = [
-                'src' => $srcUrl,
-                'invoice' => $invoice
-            ];
+
+            if ($pdfId){
+                $path = 'invoices/' . $pdfId;
+                $pdfExists = Storage::disk('public')->exists($path);
+                if (!$pdfExists){
+                    return;
+                }
+                $srcUrl = Storage::disk('public')->path($path);
+                $listSrcs[] = [
+                    'src' => $srcUrl,
+                    'invoice' => $invoice,
+                    'type' => 'pdf'
+                ];
+            }
+
         });
 
         $imagesItemsHtml = '';
-        collect($listSrcs)->each(function($item, $i) use (&$imagesItemsHtml, $instance){
+        $realImagesAdded = 0;
+        collect($listSrcs)->each(function($item, $i) use (&$imagesItemsHtml, $instance, &$realImagesAdded){
             $invoice = $item['invoice'];
-            $imageSrc = $item['src'];
-
+            $fileSrc = $item['src'];
             $jobName = $invoice->job?->name;
-
             $amount = Toolbox::moneyPrefix($instance->report->money_type->value) . ' ' . number_format($invoice->amount, 2);
-
-
             $invoiceDescription = $invoice->description;
 
             //Check if is invoice with multiples Jobs, by brackets:
@@ -143,29 +286,113 @@ class ReportPDFCreator
                 $invoiceDescription = str_replace($matches[0], "($amount)", $invoiceDescription);
             }
 
-            $imagesItemsHtml .= '
-                <article>
-                    <h1>'.$jobName.' '.$invoice->job_code . ' - '.$invoice->expense_code . '<br> '.$invoiceDescription.'</h1>
-                    <img src="'.$imageSrc.'">
-                </article>
-            ';
+            if ($item['type'] === 'pdf'){
+                $instance->pdfsToMerge[] = [
+                    'type' => 'pdf',
+                    'src' => $fileSrc,
+                    'invoice' => $invoice,
+                    'text' => $jobName.' '.$invoice->job_code . ' - '.$invoice->expense_code . "\n" .$invoiceDescription
+                ];
+            }else{
+                $imagesItemsHtml .= '
+                    <article>
+                        <h1>'.$jobName.' '.$invoice->job_code . ' - '.$invoice->expense_code . '<br> '.$invoiceDescription.'</h1>
+                        <img src="'.$fileSrc.'">
+                    </article>
+                ';
+
+                $instance->pdfsToMerge[] = [
+                    'type' => 'img',
+                    'index' => $realImagesAdded + (2),
+                ];
+                $realImagesAdded++;
+            }
         });
 
         $this->html = str_replace('{{$imagesPages}}', $imagesItemsHtml, $this->html);
     }
+    private function loadPdfPages(string $temporaryPdfPath)
+    {
+        if (collect($this->pdfsToMerge)->filter(fn($item) => $item['type'] === 'pdf')->count() === 0){
+            return $temporaryPdfPath;
+        }
+
+        $basePdfPath = $temporaryPdfPath;
+        $toMergeData = $this->pdfsToMerge;
+
+        $newPdf = new CustomPDF();
+        $currentPage = 1;
 
 
 
 
-    public function create($options = []) : Dompdf
+        //Adding first page
+        $newPdf->AddPage();
+        $newPdf->setSourceFile($basePdfPath);
+        $tplIdx = $newPdf->importPage(1);
+        $newPdf->useTemplate($tplIdx);
+        $currentPage++;
+
+
+        $toMergeDatIndex = 0;
+        foreach ($toMergeData as $mergeData){
+            if ($mergeData['type'] == 'img'){
+                $newPdf->AddPage();
+                $newPdf->setSourceFile($basePdfPath);
+                $tplIdx = $newPdf->importPage($mergeData['index']);
+                $newPdf->useTemplate($tplIdx);
+                $currentPage++;
+            }else{
+                $otherPdf = $mergeData['src'];
+                $otherPageCount = $newPdf->setSourceFile($otherPdf);
+                for ($otherPageNo = 1; $otherPageNo <= $otherPageCount; $otherPageNo++) {
+                    $newPdf->AddPage();
+                    $tplIdx = $newPdf->importPage($otherPageNo);
+                    $newPdf->useTemplate($tplIdx);
+
+
+
+                    $newPdf->SetFont('Helvetica');
+                    $newPdf->SetFont('Helvetica', 'B', 9);
+                    $newPdf->SetTextColor(255, 0, 0);
+
+                    collect(explode("\n", $mergeData['text']))->each(function($line, $i) use ($newPdf){
+                        $newPdf->SetXY(10, 10 + ($i * 3.4));
+                        $newPdf->Write(0, $line);
+                    });
+
+                    $textSize = $newPdf->GetStringWidth($mergeData['text']);
+                    $textSizeHeight = 3.4 * count(explode("\n", $mergeData['text']));
+                    $newPdf->SetAlpha(0.8);
+                    $newPdf->SetFillColor(255,255,255);
+                    $newPdf->SetDrawColor(255,255,255);
+                    $newPdf->RoundedRect(10, 7.6, $textSize, $textSizeHeight + 2, 2, '1234', 'DF');
+                    $newPdf->SetAlpha(1);
+
+                    collect(explode("\n", $mergeData['text']))->each(function($line, $i) use ($newPdf){
+                        $newPdf->SetXY(10, 10 + ($i * 3.4));
+                        $newPdf->Write(0, $line);
+                    });
+                    $currentPage++;
+                }
+            }
+
+            $toMergeDatIndex++;
+        }
+
+        $newPdf->Output($temporaryPdfPath, 'F');
+
+        return $temporaryPdfPath;
+    }
+
+
+    public function create($options = []) : string
     {
         $dompdf = new Dompdf();
         $dompdf->getOptions()->setChroot([base_path('public') . '/storage/']);
 
         $totalFramesToRenderCount = 0;
         $finishedFramesToRenderCount = 0;
-
-
 
         if (isset($options['progressId'])){
             $onProgress = function($percentage, $framesRendered, $framesTotal) use ($options){
@@ -212,7 +439,17 @@ class ReportPDFCreator
         $dompdf->loadHtml($this->html);
         $dompdf->setPaper('A4', 'portrait');
         $dompdf->render();
-        return $dompdf;
+
+
+        $content = $dompdf->output();
+        $temporaryDirectory = (new TemporaryDirectory())->create();
+        $documentName = Str::uuid() . '.pdf';
+        $tempPath = $temporaryDirectory->path($documentName);
+        file_put_contents($tempPath, $content);
+
+        $tempPath = $this->loadPdfPages($tempPath);
+
+        return file_get_contents($tempPath);
     }
 
     public static function new(Report $report)

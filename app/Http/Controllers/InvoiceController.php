@@ -57,6 +57,11 @@ class InvoiceController extends Controller
 
             $imageId = Str::random(40);
             $validatedData['image'] = $imageId;
+            $validatedData['image_size'] = $imageSize;
+
+            $validatedData['pdf'] = null;
+            $validatedData['pdf_size'] = null;
+
 
             $path = 'invoices/' . $imageId;
 
@@ -66,6 +71,40 @@ class InvoiceController extends Controller
                 return response()->json([
                     'error' => [
                         'message' => 'Image upload failed',
+                    ]
+                ], 500);
+            }
+        }
+        if (!is_null($validatedData['pdf']) && mb_strlen($validatedData['pdf']) > 40){
+            //Has pdf to upload
+            $maxSizeInBytes = $maxSizeInBytes ?? env('APP_MAXIMUM_UPLOAD_SIZE') ?? 2048 * 1024;
+            $base64Pdf = $validatedData['pdf'];
+
+            $pdfSize = (fn() => strlen(base64_decode($base64Pdf)))();
+            if ($pdfSize > $maxSizeInBytes) {
+                return response()->json([
+                    'error' => [
+                        'message' => "PDF exceeds max size (maximum $maxSizeInBytes bytes)",
+                    ]
+                ], 400);
+            }
+
+            $pdfEncoded = base64_decode($base64Pdf);
+            $pdfId = Str::random(40);
+            $validatedData['pdf'] = $pdfId;
+            $validatedData['pdf_size'] = $pdfSize;
+
+            $validatedData['image'] = null;
+            $validatedData['image_size'] = null;
+
+            $path = 'invoices/' . $pdfId;
+
+            $wasSuccessfull = Storage::disk('public')->put($path, $pdfEncoded);
+
+            if (!$wasSuccessfull) {
+                return response()->json([
+                    'error' => [
+                        'message' => 'PDF upload failed',
                     ]
                 ], 500);
             }
@@ -136,6 +175,39 @@ class InvoiceController extends Controller
             }
         }
 
+        if (!is_null($validatedData['pdf_base64']) && mb_strlen($validatedData['pdf_base64']) > 40){
+            //Has pdf to upload
+            $maxSizeInBytes = $maxSizeInBytes ?? env('APP_MAXIMUM_UPLOAD_SIZE') ?? 2048 * 1024;
+            $base64Pdf = $validatedData['pdf_base64'];
+
+            $pdfSize = (fn() => strlen(base64_decode($base64Pdf)))();
+            if ($pdfSize > $maxSizeInBytes) {
+                return response()->json([
+                    'error' => [
+                        'message' => "PDF exceeds max size (maximum $maxSizeInBytes bytes)",
+                    ]
+                ], 400);
+            }
+
+            try{
+                $wasSuccessfull = $invoice->setPdfFromBase64($base64Pdf);
+                if (!$wasSuccessfull) {
+                    return response()->json([
+                        'error' => [
+                            'message' => 'PDF upload failed',
+                        ]
+                    ], 500);
+                }
+            } catch(\Exception $e){
+                return response()->json([
+                    'error' => [
+                        'message' => 'Invalid PDF data',
+                        'details' => $e->getMessage()
+                    ]
+                ], 400);
+            }
+        }
+
         $invoice->update($validatedData);
         $invoice->save();
 
@@ -151,66 +223,6 @@ class InvoiceController extends Controller
         $report->updateFromToDates();
         RecordsCache::clearAll();
         return response()->json(['message' => 'Invoice deleted']);
-    }
-
-    public function uploadImage(Request $request, Invoice $invoice)
-    {
-        $maxSizeInBytes = $maxSizeInBytes ?? env('APP_MAXIMUM_UPLOAD_SIZE') ?? 2048 * 1024;
-        $base64Image = $request->input('image');
-
-        if (!$base64Image) {
-            return response()->json([
-                'error' => [
-                    'message' => 'Image missing',
-                ]
-            ], 400);
-        }
-
-        $imageSize = (fn() => strlen(base64_decode($base64Image)))();
-        if ($imageSize > $maxSizeInBytes) {
-            return response()->json([
-                'error' => [
-                    'message' => "Image exceeds max size (maximum $maxSizeInBytes bytes)",
-                ]
-            ], 400);
-        }
-
-
-        try{
-            $imageResource = Image::make($base64Image);
-            $imageEncoded = $imageResource->encode('png')->getEncoded();
-        } catch(\Exception $e){
-            return response()->json([
-                'error' => [
-                    'message' => 'Invalid image data',
-                    'details' => $e->getMessage()
-                ]
-            ], 400);
-        }
-
-        $imageId = Str::random(40);
-        $path = 'invoices/' . $imageId;
-
-        $wasSuccessfull = Storage::disk('public')->put($path, $imageEncoded);
-
-        if (!$wasSuccessfull) {
-            return response()->json([
-                'error' => [
-                    'message' => 'Image upload failed',
-                ]
-            ], 500);
-        }
-
-        $invoice->image = $imageId;
-        $invoice->save();
-        return response()->json([
-            'message' => 'Image uploaded',
-            'image' => [
-                'id' => $imageId,
-                'url' => Storage::disk('public')->url($path),
-                //'path' => Storage::disk('public')->path($path)
-            ]
-        ]);
     }
 
     public function showImage(Request $request, Invoice $invoice)
@@ -238,5 +250,32 @@ class InvoiceController extends Controller
 
         //Send back as base64 encoded image:
         return response()->json(['image' => base64_encode($image)]);
+    }
+
+    public function showPdf(Request $request, Invoice $invoice)
+    {
+        $pdfId = $invoice->pdf;
+        if (!$pdfId){
+            return response()->json([
+                'error' => [
+                    'message' => 'PDF not uploaded yet',
+                ]
+            ], 400);
+        }
+
+        $path = 'invoices/' . $pdfId;
+        $pdfExists = Storage::disk('public')->exists($path);
+        if (!$pdfExists){
+            return response()->json([
+                'error' => [
+                    'message' => 'PDF missing',
+                ]
+            ], 400);
+        }
+
+        $pdf = Storage::disk('public')->get($path);
+
+        //Send back as base64 encoded pdf:
+        return response()->json(['pdf' => base64_encode($pdf)]);
     }
 }

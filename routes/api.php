@@ -186,20 +186,17 @@ Route::middleware(['auth:sanctum'])->group(function () {
     //Invoice group:
     Route::group([], function(){
         Route::get('invoices/ticket-number/check', InvoiceController::class . '@checkTicketNumber');
-        Route::post('/invoices/{invoice}/image-upload', [
-            InvoiceController::class, 'uploadImage'
-        ]);
         Route::get('/invoices/{invoice}/image', [
             InvoiceController::class, 'showImage'
+        ]);
+        Route::get('/invoices/{invoice}/pdf', [
+            InvoiceController::class, 'showPdf'
         ]);
     });
 
 
     //Report group:
     Route::group([], function(){
-        Route::post('/reports/{report}/pdf-upload', [
-            ReportController::class, 'uploadReportPDF'
-        ]);
         Route::get('/reports/{report}/invoices', ReportController::class . '@invoices');
         Route::get('/reports/{report}/excel-download', [
             ReportController::class, 'downloadExcel'

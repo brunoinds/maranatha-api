@@ -42,9 +42,20 @@ class ClearUnreachableAttachments extends Command
         });
 
         $invoicesAttachmentsIds = Invoice::all()->filter(function($invoice){
-            return !is_null($invoice->image);
+            if (!is_null($invoice->image)){
+                return Storage::disk('public')->exists('invoices/' . $invoice->image);
+            }
+            if (!is_null($invoice->pdf)){
+                return Storage::disk('public')->exists('invoices/' . $invoice->pdf);
+            }
+            return false;
         })->map(function($invoice){
-            return $invoice->image;
+            if (!is_null($invoice->pdf)){
+                return $invoice->pdf;
+            }
+            if (!is_null($invoice->image)){
+                return $invoice->image;
+            }
         });
 
         $unreachableAttachments = $attachmentsItemsIds->filter(function($attachmentId) use ($invoicesAttachmentsIds){

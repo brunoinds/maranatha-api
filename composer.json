@@ -34,7 +34,9 @@
         "spatie/laravel-google-cloud-storage": "^2.2",
         "spatie/temporary-directory": "^2.2",
         "tightenco/ziggy": "^1.0",
-        "yaza/laravel-google-drive-storage": "^2.0"
+        "yaza/laravel-google-drive-storage": "^2.0",
+        "setasign/fpdf": "1.8.*",
+        "setasign/fpdi": "^2.5"
     },
     "require-dev": {
         "fakerphp/faker": "^1.9.1",

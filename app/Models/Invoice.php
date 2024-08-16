@@ -19,7 +19,7 @@ class Invoice extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['type', 'description', 'report_id', 'ticket_number', 'commerce_number', 'date', 'job_code', 'expense_code', 'amount', 'qrcode_data', 'image', 'image_size'];
+    protected $fillable = ['type', 'description', 'report_id', 'ticket_number', 'commerce_number', 'date', 'job_code', 'expense_code', 'amount', 'qrcode_data', 'image', 'image_size', 'pdf', 'pdf_size'];
 
     public function amountIn(MoneyType $currency)
     {
@@ -53,6 +53,30 @@ class Invoice extends Model
     public function amountInDollars()
     {
         return $this->amountIn(MoneyType::USD);
+    }
+
+    public function pdfSize(): ?int
+    {
+        if ($this->pdf === null){
+            return null;
+        }
+
+        if ($this->pdf_size !== null){
+            return $this->pdf_size;
+        }
+
+        $path = 'invoices/' . $this->pdf;
+        $pdfExists = Storage::disk('public')->exists($path);
+        if (!$pdfExists){
+            $this->pdf_size = null;
+            $this->save();
+            return null;
+        }
+
+        $pdfSize = Storage::disk('public')->size($path);
+        $this->pdf_size = $pdfSize;
+        $this->save();
+        return $pdfSize;
     }
 
     public function imageSize() : ?int
@@ -99,6 +123,20 @@ class Invoice extends Model
     {
         return $this->image !== null;
     }
+    public function hasPdf()
+    {
+        return $this->pdf !== null;
+    }
+    public function attachmentType()
+    {
+        if ($this->hasPdf()){
+            return 'Pdf';
+        }
+        if ($this->hasImage()){
+            return 'Image';
+        }
+        return null;
+    }
 
     public function deleteImage()
     {
@@ -117,6 +155,23 @@ class Invoice extends Model
         $this->image = null;
         $this->save();
     }
+    public function deletePdf()
+    {
+        if (!$this->hasPdf()){
+            return;
+        }
+        $path = 'invoices/' . $this->pdf;
+
+        $pdfExists = Storage::disk('public')->exists($path);
+        if (!$pdfExists){
+            $this->pdf = null;
+            $this->save();
+            return;
+        }
+        Storage::disk('public')->delete($path);
+        $this->pdf = null;
+        $this->save();
+    }
 
     public function setImageFromBase64(string $base64Image):bool
     {
@@ -131,6 +186,22 @@ class Invoice extends Model
         $wasSuccessfull = Storage::disk('public')->put($path, $imageEncoded);
 
         $this->image = $imageId;
+        $this->save();
+
+        return $wasSuccessfull;
+    }
+
+    public function setPdfFromBase64(string $base64Pdf): bool
+    {
+        $this->deletePdf();
+
+        $pdfEncoded = base64_decode($base64Pdf);
+        $pdfId = Str::random(40);
+        $path = 'invoices/' . $pdfId;
+
+        $wasSuccessfull = Storage::disk('public')->put($path, $pdfEncoded);
+
+        $this->pdf = $pdfId;
         $this->save();
 
         return $wasSuccessfull;

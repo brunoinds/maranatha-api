@@ -206,36 +206,6 @@ class ReportController extends Controller
         return response()->json(collect($invoices)->toArray());
     }
 
-    public function uploadReportPDF(Request $request, Report $report)
-    {
-        $base64PDF = $request->input('pdf');
-        $documentId = Str::random(40);
-        $path = 'reports/' . $documentId;
-
-        $pdfDecoded = base64_decode($base64PDF);
-
-        $wasSuccessfull = Storage::disk('public')->put($path, $pdfDecoded);
-
-        if (!$wasSuccessfull) {
-            return response()->json([
-                'error' => [
-                    'message' => 'PDF upload failed',
-                ]
-            ], 500);
-        }
-
-        $report->exported_pdf = $documentId;
-        $report->save();
-
-        return response()->json([
-            'message' => 'PDF uploaded',
-            'pdf' => [
-                'id' => $documentId,
-                'url' => Storage::disk('public')->url($path),
-            ]
-        ]);
-    }
-
     public function checkProgressDownloadPDF(Request $request)
     {
         $progressId = request()->query('progress_id');
@@ -262,7 +232,7 @@ class ReportController extends Controller
 
 
         $pdf = ReportPDFCreator::new($report);
-        $content = $pdf->create($options)->output();
+        $content = $pdf->create($options);
 
         $documentName = Str::slug($report->title, '-') . '.pdf';
 
