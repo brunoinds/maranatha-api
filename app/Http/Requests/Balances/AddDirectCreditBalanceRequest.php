@@ -27,6 +27,7 @@ class AddDirectCreditBalanceRequest extends FormRequest
             'date' => ['required', 'date'],
             'ticket_number' => ['nullable', 'string', 'max:100'],
             'receipt_base64' => ['nullable', 'string'],
+            'receipt_type' => ['nullable', 'string', 'in:Image,Pdf'],
         ];
     }
 }

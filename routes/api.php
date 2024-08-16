@@ -160,12 +160,10 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::post('users/{user}/debits', BalanceController::class . '@userBalanceAddDebit');
         Route::delete('users/{user}/debits/{balance}', BalanceController::class . '@userBalanceRemoveDebit');
         Route::get('reports/{report}/balances', BalanceController::class . '@getBalancesFromReport');
-        Route::get('reports/{report}/receipt-image', BalanceController::class . '@getBalanceReceiptImageFromReport');
-        Route::post('reports/{report}/receipt-image', BalanceController::class . '@setBalanceReceiptImageFromReport');
-        Route::delete('reports/{report}/receipt-image', BalanceController::class . '@deleteBalanceReceiptImageFromReport');
+        Route::get('reports/{report}/receipt', BalanceController::class . '@getBalanceReceiptFromReport');
     });
     Route::group([], function(){
-        Route::get('balances/{balance}/receipt-image', BalanceController::class . '@getReceiptImage');
+        Route::get('balances/{balance}/receipt', BalanceController::class . '@getReceipt');
     });
 
 

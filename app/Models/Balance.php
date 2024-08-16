@@ -44,12 +44,20 @@ class Balance extends Model
         $wasSuccessfull = Storage::disk('public')->put($path, $imageEncoded);
         return $wasSuccessfull;
     }
+    public function setReceiptPdfFromBase64(string $base64Pdf): bool{
+        $pdfEncoded = base64_decode($base64Pdf);
+        $pdfId = $this->id;
+        $path = 'balances/' . $pdfId;
+
+        $wasSuccessfull = Storage::disk('public')->put($path, $pdfEncoded);
+        return $wasSuccessfull;
+    }
     public function deleteReceiptImage():void{
         $path = 'balances/' . $this->id;
         Storage::disk('public')->delete($path);
     }
-    public function getReceiptImageUrl():string|null{
-        if (!$this->hasReceiptImage()) {
+    public function getReceiptUrl():string|null{
+        if (!$this->hasReceipt()) {
             return null;
         }
         $path = 'balances/' . $this->id;
@@ -59,19 +67,29 @@ class Balance extends Model
         return $image;
     }
 
-    public function hasReceiptImage():bool{
+    public function hasReceipt():bool{
         $path = 'balances/' . $this->id;
         $imageExists = Storage::disk('public')->exists($path);
         return $imageExists;
     }
-
-    public function getReceiptImageInBase64():string|null{
-        if (!$this->hasReceiptImage()) {
+    public function getReceiptType()
+    {
+        if (!$this->hasReceipt()) {
             return null;
         }
         $path = 'balances/' . $this->id;
-        $image = Storage::disk('public')->get($path);
-        $image = base64_encode($image);
-        return $image;
+        $data = Storage::disk('public')->get($path);
+        $isPdf = strpos($data, '%PDF-') === 0;
+        return $isPdf ? 'Pdf' : 'Image';
+    }
+
+    public function getReceiptInBase64():string|null{
+        if (!$this->hasReceipt()) {
+            return null;
+        }
+        $path = 'balances/' . $this->id;
+        $data = Storage::disk('public')->get($path);
+        $data = base64_encode($data);
+        return $data;
     }
 }

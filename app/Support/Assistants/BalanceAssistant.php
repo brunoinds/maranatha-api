@@ -98,7 +98,8 @@ class BalanceAssistant{
                 'model' => $balance->model,
                 'amount' => $balance->amount,
                 'balance_here' => $totalChain->toFloat(),
-                'receipt_image_url' => $balance->getReceiptImageUrl(),
+                'receipt_url' => $balance->getReceiptUrl(),
+                'receipt_type' => $balance->getReceiptType(),
             ];
         }
         $total = $totalChain->toFloat();
