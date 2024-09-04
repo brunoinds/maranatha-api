@@ -11,7 +11,7 @@ use Illuminate\Support\Str;
 use Intervention\Image\Facades\Image;
 use App\Support\Toolbox\TString;
 use App\Support\Cache\RecordsCache;
-
+use App\Support\Toolbox\TPdf;
 
 class InvoiceController extends Controller
 {
@@ -87,6 +87,12 @@ class InvoiceController extends Controller
                         'message' => "PDF exceeds max size (maximum $maxSizeInBytes bytes)",
                     ]
                 ], 400);
+            }
+
+            //Avoid corrupted PDF or PDF version 1.5 or higher, transform it into a PDF version 1.4:
+            $pdfTempFilePath = TPdf::transformPdfBase64IntoTemporarilyFile($base64Pdf);
+            if (TPdf::checkIfPdfNeedsRepair($pdfTempFilePath)){
+                $base64Pdf = TPdf::transformPdfFileIntoBase64(TPdf::repairPdf($pdfTempFilePath));
             }
 
             $pdfEncoded = base64_decode($base64Pdf);
@@ -187,6 +193,12 @@ class InvoiceController extends Controller
                         'message' => "PDF exceeds max size (maximum $maxSizeInBytes bytes)",
                     ]
                 ], 400);
+            }
+
+            //Avoid corrupted PDF or PDF version 1.5 or higher, transform it into a PDF version 1.4:
+            $pdfTempFilePath = TPdf::transformPdfBase64IntoTemporarilyFile($base64Pdf);
+            if (TPdf::checkIfPdfNeedsRepair($pdfTempFilePath)){
+                $base64Pdf = TPdf::transformPdfFileIntoBase64(TPdf::repairPdf($pdfTempFilePath));
             }
 
             try{

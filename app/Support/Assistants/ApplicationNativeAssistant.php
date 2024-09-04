@@ -55,7 +55,7 @@ class ApplicationNativeAssistant{
 
 
                 $fileInfo['version'] = $version;
-                $fileInfo['minimalVersion'] = str_replace('m', '', $minimalVersion);;
+                $fileInfo['minimalVersion'] = str_replace('m', '', $minimalVersion);
                 $fileInfo['url'] = url('/api/app/native/bundles/' . $fileInfo['version']);
 
                 $bundleFile = new BundleFile(

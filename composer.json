@@ -20,6 +20,7 @@
         "dompdf/dompdf": "^2.0",
         "google/apiclient": "^2.15",
         "guzzlehttp/guzzle": "^7.2",
+        "ilovepdf/ilovepdf-php": "^1.2",
         "inertiajs/inertia-laravel": "^0.6.8",
         "intervention/image": "^2.7",
         "laravel/framework": "^10.10",
@@ -29,14 +30,14 @@
         "mikehaertl/php-shellcommand": "^1.7",
         "revolution/laravel-google-sheets": "^6.2",
         "sentry/sentry-laravel": "^4.4",
+        "setasign/fpdf": "1.8.*",
+        "setasign/fpdi": "^2.5",
         "softinklab/laravel-keyvalue-storage": "^1.8",
         "spatie/laravel-backup": "^8.6",
         "spatie/laravel-google-cloud-storage": "^2.2",
         "spatie/temporary-directory": "^2.2",
         "tightenco/ziggy": "^1.0",
-        "yaza/laravel-google-drive-storage": "^2.0",
-        "setasign/fpdf": "1.8.*",
-        "setasign/fpdi": "^2.5"
+        "yaza/laravel-google-drive-storage": "^2.0"
     },
     "require-dev": {
         "fakerphp/faker": "^1.9.1",
