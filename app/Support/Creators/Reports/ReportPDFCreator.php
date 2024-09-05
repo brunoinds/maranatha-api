@@ -348,7 +348,24 @@ class ReportPDFCreator
                 for ($otherPageNo = 1; $otherPageNo <= $otherPageCount; $otherPageNo++) {
                     $newPdf->AddPage();
                     $tplIdx = $newPdf->importPage($otherPageNo);
-                    $newPdf->useTemplate($tplIdx);
+                    $templateSize = $newPdf->getTemplateSize($tplIdx);
+
+
+                    if ($templateSize['orientation'] === 'L'){
+                        $newPdf->useTemplate(tpl: $tplIdx, adjustPageSize: true);
+                    }else{
+                        //Add into page without adjust, but make it centered, so we need to calculate the position:
+                        $x = 0;
+                        $y = 0;
+                        $w = $templateSize['width'];
+                        $h = $templateSize['height'];
+
+                        $x = ($newPdf->GetPageWidth() - $w) / 2;
+                        $y = ($newPdf->GetPageHeight() - $h) / 2;
+                        $newPdf->useTemplate(tpl: $tplIdx, x: $x, y: $y, width: $w, height: $h);
+                    }
+
+
 
 
 
