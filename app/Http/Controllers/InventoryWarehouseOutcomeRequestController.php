@@ -211,12 +211,12 @@ class InventoryWarehouseOutcomeRequestController extends Controller
 
         foreach ($notifications as $notification) {
             foreach ($notification['users_ids'] as $userId) {
-                /*OneSignal::sendNotificationToExternalUser(
+                OneSignal::sendNotificationToExternalUser(
                     headings: $notification['headings'],
                     message: $notification['message'],
                     userId: Toolbox::getOneSignalUserId($userId),
                     data: $notification['data']
-                );*/
+                );
             }
         }
 

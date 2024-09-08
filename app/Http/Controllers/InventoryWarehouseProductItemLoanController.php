@@ -8,9 +8,12 @@ use App\Http\Requests\UpdateInventoryWarehouseProductItemLoanRequest;
 use App\Models\InventoryWarehouse;
 use App\Models\InventoryWarehouseProductItemLoan;
 use Illuminate\Http\Request;
+use App\Helpers\Toolbox;
+
 use Illuminate\Support\Str;
 use App\Models\InventoryWarehouseOutcomeRequest;
 use App\Helpers\Enums\InventoryWarehouseOutcomeRequestStatus;
+use OneSignal;
 
 class InventoryWarehouseProductItemLoanController extends Controller
 {
@@ -186,12 +189,12 @@ class InventoryWarehouseProductItemLoanController extends Controller
 
         foreach ($notifications as $notification) {
             foreach ($notification['users_ids'] as $userId) {
-                /*OneSignal::sendNotificationToExternalUser(
+                OneSignal::sendNotificationToExternalUser(
                     headings: $notification['headings'],
                     message: $notification['message'],
                     userId: Toolbox::getOneSignalUserId($userId),
                     data: $notification['data']
-                );*/
+                );
             }
         }
 
