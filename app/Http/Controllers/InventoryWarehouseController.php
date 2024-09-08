@@ -46,6 +46,18 @@ class InventoryWarehouseController extends Controller
 
         return response()->json($outcomes);
     }
+    public function listLoans(InventoryWarehouse $warehouse)
+    {
+        $loans = $warehouse->loans;
+        $loans->each(function ($loan) {
+            $loan->productItem;
+            $loan->productItem->product;
+            $loan->loanedBy;
+            $loan->loanedTo;
+        });
+
+        return response()->json($loans->toArray());
+    }
 
     public function listOutcomeRequests(InventoryWarehouse $warehouse)
     {

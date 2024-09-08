@@ -127,6 +127,10 @@ class InventoryWarehouseOutcomeRequest extends Model
                 ]
             ];
         }elseif ($previousStatus === InventoryWarehouseOutcomeRequestStatus::Delivered && $newStatus === InventoryWarehouseOutcomeRequestStatus::Finished) {
+            $this->loans->each(function ($loan) {
+                $loan->doReceivedFromWarehouse();
+            });
+
             //Notify warehouse owner, the request has been received and its checked.
             $notifications[] = [
                 'headings' => '✅ Pedido finalizado',
@@ -142,6 +146,10 @@ class InventoryWarehouseOutcomeRequest extends Model
         //Regressive timeline:
         if ($previousStatus === InventoryWarehouseOutcomeRequestStatus::Finished && $newStatus === InventoryWarehouseOutcomeRequestStatus::Delivered) {
             //NOT, notify warehouse owner, was finished but its reopend
+            $this->loans->each(function ($loan) {
+                $loan->undoReceivedFromWarehouse();
+            });
+
         }elseif ($previousStatus === InventoryWarehouseOutcomeRequestStatus::Delivered && $newStatus === InventoryWarehouseOutcomeRequestStatus::OnTheWay) {
             //NOT, notify warehouse owner, was delivered but its on the way again
         }elseif ($previousStatus === InventoryWarehouseOutcomeRequestStatus::OnTheWay && $newStatus === InventoryWarehouseOutcomeRequestStatus::Dispatched) {
@@ -150,6 +158,7 @@ class InventoryWarehouseOutcomeRequest extends Model
             //NOT, notify request owner, was dispatched but its approved again
             //Undo dispatch:
             $this->outcome?->delete();
+            $this->loans()->delete();
             $this->inventory_warehouse_outcome_id = null;
         }elseif ($previousStatus === InventoryWarehouseOutcomeRequestStatus::Approved && $newStatus === InventoryWarehouseOutcomeRequestStatus::Requested) {
             //NOT, notify request owner, was approved but its requested again
@@ -246,5 +255,10 @@ class InventoryWarehouseOutcomeRequest extends Model
     public function expense()
     {
         return $this->belongsTo(Expense::class, 'expense_code', 'code');
+    }
+
+    public function loans()
+    {
+        return $this->hasMany(InventoryWarehouseProductItemLoan::class, 'inventory_warehouse_outcome_request_id', 'id');
     }
 }

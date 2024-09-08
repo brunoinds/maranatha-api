@@ -8,6 +8,8 @@ use Illuminate\Database\Eloquent\Model;
 use App\Models\InventoryProduct;
 use App\Models\InventoryWarehouse;
 use App\Helpers\Enums\InventoryProductItemStatus;
+use App\Models\InventoryWarehouseProductItemLoan;
+
 
 class InventoryProductItem extends Model
 {
@@ -57,5 +59,16 @@ class InventoryProductItem extends Model
     public function outcome()
     {
         return $this->belongsTo(InventoryWarehouse::class, 'inventory_warehouse_outcome_id');
+    }
+
+    public function loans()
+    {
+        return $this->hasMany(InventoryWarehouseProductItemLoan::class, 'inventory_product_item_id', 'id');
+    }
+
+    public function delete()
+    {
+        InventoryWarehouseProductItemLoan::where('inventory_product_item_id', $this->id)->delete();
+        parent::delete();
     }
 }

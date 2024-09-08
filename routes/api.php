@@ -25,6 +25,7 @@ use App\Http\Controllers\InventoryProductsPackController;
 use App\Http\Controllers\InventoryWarehouseIncomeController;
 use App\Http\Controllers\InventoryWarehouseOutcomeController;
 use App\Http\Controllers\InventoryWarehouseOutcomeRequestController;
+use App\Http\Controllers\InventoryWarehouseProductItemLoanController;
 
 
 /*
@@ -253,6 +254,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::get('inventory/product-image-search', InventoryProductController::class . '@queryImageSearch');
 
         Route::get('inventory/me/outcome-requests', InventoryWarehouseOutcomeRequestController::class . '@listMeOutcomeRequests');
+        Route::get('inventory/me/loans', InventoryWarehouseProductItemLoanController::class . '@listMeLoans');
 
         Route::apiResource('inventory/products', InventoryProductController::class);
 
@@ -262,6 +264,8 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::apiResource('inventory/warehouse-incomes', InventoryWarehouseIncomeController::class);
         Route::apiResource('inventory/warehouse-outcomes', InventoryWarehouseOutcomeController::class);
         Route::apiResource('inventory/warehouse-outcome-requests', InventoryWarehouseOutcomeRequestController::class);
+        Route::apiResource('inventory/warehouse-loans', InventoryWarehouseProductItemLoanController::class);
+        Route::post('inventory/warehouse-loans', InventoryWarehouseProductItemLoanController::class . '@storeBulk');
 
 
         Route::get('inventory/warehouse-outcomes/{warehouseOutcome}/download-pdf', [
@@ -271,10 +275,13 @@ Route::middleware(['auth:sanctum'])->group(function () {
             InventoryWarehouseOutcomeRequestController::class, 'downloadPDF'
         ]);
 
+        Route::get('inventory/products/items/{inventoryProductItem}/loans', InventoryProductItemController::class . '@loans');
+
 
         Route::get('inventory/warehouses/{warehouse}/incomes', InventoryWarehouseController::class . '@listIncomes');
         Route::get('inventory/warehouses/{warehouse}/outcomes', InventoryWarehouseController::class . '@listOutcomes');
         Route::get('inventory/warehouses/{warehouse}/outcome-requests', InventoryWarehouseController::class . '@listOutcomeRequests');
+        Route::get('inventory/warehouses/{warehouse}/loans', InventoryWarehouseController::class . '@listLoans');
 
         Route::get('inventory/warehouses/{warehouse}/products', InventoryWarehouseController::class . '@listProducts');
         Route::get('inventory/warehouses/{warehouse}/stock', InventoryWarehouseController::class . '@listStock');
@@ -284,6 +291,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::get('inventory/chat-attachments/{chatAttachmentId}', InventoryWarehouseOutcomeRequestController::class . '@showChatAttachment');
 
         Route::get('inventory/warehouse-outcomes/{inventoryWarehouseOutcome}/products', InventoryWarehouseOutcomeController::class . '@listProductsItems');
+        Route::get('inventory/warehouse-outcome-requests/{warehouseOutcomeRequest}/loans', InventoryWarehouseOutcomeRequestController::class . '@listLoans');
 
         Route::get('inventory/warehouse-incomes/{inventoryWarehouseIncome}/products', InventoryWarehouseIncomeController::class . '@listProductsItems');
         Route::get('inventory/warehouse-incomes/{inventoryWarehouseIncome}/image', InventoryWarehouseIncomeController::class . '@showImage');

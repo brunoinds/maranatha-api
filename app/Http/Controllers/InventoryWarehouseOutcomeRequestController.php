@@ -32,6 +32,20 @@ class InventoryWarehouseOutcomeRequestController extends Controller
         return response()->json($outcomeRequests->toArray());
     }
 
+    public function listLoans(InventoryWarehouseOutcomeRequest $warehouseOutcomeRequest)
+    {
+        $loans = $warehouseOutcomeRequest->loans;
+        $loans->each(function ($loan) {
+            $loan->productItem;
+            $loan->productItem->product;
+            $loan->loanedBy;
+            $loan->loanedTo;
+        });
+
+        return response()->json($loans->toArray());
+    }
+
+
     public function listChatMessages(InventoryWarehouseOutcomeRequest $warehouseOutcomeRequest)
     {
         $meUser = auth()->id();

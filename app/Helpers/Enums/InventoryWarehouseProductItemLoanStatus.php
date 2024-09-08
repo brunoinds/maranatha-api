@@ -3,11 +3,12 @@
 namespace App\Helpers\Enums;
 
 
-enum InventoryProductItemStatus: string
+enum InventoryWarehouseProductItemLoanStatus: string
 {
-    case InStock = 'InStock';
-    case Sold = 'Sold';
-    case Loaned = 'Loaned';
+    case SendingToLoan = 'SendingToLoan';
+    case OnLoan = 'OnLoan';
+    case ReturningToWarehouse = 'ReturningToWarehouse';
+    case Returned = 'Returned';
 
     public static function toArray():array
     {

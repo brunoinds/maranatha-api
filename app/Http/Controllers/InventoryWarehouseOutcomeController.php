@@ -31,6 +31,7 @@ class InventoryWarehouseOutcomeController extends Controller
     }
 
 
+
     public function store(StoreInventoryWarehouseOutcomeRequest $request)
     {
         $validated = $request->validated();

@@ -16,6 +16,18 @@ class InventoryProductItemController extends Controller
         //
     }
 
+    public function loans(InventoryProductItem $inventoryProductItem)
+    {
+        $inventoryProductItemLoans = $inventoryProductItem->loans;
+        $inventoryProductItemLoans->each(function ($loan) {
+            $loan->productItem;
+            $loan->productItem->product;
+            $loan->loanedBy;
+            $loan->loanedTo;
+        });
+        return response()->json($inventoryProductItemLoans);
+    }
+
     /**
      * Show the form for creating a new resource.
      */
