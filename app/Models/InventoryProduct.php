@@ -12,6 +12,7 @@ use App\Models\InventoryProductsPack;
 use App\Models\InventoryWarehouseProductItemLoan;
 
 
+
 class InventoryProduct extends Model
 {
     use HasFactory;
@@ -52,7 +53,9 @@ class InventoryProduct extends Model
 
     public function delete()
     {
-        $this->items()->delete();
+        $this->items()->each(function($item){
+            $item->delete();
+        });
 
         //Delete product on InventoryProductsPack that contains this product, that has an attribute products that is an array of objects like: [{product_id: 1, quantity: 1}]'
         $productPacks = InventoryProductsPack::all();

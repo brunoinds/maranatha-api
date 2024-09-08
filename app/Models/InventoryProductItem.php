@@ -68,7 +68,7 @@ class InventoryProductItem extends Model
 
     public function delete()
     {
-        InventoryWarehouseProductItemLoan::where('inventory_product_item_id', $this->id)->delete();
+        $this->loans()->delete();
         parent::delete();
     }
 }

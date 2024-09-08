@@ -215,16 +215,19 @@ class InventoryWarehouseOutcomeRequest extends Model
         }
         $this->save();
 
-        foreach ($notifications as $notification) {
-            foreach ($notification['users_ids'] as $userId) {
-                OneSignal::sendNotificationToExternalUser(
-                    headings: $notification['headings'],
-                    message: $notification['message'],
-                    userId: Toolbox::getOneSignalUserId($userId),
-                    data: $notification['data']
-                );
+        if (env('APP_ENV') !== 'local'){
+            foreach ($notifications as $notification) {
+                foreach ($notification['users_ids'] as $userId) {
+                    OneSignal::sendNotificationToExternalUser(
+                        headings: $notification['headings'],
+                        message: $notification['message'],
+                        userId: Toolbox::getOneSignalUserId($userId),
+                        data: $notification['data']
+                    );
+                }
             }
         }
+
     }
 
     public function warehouse()

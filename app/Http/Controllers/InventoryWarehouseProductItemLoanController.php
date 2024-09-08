@@ -187,16 +187,19 @@ class InventoryWarehouseProductItemLoanController extends Controller
 
         $warehouseLoan->update($validated);
 
-        foreach ($notifications as $notification) {
-            foreach ($notification['users_ids'] as $userId) {
-                OneSignal::sendNotificationToExternalUser(
-                    headings: $notification['headings'],
-                    message: $notification['message'],
-                    userId: Toolbox::getOneSignalUserId($userId),
-                    data: $notification['data']
-                );
+        if (env('APP_ENV') !== 'local'){
+            foreach ($notifications as $notification) {
+                foreach ($notification['users_ids'] as $userId) {
+                    OneSignal::sendNotificationToExternalUser(
+                        headings: $notification['headings'],
+                        message: $notification['message'],
+                        userId: Toolbox::getOneSignalUserId($userId),
+                        data: $notification['data']
+                    );
+                }
             }
         }
+
 
 
         return response()->json(['message' => 'Préstamo de producto actualizado', 'loan' => $warehouseLoan], 200);
