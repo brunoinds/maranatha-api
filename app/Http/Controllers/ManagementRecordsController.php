@@ -13,6 +13,7 @@ use App\Support\Generators\Records\Invoices\RecordInvoicesByItems;
 use App\Support\Generators\Records\Inventory\RecordInventoryProductsKardex;
 use App\Support\Generators\Records\Inventory\RecordInventoryProductsBalance;
 use App\Support\Generators\Records\Inventory\RecordInventoryProductsStock;
+use App\Support\Generators\Records\Inventory\RecordInventoryProductsLoans;
 use DateTime;
 use Carbon\Carbon;
 use App\Support\Cache\RecordsCache;
@@ -431,12 +432,12 @@ class ManagementRecordsController extends Controller
 
         $validatedData = array_merge($defaults, $validatedData);
 
-        /*if (RecordsCache::getRecord('inventoryProductsKardex', $validatedData)){
+        if (RecordsCache::getRecord('inventoryProductsKardex', $validatedData)){
             return response()->json([
                 ...RecordsCache::getRecord('inventoryProductsKardex', $validatedData),
                 'is_cached' => true
             ]);
-        }*/
+        }
 
         $record = new RecordInventoryProductsKardex([
             'startDate' => ($validatedData['start_date']) ? new DateTime($validatedData['start_date']) : null,
@@ -474,12 +475,12 @@ class ManagementRecordsController extends Controller
 
         $validatedData = array_merge($defaults, $validatedData);
 
-        /*if (RecordsCache::getRecord('inventoryProductsBalance', $validatedData)){
+        if (RecordsCache::getRecord('inventoryProductsBalance', $validatedData)){
             return response()->json([
                 ...RecordsCache::getRecord('inventoryProductsBalance', $validatedData),
                 'is_cached' => true
             ]);
-        }*/
+        }
 
         $record = new RecordInventoryProductsBalance([
             'moneyType' => $validatedData['money_type'],
@@ -517,12 +518,12 @@ class ManagementRecordsController extends Controller
 
         $validatedData = array_merge($defaults, $validatedData);
 
-        /*if (RecordsCache::getRecord('inventoryProductsStock', $validatedData)){
+        if (RecordsCache::getRecord('inventoryProductsStock', $validatedData)){
             return response()->json([
                 ...RecordsCache::getRecord('inventoryProductsStock', $validatedData),
                 'is_cached' => true
             ]);
-        }*/
+        }
 
         $record = new RecordInventoryProductsStock([
             'warehouseId' => $validatedData['warehouse_id'],
@@ -535,6 +536,44 @@ class ManagementRecordsController extends Controller
         $document = $record->generate();
 
         RecordsCache::storeRecord('inventoryProductsStock', $validatedData, $document);
+
+        return response()->json([
+            ...$document,
+            'is_cached' => false
+        ]);
+    }
+    public function inventoryProductsLoans()
+    {
+        $validatedData = request()->validate([
+            'warehouse_id' => 'nullable|string',
+            'product_id' => 'nullable|string',
+        ]);
+
+        $defaults = [
+            'warehouse_id' => null,
+            'product_id' => null,
+        ];
+
+        $validatedData = array_merge($defaults, $validatedData);
+
+        /*if (RecordsCache::getRecord('inventoryProductsLoans', $validatedData)){
+            return response()->json([
+                ...RecordsCache::getRecord('inventoryProductsLoans', $validatedData),
+                'is_cached' => true
+            ]);
+        }*/
+
+        $record = new RecordInventoryProductsLoans([
+            'warehouseId' => $validatedData['warehouse_id'],
+            'productId' => $validatedData['product_id'],
+            'brand' => $validatedData['brand'],
+            'category' => $validatedData['category'],
+            'status' => $validatedData['status'],
+        ]);
+
+        $document = $record->generate();
+
+        RecordsCache::storeRecord('inventoryProductsLoans', $validatedData, $document);
 
         return response()->json([
             ...$document,

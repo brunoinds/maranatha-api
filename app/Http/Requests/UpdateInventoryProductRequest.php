@@ -34,7 +34,8 @@ class UpdateInventoryProductRequest extends FormRequest
             'unit' => ['string', Rule::in(InventoryProductUnit::toArray())],
             'code' => ['string','nullable', 'max:500'],
             'status' => ['string', Rule::in(InventoryProductStatus::toArray())],
-            'image' => ['nullable', 'url:http,https']
+            'image' => ['nullable', 'url:http,https'],
+            'is_loanable' => ['boolean'],
         ];
     }
 }

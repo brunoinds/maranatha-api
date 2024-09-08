@@ -25,7 +25,8 @@ class InventoryProduct extends Model
         'unit',
         'code',
         'status',
-        'image'
+        'image',
+        'is_loanable'
     ];
 
     protected $casts = [

@@ -241,6 +241,8 @@ Route::middleware(['auth:sanctum'])->group(function () {
             Route::get('inventory/by-products-kardex', ManagementRecordsController::class . '@inventoryProductsKardex');
             Route::get('inventory/by-products-balance', ManagementRecordsController::class . '@inventoryProductsBalance');
             Route::get('inventory/by-products-stock', ManagementRecordsController::class . '@inventoryProductsStock');
+            Route::get('inventory/by-products-loans', ManagementRecordsController::class . '@inventoryProductsLoans');
+
         });
         Route::group(['prefix' => 'balances'], function () {
             Route::get('users', ManagementBalancesController::class . '@usersBalances');
