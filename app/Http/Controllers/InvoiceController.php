@@ -171,6 +171,7 @@ class InvoiceController extends Controller
                         ]
                     ], 500);
                 }
+
             } catch(\Exception $e){
                 return response()->json([
                     'error' => [

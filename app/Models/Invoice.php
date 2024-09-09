@@ -185,6 +185,9 @@ class Invoice extends Model
 
         $wasSuccessfull = Storage::disk('public')->put($path, $imageEncoded);
 
+        $this->pdf = null;
+        $this->pdf_size = null;
+
         $this->image = $imageId;
         $this->save();
 
@@ -200,6 +203,9 @@ class Invoice extends Model
         $path = 'invoices/' . $pdfId;
 
         $wasSuccessfull = Storage::disk('public')->put($path, $pdfEncoded);
+
+        $this->image = null;
+        $this->image_size = null;
 
         $this->pdf = $pdfId;
         $this->save();
