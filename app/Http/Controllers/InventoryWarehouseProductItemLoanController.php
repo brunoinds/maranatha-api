@@ -112,29 +112,28 @@ class InventoryWarehouseProductItemLoanController extends Controller
 
 
         //Progressive status:
-        if ($warehouseLoan->status == InventoryWarehouseProductItemLoanStatus::SendingToLoan && $validated['status'] == InventoryWarehouseProductItemLoanStatus::OnLoan){
+        if ($warehouseLoan->status == InventoryWarehouseProductItemLoanStatus::SendingToLoan->value && $validated['status'] == InventoryWarehouseProductItemLoanStatus::OnLoan->value){
             unset($validated['status'], $validated['loaned_at'], $validated['received_at'], $validated['returned_at'], $validated['confirm_returned_at']);
             $warehouseLoan->doReceivedFromWarehouse();
-        }elseif ($warehouseLoan->status == InventoryWarehouseProductItemLoanStatus::OnLoan && $validated['status'] == InventoryWarehouseProductItemLoanStatus::ReturningToWarehouse){
+        }elseif ($warehouseLoan->status == InventoryWarehouseProductItemLoanStatus::OnLoan->value && $validated['status'] == InventoryWarehouseProductItemLoanStatus::ReturningToWarehouse->value){
             unset($validated['status'], $validated['loaned_at'], $validated['received_at'], $validated['returned_at'], $validated['confirm_returned_at']);
             $warehouseLoan->doReturnToWarehouse();
-
             $notifications[] = [
-                'headings' => '📦 Devolución de producto',
+                'headings' => '⏪ Devolución de producto',
                 'message' => $warehouseLoan->loanedTo->name . " ha devuelto un producto a tu almacén. Confirma la recepción del producto en la aplicación para finalizar el proceso.",
                 'users_ids' => $warehouseLoan->warehouse->owners,
                 'data' => [
                     'deepLink' => $notificationUrlOnUserReports
                 ]
             ];
-        }elseif ($warehouseLoan->status == InventoryWarehouseProductItemLoanStatus::ReturningToWarehouse && $validated['status'] == InventoryWarehouseProductItemLoanStatus::Returned){
+        }elseif ($warehouseLoan->status == InventoryWarehouseProductItemLoanStatus::ReturningToWarehouse->value && $validated['status'] == InventoryWarehouseProductItemLoanStatus::Returned->value){
             unset($validated['status'], $validated['loaned_at'], $validated['received_at'], $validated['returned_at'], $validated['confirm_returned_at']);
             $warehouseLoan->doConfirmReturnedToWarehouse();
 
             $notifications[] = [
                 'headings' => '✅ Devolución de producto confirmada',
                 'message' => "El producto ha sido devuelto y confirmado en el almacén.",
-                'users_ids' => $warehouseLoan->loanedTo->id,
+                'users_ids' => [$warehouseLoan->loanedTo->id],
                 'data' => [
                     'deepLink' => $notificationUrlOnUserReports
                 ]
@@ -142,13 +141,13 @@ class InventoryWarehouseProductItemLoanController extends Controller
         }
 
         //Regressive status:
-        elseif ($warehouseLoan->status == InventoryWarehouseProductItemLoanStatus::OnLoan && $validated['status'] == InventoryWarehouseProductItemLoanStatus::SendingToLoan){
+        elseif ($warehouseLoan->status == InventoryWarehouseProductItemLoanStatus::OnLoan->value && $validated['status'] == InventoryWarehouseProductItemLoanStatus::SendingToLoan->value){
             unset($validated['status'], $validated['loaned_at'], $validated['received_at'], $validated['returned_at'], $validated['confirm_returned_at']);
             $warehouseLoan->undoReceivedFromWarehouse();
-        }elseif ($warehouseLoan->status == InventoryWarehouseProductItemLoanStatus::ReturningToWarehouse && $validated['status'] == InventoryWarehouseProductItemLoanStatus::OnLoan){
+        }elseif ($warehouseLoan->status == InventoryWarehouseProductItemLoanStatus::ReturningToWarehouse->value && $validated['status'] == InventoryWarehouseProductItemLoanStatus::OnLoan->value){
             unset($validated['status'], $validated['loaned_at'], $validated['received_at'], $validated['returned_at'], $validated['confirm_returned_at']);
             $warehouseLoan->undoReturnToWarehouse();
-        }elseif ($warehouseLoan->status == InventoryWarehouseProductItemLoanStatus::Returned && $validated['status'] == InventoryWarehouseProductItemLoanStatus::OnLoan){
+        }elseif ($warehouseLoan->status == InventoryWarehouseProductItemLoanStatus::Returned->value && $validated['status'] == InventoryWarehouseProductItemLoanStatus::OnLoan->value){
             unset($validated['status'], $validated['loaned_at'], $validated['received_at'], $validated['returned_at'], $validated['confirm_returned_at']);
             $warehouseLoan->undoConfirmReturnedToWarehouse();
         }
@@ -199,8 +198,6 @@ class InventoryWarehouseProductItemLoanController extends Controller
                 }
             }
         }
-
-
 
         return response()->json(['message' => 'Préstamo de producto actualizado', 'loan' => $warehouseLoan], 200);
     }
