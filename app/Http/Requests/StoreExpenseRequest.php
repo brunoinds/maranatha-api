@@ -25,7 +25,7 @@ class StoreExpenseRequest extends FormRequest
             'name' => ['required', 'string', 'max:255'],
             'code' => ['required', 'string', 'max:255', 'unique:expenses'],
             'uses' => ['required', 'array'],
-            'uses.*' => ['string', 'in:Reports,Attendances']
+            'uses.*' => ['string', 'in:Reports,Attendances,Inventory']
         ];
     }
 }

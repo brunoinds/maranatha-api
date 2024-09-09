@@ -26,7 +26,7 @@ class UpdateExpenseRequest extends FormRequest
             'name' => ['required', 'string', 'max:255'],
             'code' => ['required', 'string', 'max:255'],
             'uses' => ['required', 'array'],
-            'uses.*' => ['string', 'in:Reports,Attendances']
+            'uses.*' => ['string', 'in:Reports,Attendances,Inventory']
         ];
     }
 }
