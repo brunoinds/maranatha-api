@@ -160,8 +160,8 @@ class InventoryWarehouseProductItemLoanController extends Controller
             $newMovements = array_slice($validated['movements'], count($warehouseLoan->movements));
             foreach ($newMovements as $newMovement){
                 $notifications[] = [
-                    'headings' => '📍 Movimiento de producto prestado',
-                    'message' => $warehouseLoan->loanedTo->name . " ha realizado un movimiento del producto " . $warehouseLoan->productItem->product->name . ".",
+                    'headings' => '↔️ Movimiento de producto prestado',
+                    'message' => $warehouseLoan->loanedTo->name . ' ha realizado un movimiento con "' . $warehouseLoan->productItem->product->name . '".',
                     'users_ids' => $warehouseLoan->warehouse->owners,
                     'data' => [
                         'deepLink' => $notificationUrlOnUserReports
@@ -175,8 +175,8 @@ class InventoryWarehouseProductItemLoanController extends Controller
             $newIntercurrences = array_slice($validated['intercurrences'], count($warehouseLoan->intercurrences));
             foreach ($newIntercurrences as $newIntercurrence){
                 $notifications[] = [
-                    'headings' => '‼️ Intercurrencia en producto prestado',
-                    'message' => $warehouseLoan->loanedTo->name . " ha registrado una intercurrencia con producto " . $warehouseLoan->productItem->product->name . " que ha sido prestado.",
+                    'headings' => '‼️ Nueva intercurrencia registrada',
+                    'message' => $warehouseLoan->loanedTo->name . ' ha registrado una intercurrencia con producto "' . $warehouseLoan->productItem->product->name . '".',
                     'users_ids' => $warehouseLoan->warehouse->owners,
                     'data' => [
                         'deepLink' => $notificationUrlOnUserReports
