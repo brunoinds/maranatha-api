@@ -120,7 +120,7 @@ class InventoryWarehouseProductItemLoanController extends Controller
             $warehouseLoan->doReturnToWarehouse();
             $notifications[] = [
                 'headings' => '⏪ Devolución de producto',
-                'message' => $warehouseLoan->loanedTo->name . " ha devuelto un producto a tu almacén. Confirma la recepción del producto en la aplicación para finalizar el proceso.",
+                'message' => $warehouseLoan->loanedTo->name . " ha devuelto un producto prestado a tu almacén. Confirma la recepción del producto en la aplicación para finalizar el proceso.",
                 'users_ids' => $warehouseLoan->warehouse->owners,
                 'data' => [
                     'deepLink' => $notificationUrlOnUserReports
@@ -132,7 +132,7 @@ class InventoryWarehouseProductItemLoanController extends Controller
 
             $notifications[] = [
                 'headings' => '✅ Devolución de producto confirmada',
-                'message' => "El producto ha sido devuelto y confirmado en el almacén.",
+                'message' => 'El producto "' . $warehouseLoan->productItem->product->name . '" ha sido devuelto y confirmado en el almacén.',
                 'users_ids' => [$warehouseLoan->loanedTo->id],
                 'data' => [
                     'deepLink' => $notificationUrlOnUserReports

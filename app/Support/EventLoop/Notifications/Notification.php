@@ -57,4 +57,5 @@ class Notification{
 
         $this->sendNotificationToUserId($this->userTarget->id);
     }
+
 }
