@@ -119,8 +119,8 @@ class InventoryWarehouseProductItemLoanController extends Controller
             unset($validated['status'], $validated['loaned_at'], $validated['received_at'], $validated['returned_at'], $validated['confirm_returned_at']);
             $warehouseLoan->doReturnToWarehouse();
             $notifications[] = [
-                'headings' => '⏪ Devolución de producto',
-                'message' => $warehouseLoan->loanedTo->name . " ha devuelto un producto prestado a tu almacén. Confirma la recepción del producto en la aplicación para finalizar el proceso.",
+                'headings' => '⏪ Devolución de préstamo',
+                'message' => $warehouseLoan->loanedTo->name . ' ha devuelto el producto "' . $warehouseLoan->productItem->product->name . '" a tu almacén. Confirma la recepción del producto en la aplicación para finalizar el proceso.',
                 'users_ids' => $warehouseLoan->warehouse->owners,
                 'data' => [
                     'deepLink' => $notificationUrlOnUserReports
