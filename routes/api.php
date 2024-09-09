@@ -26,6 +26,7 @@ use App\Http\Controllers\InventoryWarehouseIncomeController;
 use App\Http\Controllers\InventoryWarehouseOutcomeController;
 use App\Http\Controllers\InventoryWarehouseOutcomeRequestController;
 use App\Http\Controllers\InventoryWarehouseProductItemLoanController;
+use App\Http\Controllers\ApplicationAdapterController;
 
 
 /*
@@ -120,6 +121,7 @@ Route::group(['prefix' => 'cd'], function () {
     Route::get("check", function(){
         return response()->json(["message" => "API is working!"], 200);
     });
+    Route::get("backup", [ApplicationAdapterController::class, 'backup']);
 });
 
 

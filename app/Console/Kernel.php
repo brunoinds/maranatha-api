@@ -18,7 +18,16 @@ class Kernel extends ConsoleKernel
     protected function schedule(Schedule $schedule): void
     {
         $schedule->command('attachments:clear-unreachable')->dailyAt('01:45')->timezone('America/Lima');
-        $schedule->command('backup:run')->dailyAt('02:00')->timezone('America/Lima');
+
+
+
+        //$schedule->command('backup:run')->dailyAt('02:00')->timezone('America/Lima');
+        $schedule->call(function(){
+            $client = new \GuzzleHttp\Client();
+            $response = $client->request('GET', env('APP_API_URL') . '/cd/backup');
+            $response = json_decode($response->getBody()->getContents());
+        })->dailyAt('02:00')->timezone('America/Lima');
+
         $schedule->command('backup:clean')->dailyAt('02:15')->timezone('America/Lima');
         $schedule->command('backup:sync-remote')->dailyAt('02:30')->timezone('America/Lima');
         $schedule->command('backup:clear-remote-trash-bin')->dailyAt('02:45')->timezone('America/Lima');
