@@ -193,6 +193,14 @@ class InventoryWarehouseOutcomeRequestController extends Controller
                     return $user->name . ' envió una imagen 🌅: "' . $validated['text'] . '"';
                 }elseif (isset($validated['image'])){
                     return $user->name . ' envió una imagen 🌅.';
+                }elseif (isset($validated['document']) && $validated['text'] !== null){
+                    return $user->name . ' envió un documento 📄: "' . $validated['text'] . '"';
+                }elseif (isset($validated['image'])){
+                    return $user->name . ' envió un documento 📄.';
+                }elseif (isset($validated['react_to']) && $validated['text'] !== null){
+                    return $user->name . ' reaccionó a un mensaje: "' . $validated['text'] . '"';
+                }elseif (isset($validated['reply_to']) && $validated['text'] !== null){
+                    return $user->name . ' respondió a un mensaje: "' . $validated['text'] . '"';
                 }elseif ($validated['text'] !== null){
                     return $user->name . ' envió: "' . $validated['text'] . '"';
                 }
