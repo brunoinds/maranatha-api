@@ -13,7 +13,7 @@ use App\Support\Generators\Records\Invoices\RecordInvoicesByItems;
 use App\Support\Generators\Records\Inventory\RecordInventoryProductsKardex;
 use App\Support\Generators\Records\Inventory\RecordInventoryProductsBalance;
 use App\Support\Generators\Records\Inventory\RecordInventoryProductsStock;
-use App\Support\Generators\Records\Inventory\RecordInventoryProductsLoans;
+use App\Support\Generators\Records\Inventory\RecordInventoryProductsLoansKardex;
 use DateTime;
 use Carbon\Carbon;
 use App\Support\Cache\RecordsCache;
@@ -542,38 +542,41 @@ class ManagementRecordsController extends Controller
             'is_cached' => false
         ]);
     }
-    public function inventoryProductsLoans()
+    public function inventoryProductsLoansKardex()
     {
         $validatedData = request()->validate([
             'warehouse_id' => 'nullable|string',
             'product_id' => 'nullable|string',
+            'start_date' => 'nullable|date',
+            'end_date' => 'nullable|date',
         ]);
 
         $defaults = [
             'warehouse_id' => null,
             'product_id' => null,
+            'start_date' => null,
+            'end_date' => null,
         ];
 
         $validatedData = array_merge($defaults, $validatedData);
 
-        /*if (RecordsCache::getRecord('inventoryProductsLoans', $validatedData)){
+        /*if (RecordsCache::getRecord('inventoryProductsLoansKardex', $validatedData)){
             return response()->json([
-                ...RecordsCache::getRecord('inventoryProductsLoans', $validatedData),
+                ...RecordsCache::getRecord('inventoryProductsLoansKardex', $validatedData),
                 'is_cached' => true
             ]);
         }*/
 
-        $record = new RecordInventoryProductsLoans([
+        $record = new RecordInventoryProductsLoansKardex([
             'warehouseId' => $validatedData['warehouse_id'],
             'productId' => $validatedData['product_id'],
-            'brand' => $validatedData['brand'],
-            'category' => $validatedData['category'],
-            'status' => $validatedData['status'],
+            'startDate' => ($validatedData['start_date']) ? new DateTime($validatedData['start_date']) : null,
+            'endDate' => ($validatedData['end_date']) ? new DateTime($validatedData['end_date']) : null,
         ]);
 
         $document = $record->generate();
 
-        RecordsCache::storeRecord('inventoryProductsLoans', $validatedData, $document);
+        RecordsCache::storeRecord('inventoryProductsLoansKardex', $validatedData, $document);
 
         return response()->json([
             ...$document,

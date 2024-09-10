@@ -76,28 +76,23 @@ class RecordInventoryProductsStock
             }
 
             $allInStockProductsCount = $productsItemsQuery->where('status', InventoryProductItemStatus::InStock)->count();
-
+            $allLoanedProductsCount = $productsItemsQuery->where('status', InventoryProductItemStatus::Loaned)->count();
+            $allInRepairProductsCount = $productsItemsQuery->where('status', InventoryProductItemStatus::InRepair)->count();
+            $allWriteOffProductsCount = $productsItemsQuery->where('status', InventoryProductItemStatus::WriteOff)->count();
+            $allSoldProductsCount = $productsItemsQuery->where('status', InventoryProductItemStatus::Sold)->count();
 
             $productItemData = [
                 'id' => $product->id,
                 'name' => $product->name,
                 'category' => $product->category,
                 'brand' => $product->brand,
-                'quantity_total' => $allInStockProductsCount,
+                'quantity_total' => $productsItemsQuery->count(),
+                'quantity_in_stock' => $allInStockProductsCount,
+                'quantity_loaned' => $allLoanedProductsCount,
+                'quantity_in_repair' => $allInRepairProductsCount,
+                'quantity_write_off' => $allWriteOffProductsCount,
+                'quantity_sold' => $allSoldProductsCount,
             ];
-
-
-            InventoryWarehouse::all()->each(function($warehouse) use (&$productItemData){
-                $productItemData['warehouse_' . $warehouse->id . '_quantity'] = 0;
-            });
-
-            //Group products by warehouse:
-            $productsItemsQuery->get()->groupBy('inventory_warehouse_id')->each(function($warehouseItems) use (&$productItemData){
-                $warehouseItemsInStockCount = $warehouseItems->where('status', InventoryProductItemStatus::InStock)->count();
-
-                $productItemData['warehouse_' . $warehouseItems->first()->inventory_warehouse_id . '_quantity'] = $warehouseItemsInStockCount;
-            });
-
             return $productItemData;
         });
 
@@ -127,16 +122,30 @@ class RecordInventoryProductsStock
             [
                 'title' => 'Categoría',
                 'key' => 'category'
+            ],
+            [
+                'title' => 'En Stock',
+                'key' => 'quantity_in_stock',
+            ],
+            [
+                'title' => 'Prestado',
+                'key' => 'quantity_loaned'
+            ],
+            [
+                'title' => 'En Reparación',
+                'key' => 'quantity_in_repair'
+            ],
+            [
+                'title' => 'Dado de Baja',
+                'key' => 'quantity_write_off'
+            ],
+            [
+                'title' => 'Vendido',
+                'key' => 'quantity_sold'
             ]
         ];
 
 
-        InventoryWarehouse::all()->each(function($warehouse) use (&$headers){
-            $headers[] = [
-                'title' => $warehouse->name . ' (' . $warehouse->zone . ' - ' . $warehouse->country . ')',
-                'key' => 'warehouse_' . $warehouse->id . '_quantity'
-            ];
-        });
 
         $headers[] = [
             'title' => 'Total',

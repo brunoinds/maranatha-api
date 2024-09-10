@@ -20,4 +20,23 @@ enum InventoryProductItemStatus: string
 
         return $items;
     }
+
+
+    public static function getDescription(string $status):string
+    {
+        switch ($status){
+            case self::InStock->value:
+                return 'En stock';
+            case self::Sold->value:
+                return 'Vendido';
+            case self::Loaned->value:
+                return 'Prestado';
+            case self::InRepair->value:
+                return 'En reparación';
+            case self::WriteOff->value:
+                return 'Dado de baja';
+            default:
+                return '';
+        }
+    }
 }

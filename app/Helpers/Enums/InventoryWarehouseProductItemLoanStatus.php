@@ -19,4 +19,20 @@ enum InventoryWarehouseProductItemLoanStatus: string
 
         return $items;
     }
+
+    public static function getDescription(string $status):string
+    {
+        switch ($status){
+            case self::SendingToLoan->value:
+                return 'En camino';
+            case self::OnLoan->value:
+                return 'Prestado';
+            case self::ReturningToWarehouse->value:
+                return 'Devolviendo a almacén';
+            case self::Returned->value:
+                return 'Devuelto';
+            default:
+                return '';
+        }
+    }
 }
