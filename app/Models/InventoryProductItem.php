@@ -53,12 +53,12 @@ class InventoryProductItem extends Model
 
     public function income()
     {
-        return $this->belongsTo(InventoryWarehouse::class, 'inventory_warehouse_income_id');
+        return $this->belongsTo(InventoryWarehouseIncome::class, 'inventory_warehouse_income_id', 'id');
     }
 
     public function outcome()
     {
-        return $this->belongsTo(InventoryWarehouse::class, 'inventory_warehouse_outcome_id');
+        return $this->belongsTo(InventoryWarehouseOutcome::class, 'inventory_warehouse_outcome_id', 'id');
     }
 
     public function loans()

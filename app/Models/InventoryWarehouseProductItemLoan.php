@@ -104,8 +104,10 @@ class InventoryWarehouseProductItemLoan extends Model
 
     public function doConfirmReturnedToWarehouse()
     {
-        $this->productItem->status = InventoryProductItemStatus::InStock;
-        $this->productItem->save();
+        if ($this->productItem->status != InventoryProductItemStatus::InRepair && $this->productItem->status != InventoryProductItemStatus::WriteOff){
+            $this->productItem->status = InventoryProductItemStatus::InStock;
+            $this->productItem->save();
+        }
 
         $this->status = InventoryWarehouseProductItemLoanStatus::Returned;
         $this->confirm_returned_at = now();
@@ -124,8 +126,10 @@ class InventoryWarehouseProductItemLoan extends Model
 
     public function delete()
     {
-        $this->productItem->status = InventoryProductItemStatus::InStock;
-        $this->productItem->save();
+        if ($this->productItem->status != InventoryProductItemStatus::InRepair && $this->productItem->status != InventoryProductItemStatus::WriteOff){
+            $this->productItem->status = InventoryProductItemStatus::InStock;
+            $this->productItem->save();
+        }
         parent::delete();
     }
 }

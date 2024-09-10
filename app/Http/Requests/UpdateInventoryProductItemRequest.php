@@ -2,7 +2,10 @@
 
 namespace App\Http\Requests;
 
+use App\Helpers\Enums\InventoryProductItemStatus;
+use App\Models\InventoryProductItem;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class UpdateInventoryProductItemRequest extends FormRequest
 {
@@ -11,7 +14,7 @@ class UpdateInventoryProductItemRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -22,7 +25,8 @@ class UpdateInventoryProductItemRequest extends FormRequest
     public function rules(): array
     {
         return [
-            //
+            'status' => ['string', Rule::in(InventoryProductItemStatus::toArray())],
+            'batch' => ['nullable', 'string', 'max:255'],
         ];
     }
 }

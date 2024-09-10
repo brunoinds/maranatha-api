@@ -223,6 +223,7 @@ class RecordInventoryProductsKardex
             return [
                 'order' => $item['order'] ?? '',
                 'product' => $item['product']?->name ?? '',
+                'category' => $item['product']?->category ?? '',
                 'date' => ($item['date'] !== null) ? Carbon::parse($item['date'])->format('d/m/Y') : '',
                 'currency' => $item['currency'] ?? '',
                 'job' => $item['job']?->code ?? '',
@@ -275,6 +276,10 @@ class RecordInventoryProductsKardex
                 [
                     'title' => 'Producto',
                     'key' => 'product'
+                ],
+                [
+                    'title' => 'Categoría',
+                    'key' => 'category'
                 ],
                 [
                     'title' => 'Operación',

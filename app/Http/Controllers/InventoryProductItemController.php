@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Http\Requests\StoreInventoryProductItemRequest;
 use App\Http\Requests\UpdateInventoryProductItemRequest;
 use App\Models\InventoryProductItem;
+use App\Models\User;
+
 
 class InventoryProductItemController extends Controller
 {
@@ -29,14 +31,6 @@ class InventoryProductItemController extends Controller
     }
 
     /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
-    }
-
-    /**
      * Store a newly created resource in storage.
      */
     public function store(StoreInventoryProductItemRequest $request)
@@ -47,31 +41,48 @@ class InventoryProductItemController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(InventoryProductItem $inventoryProductItem)
+    public function show(InventoryProductItem $item)
     {
-        //
-    }
+        $item->product;
+        $item->warehouse;
+        $item->income;
+        $item->outcome;
+        $item->loans->each(function ($loan) {
+            $loan->loanedBy;
+            $loan->loanedTo;
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(InventoryProductItem $inventoryProductItem)
-    {
-        //
+
+            $loan->intercurrences = collect($loan->intercurrences)->map(function ($intercurrence){
+                $intercurrence['user'] = User::where('id', $intercurrence['user_id'])->first();
+                return $intercurrence;
+            });
+
+            $loan->movements = collect($loan->movements)->map(function ($movement){
+                $movement['user'] = User::where('id', $movement['user_id'])->first();
+                return $movement;
+            });
+
+        });
+
+        return response()->json($item);
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(UpdateInventoryProductItemRequest $request, InventoryProductItem $inventoryProductItem)
+    public function update(UpdateInventoryProductItemRequest $request, InventoryProductItem $item)
     {
-        //
+        $validated = $request->validated();
+
+        $item->update($validated);
+
+        return response()->json($item);
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(InventoryProductItem $inventoryProductItem)
+    public function destroy(InventoryProductItem $item)
     {
         //
     }

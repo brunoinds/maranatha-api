@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Helpers\Enums\InventoryWarehouseProductItemLoanStatus;
 use App\Http\Requests\StoreInventoryWarehouseProductItemLoanBulkRequest;
 use App\Http\Requests\UpdateInventoryWarehouseProductItemLoanRequest;
+use App\Models\User;
 use App\Models\InventoryWarehouse;
 use App\Models\InventoryWarehouseProductItemLoan;
 use Illuminate\Http\Request;
@@ -75,6 +76,16 @@ class InventoryWarehouseProductItemLoanController extends Controller
         $warehouseLoan->productItem->product;
         $warehouseLoan->loanedBy;
         $warehouseLoan->loanedTo;
+
+        $warehouseLoan->intercurrences = collect($warehouseLoan->intercurrences)->map(function ($intercurrence){
+            $intercurrence['user'] = User::where('id', $intercurrence['user_id'])->first();
+            return $intercurrence;
+        });
+
+        $warehouseLoan->movements = collect($warehouseLoan->movements)->map(function ($movement){
+            $movement['user'] = User::where('id', $movement['user_id'])->first();
+            return $movement;
+        });
 
         return response()->json($warehouseLoan->toArray());
     }

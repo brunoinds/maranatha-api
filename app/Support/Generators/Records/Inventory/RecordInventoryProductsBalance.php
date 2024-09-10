@@ -58,6 +58,7 @@ class RecordInventoryProductsBalance
             $item = [
                 'id' => $productItems->first()->product->id,
                 'name' => $productItems->first()->product->name,
+                'category' => $productItems->first()->product->category,
                 'currency' => $productItems->first()->buy_currency,
                 'warehouse' => $productItems->first()->warehouse->name,
                 'income_quantity' => $productItems->count(),
@@ -80,6 +81,7 @@ class RecordInventoryProductsBalance
             return [
                 'product_id' => $item['id'],
                 'product_name' => $item['name'],
+                'category' => $item['category'],
                 'currency' => $item['currency'],
                 'warehouse' => $item['warehouse'],
                 'income_quantity' => $item['income_quantity'],
@@ -101,6 +103,10 @@ class RecordInventoryProductsBalance
                 [
                     'title' => 'Producto',
                     'key' => 'product_name'
+                ],
+                [
+                    'title' => 'Categoria',
+                    'key' => 'category'
                 ],
                 [
                     'title' => 'Almacen',
