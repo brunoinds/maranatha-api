@@ -8,6 +8,8 @@ enum InventoryProductItemStatus: string
     case InStock = 'InStock';
     case Sold = 'Sold';
     case Loaned = 'Loaned';
+    case InRepair = 'InRepair';
+    case WriteOff = 'WriteOff';
 
     public static function toArray():array
     {
