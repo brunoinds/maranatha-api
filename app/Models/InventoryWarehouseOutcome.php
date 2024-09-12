@@ -10,6 +10,11 @@ use App\Models\InventoryProductItem;
 use App\Models\InventoryWarehouse;
 use App\Models\Job;
 use App\Models\Expense;
+use App\Models\User;
+use App\Models\InventoryWarehouseIncome;
+use App\Models\InventoryWarehouseOutcomeRequest;
+
+use App\Support\Toolbox\TString;
 
 class InventoryWarehouseOutcome extends Model
 {
@@ -90,6 +95,53 @@ class InventoryWarehouseOutcome extends Model
             $item->sell_currency = $item->buy_currency;
             $item->save();
         });
+    }
+
+
+    public function transferItemsAsIncomesToWarehouse(InventoryWarehouse $warehouse)
+    {
+        $incomes = $this->items->groupBy(function($item){
+            return $item->inventory_warehouse_income_id;
+        });
+
+        foreach ($incomes as $incomeId => $items){
+            $income = InventoryWarehouseIncome::find($incomeId);
+
+            $newIncome = InventoryWarehouseIncome::create([
+                'description' => $income->description,
+                'date' => $income->date,
+                'ticket_type' => $income->ticket_type,
+                'ticket_number' => $income->ticket_number,
+                'commerce_number' => $income->commerce_number,
+                'qrcode_data' => $income->qrcode_data,
+                'image' => $income->image,
+                'currency' => $income->currency,
+                'job_code' => $income->job_code,
+                'expense_code' => $income->expense_code,
+                'inventory_warehouse_id' => $warehouse->id,
+                'origin_inventory_warehouse_income_id' => $income->id,
+            ]);
+
+            $lastOrder = InventoryProductItem::orderBy('order', 'desc')->first();
+            $lastOrder = $lastOrder ? $lastOrder->order : -1;
+
+            $i = 0;
+            $items->each(function($item) use ($income, $newIncome, $lastOrder, &$i, $warehouse){
+                $newItem = InventoryProductItem::create([
+                    'batch' => TString::generateRandomBatch(),
+                    'order' => $lastOrder + $i + 1,
+                    'buy_amount' => $item->buy_amount,
+                    'buy_currency' =>  $item->buy_currency,
+                    'sell_amount' => $item->sell_amount,
+                    'sell_currency' => $item->sell_currency,
+                    'inventory_product_id' => $item->inventory_product_id,
+                    'inventory_warehouse_id' => $warehouse->id,
+                    'inventory_warehouse_income_id' => $newIncome->id,
+                    'origin_inventory_product_item_id' => $item->id,
+                ]);
+                $i++;
+            });
+        }
     }
 
     public function delete()

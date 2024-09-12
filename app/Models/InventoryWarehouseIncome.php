@@ -27,7 +27,8 @@ class InventoryWarehouseIncome extends Model
         'currency',
         'job_code',
         'expense_code',
-        'inventory_warehouse_id'
+        'inventory_warehouse_id',
+        'origin_inventory_warehouse_income_id'
     ];
 
     protected $casts = [
@@ -35,6 +36,10 @@ class InventoryWarehouseIncome extends Model
     ];
 
 
+    public function origin()
+    {
+        return $this->belongsTo(InventoryWarehouseIncome::class, 'origin_inventory_warehouse_income_id', 'id');
+    }
 
     public function warehouse()
     {

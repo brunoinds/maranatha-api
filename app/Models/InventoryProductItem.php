@@ -28,13 +28,19 @@ class InventoryProductItem extends Model
         'inventory_product_id',
         'inventory_warehouse_id',
         'inventory_warehouse_income_id',
-        'inventory_warehouse_outcome_id'
+        'inventory_warehouse_outcome_id',
+        'origin_inventory_product_item_id'
     ];
 
     protected $casts = [
         'currency' => MoneyType::class,
         'status' => InventoryProductItemStatus::class
     ];
+
+    public function origin()
+    {
+        return $this->belongsTo(InventoryProductItem::class, 'origin_inventory_product_item_id', 'id');
+    }
 
     public function product()
     {

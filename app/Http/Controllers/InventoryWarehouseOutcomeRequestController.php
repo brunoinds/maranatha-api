@@ -13,6 +13,7 @@ use Intervention\Image\Facades\Image;
 use OneSignal;
 use App\Support\Creators\Inventory\WarehouseOutcomeRequest\PDFCreator;
 use Spatie\TemporaryDirectory\TemporaryDirectory;
+use App\Models\InventoryWarehouse;
 
 
 
@@ -347,5 +348,27 @@ class InventoryWarehouseOutcomeRequestController extends Controller
                 'Content-Encoding' => 'base64',
                 'Content-Length' => filesize($tempPath),
             ])->deleteFileAfterSend(true);
+    }
+
+    public function importProductsAsIncome(InventoryWarehouseOutcomeRequest $warehouseOutcomeRequest)
+    {
+        $validated = request()->validate([
+            'warehouse_id' => 'required|integer|exists:inventory_warehouses,id',
+        ]);
+
+        if (!$warehouseOutcomeRequest->outcome){
+            return response()->json([
+                'error' => [
+                    'message' => 'The outcome is not yet created',
+                ]
+            ], 400);
+        }
+
+        $warehouse = InventoryWarehouse::find($validated['warehouse_id']);
+
+
+        $warehouseOutcomeRequest->outcome->transferItemsAsIncomesToWarehouse($warehouse);
+
+        return response()->json(['message' => 'Products imported as income successfully']);
     }
 }

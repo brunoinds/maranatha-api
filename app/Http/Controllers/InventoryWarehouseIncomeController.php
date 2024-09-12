@@ -7,6 +7,7 @@ use App\Http\Requests\UpdateInventoryWarehouseIncomeRequest;
 use App\Models\InventoryWarehouseIncome;
 use App\Models\InventoryProductItem;
 use App\Helpers\Toolbox;
+use App\Support\Toolbox\TString;
 use Illuminate\Support\Facades\Storage;
 
 
@@ -74,6 +75,7 @@ class InventoryWarehouseIncomeController extends Controller
             $i = 0;
             while ($i < $product['quantity']) {
                 InventoryProductItem::create([
+                    'batch' => TString::generateRandomBatch(),
                     'order' => $lastOrder + $i + 1,
                     'buy_amount' => (float) $product['amount'],
                     'sell_amount' => (float)  $product['amount'],

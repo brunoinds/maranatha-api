@@ -292,6 +292,8 @@ Route::middleware(['auth:sanctum'])->group(function () {
 
         Route::get('inventory/warehouse-outcome-requests/{warehouseOutcomeRequest}/chat', InventoryWarehouseOutcomeRequestController::class . '@listChatMessages');
         Route::post('inventory/warehouse-outcome-requests/{warehouseOutcomeRequest}/chat', InventoryWarehouseOutcomeRequestController::class . '@storeChatMessage');
+        Route::post('inventory/warehouse-outcome-requests/{warehouseOutcomeRequest}/import-products-as-income', InventoryWarehouseOutcomeRequestController::class . '@importProductsAsIncome');
+
 
         Route::get('inventory/chat-attachments/{chatAttachmentId}', InventoryWarehouseOutcomeRequestController::class . '@showChatAttachment');
 
@@ -300,6 +302,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
 
         Route::get('inventory/warehouse-incomes/{inventoryWarehouseIncome}/products', InventoryWarehouseIncomeController::class . '@listProductsItems');
         Route::get('inventory/warehouse-incomes/{inventoryWarehouseIncome}/image', InventoryWarehouseIncomeController::class . '@showImage');
+
     });
 });
 
