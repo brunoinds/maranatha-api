@@ -22,8 +22,8 @@ return new class extends Migration
             $table->string('icon')->nullable(true)->default(null);
             $table->string('color')->nullable(true)->default(null);
             $table->string('status')->default('WaitingToStart');
-            $table->timestamp('scheduled_start_date')->nullable(true)->default(null);
-            $table->timestamp('scheduled_end_date')->nullable(true)->default(null);
+            $table->timestamp('scheduled_start_date');
+            $table->timestamp('scheduled_end_date');
             $table->timestamp('started_at')->nullable(true)->default(null);
             $table->timestamp('ended_at')->nullable(true)->default(null);
 
