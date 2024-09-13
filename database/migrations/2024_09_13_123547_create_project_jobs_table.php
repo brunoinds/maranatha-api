@@ -19,7 +19,7 @@ return new class extends Migration
             $table->integer('project_structure_id');
 
             $table->string('width')->nullable(true)->default(null);
-            $table->string('height')->nullable(true)->default(null);
+            $table->string('length')->nullable(true)->default(null);
             $table->string('area')->nullable(true)->default(null);
             $table->json('admins_ids')->default('[]');
             $table->integer('supervisor_id');

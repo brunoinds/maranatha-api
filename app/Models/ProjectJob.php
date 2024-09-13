@@ -17,7 +17,7 @@ class ProjectJob extends Model
         'job_code',
         'project_structure_id',
         'width',
-        'height',
+        'length',
         'area',
         'admins_ids',
         'supervisor_id',
