@@ -18,7 +18,9 @@ class Job extends Model
         'name',
         'code',
         'zone',
-        'state'
+        'state',
+        'country',
+        'location',
     ];
 
     protected $casts = [
