@@ -30,6 +30,7 @@ return new class extends Migration
             $table->timestamp('ended_at')->nullable(true)->default(null);
             $table->string('status')->default('WaitingApproval');
             $table->json('final_report')->nullable(true)->default(null);
+            $table->json('marketing_report')->nullable(true)->default(null);
             $table->json('messages')->default('[]');
         });
     }

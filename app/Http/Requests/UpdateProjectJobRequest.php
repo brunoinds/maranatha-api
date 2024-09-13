@@ -38,8 +38,8 @@ class UpdateProjectJobRequest extends FormRequest
             'started_at' => ['nullable', 'date'],
             'ended_at' => ['nullable', 'date'],
             'status' => ['string', Rule::in(ProjectJobStatus::toArray())],
-            'final_report' => ['array'],
-            'messages' => ['array']
+            'final_report' => ['nullable', 'array'],
+            'marketing_report' => ['nullable', 'array']
         ];
     }
 }

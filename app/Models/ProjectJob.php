@@ -28,6 +28,7 @@ class ProjectJob extends Model
         'ended_at',
         'status',
         'final_report',
+        'marketing_report',
         'messages',
     ];
 
