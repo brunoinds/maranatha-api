@@ -2,7 +2,9 @@
 
 namespace App\Http\Requests;
 
+use App\Helpers\Enums\ProjectStructureBuildingType;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class StoreProjectStructureRequest extends FormRequest
 {
@@ -24,7 +26,7 @@ class StoreProjectStructureRequest extends FormRequest
         return [
             'name' => ['required', 'string', 'max:255'],
             'structure_type' => ['required', 'string', 'max:255'],
-            'building_type' => ['required', 'string', 'max:255'],
+            'building_type' => ['required', 'string', Rule::in(ProjectStructureBuildingType::toArray())],
             'axes_count' => ['nullable', 'integer'],
             'beams_count' => ['nullable', 'integer'],
             'columns_count' => ['nullable', 'integer'],

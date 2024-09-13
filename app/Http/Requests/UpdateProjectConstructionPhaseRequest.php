@@ -3,6 +3,8 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
+use App\Helpers\Enums\ProjectConstructionPhaseStatus;
 
 class UpdateProjectConstructionPhaseRequest extends FormRequest
 {
@@ -27,7 +29,7 @@ class UpdateProjectConstructionPhaseRequest extends FormRequest
             'description' => ['nullable', 'string', 'max:255'],
             'icon' => ['nullable', 'string', 'max:255'],
             'color' => ['nullable', 'string', 'max:255'],
-            'status' => ['string', 'max:255'],
+            'status' => ['string', Rule::in(ProjectConstructionPhaseStatus::toArray())],
             'scheduled_start_date' => ['date'],
             'scheduled_end_date' => ['date'],
             'started_at' => ['nullable', 'date'],

@@ -3,6 +3,9 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
+use App\Helpers\Enums\ProjectJobEventType;
+use App\Helpers\Enums\ProjectJobStatus;
 
 class StoreProjectJobRequest extends FormRequest
 {
@@ -30,12 +33,12 @@ class StoreProjectJobRequest extends FormRequest
             'admins_ids' => ['array'],
             'admins_ids.*' => ['integer', 'exists:users,id'],
             'supervisor_id' => ['required', 'integer', 'exists:users,id'],
-            'event_type' => ['string', 'max:255'],
+            'event_type' => ['string', Rule::in(ProjectJobEventType::toArray())],
             'scheduled_start_date' => ['date'],
             'scheduled_end_date' => ['date'],
             'started_at' => ['nullable', 'date'],
             'ended_at' => ['nullable', 'date'],
-            'status' => ['string', 'max:255'],
+            'status' => ['string', Rule::in(ProjectJobStatus::toArray())],
             'final_report' => ['array'],
             'messages' => ['array']
         ];
