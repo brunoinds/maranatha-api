@@ -11,7 +11,7 @@ class UpdateProjectJobRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -22,7 +22,22 @@ class UpdateProjectJobRequest extends FormRequest
     public function rules(): array
     {
         return [
-            //
+            'job_code' => ['required', 'string', 'max:255'],
+            'project_structure_id' => ['required', 'integer', 'exists:project_structures,id'],
+            'width' => ['nullable', 'string', 'max:255'],
+            'height' => ['nullable', 'string', 'max:255'],
+            'area' => ['nullable', 'string', 'max:255'],
+            'admins_ids' => ['array'],
+            'admins_ids.*' => ['integer', 'exists:users,id'],
+            'supervisor_id' => ['required', 'integer', 'exists:users,id'],
+            'event_type' => ['string', 'max:255'],
+            'scheduled_start_date' => ['date'],
+            'scheduled_end_date' => ['date'],
+            'started_at' => ['nullable', 'date'],
+            'ended_at' => ['nullable', 'date'],
+            'status' => ['string', 'max:255'],
+            'final_report' => ['array'],
+            'messages' => ['array']
         ];
     }
 }

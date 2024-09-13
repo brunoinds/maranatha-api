@@ -23,9 +23,9 @@ return new class extends Migration
             $table->string('area')->nullable(true)->default(null);
             $table->json('admins_ids')->default('[]');
             $table->integer('supervisor_id');
-            $table->string('event_type')->nullable(true)->default(null);
-            $table->timestamp('scheduled_start_date')->nullable(true)->default(null);
-            $table->timestamp('scheduled_end_date')->nullable(true)->default(null);
+            $table->string('event_type');
+            $table->timestamp('scheduled_start_date');
+            $table->timestamp('scheduled_end_date');
             $table->timestamp('started_at')->nullable(true)->default(null);
             $table->timestamp('ended_at')->nullable(true)->default(null);
             $table->string('status')->default('WaitingApproval');
