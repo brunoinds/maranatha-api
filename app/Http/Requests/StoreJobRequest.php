@@ -28,6 +28,10 @@ class StoreJobRequest extends FormRequest
             'zone' => ['required', 'string', 'max:255'],
             'details' => ['string', 'max:1000'],
             'state' => ['required', 'string', Rule::in(['Active', 'Inactive'])],
+            'country' => ['nullable', 'string', 'max:255'],
+            'location' => ['nullable', 'array'],
+            'location.latitude' => ['required_with:location', 'numeric'],
+            'location.longitude' => ['required_with:location', 'numeric'],
         ];
     }
 }
