@@ -27,6 +27,11 @@ use App\Http\Controllers\InventoryWarehouseOutcomeController;
 use App\Http\Controllers\InventoryWarehouseOutcomeRequestController;
 use App\Http\Controllers\InventoryWarehouseProductItemLoanController;
 use App\Http\Controllers\ApplicationAdapterController;
+use App\Http\Controllers\ProjectJobController;
+use App\Http\Controllers\ProjectStructureController;
+use App\Http\Controllers\ProjectConstructionPhaseController;
+use App\Http\Controllers\ProjectConstructionTaskController;
+
 
 
 /*
@@ -303,6 +308,14 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::get('inventory/warehouse-incomes/{inventoryWarehouseIncome}/products', InventoryWarehouseIncomeController::class . '@listProductsItems');
         Route::get('inventory/warehouse-incomes/{inventoryWarehouseIncome}/image', InventoryWarehouseIncomeController::class . '@showImage');
 
+    });
+
+    //Projects group:
+    Route::group(['prefix' => 'projects'], function(){
+        Route::apiResource('jobs', ProjectJobController::class);
+        Route::apiResource('structures', ProjectStructureController::class);
+        Route::apiResource('construction-phases', ProjectConstructionPhaseController::class);
+        Route::apiResource('construction-tasks', ProjectConstructionTaskController::class);
     });
 });
 

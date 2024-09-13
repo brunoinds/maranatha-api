@@ -35,15 +35,7 @@ class ProjectConstructionTaskController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(ProjectConstructionTask $projectConstructionTask)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(ProjectConstructionTask $projectConstructionTask)
+    public function show(ProjectConstructionTask $constructionTask)
     {
         //
     }
@@ -51,7 +43,7 @@ class ProjectConstructionTaskController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(UpdateProjectConstructionTaskRequest $request, ProjectConstructionTask $projectConstructionTask)
+    public function update(UpdateProjectConstructionTaskRequest $request, ProjectConstructionTask $constructionTask)
     {
         //
     }
@@ -59,7 +51,7 @@ class ProjectConstructionTaskController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(ProjectConstructionTask $projectConstructionTask)
+    public function destroy(ProjectConstructionTask $constructionTask)
     {
         //
     }

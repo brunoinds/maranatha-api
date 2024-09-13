@@ -16,13 +16,6 @@ class ProjectJobController extends Controller
         //
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
-    }
 
     /**
      * Store a newly created resource in storage.
@@ -35,15 +28,7 @@ class ProjectJobController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(ProjectJob $projectJob)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(ProjectJob $projectJob)
+    public function show(ProjectJob $job)
     {
         //
     }
@@ -51,7 +36,7 @@ class ProjectJobController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(UpdateProjectJobRequest $request, ProjectJob $projectJob)
+    public function update(UpdateProjectJobRequest $request, ProjectJob $job)
     {
         //
     }
@@ -59,7 +44,7 @@ class ProjectJobController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(ProjectJob $projectJob)
+    public function destroy(ProjectJob $job)
     {
         //
     }

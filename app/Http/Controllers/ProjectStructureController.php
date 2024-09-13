@@ -15,15 +15,6 @@ class ProjectStructureController extends Controller
     {
         //
     }
-
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
-    }
-
     /**
      * Store a newly created resource in storage.
      */
@@ -35,15 +26,7 @@ class ProjectStructureController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(ProjectStructure $projectStructure)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(ProjectStructure $projectStructure)
+    public function show(ProjectStructure $structure)
     {
         //
     }
@@ -51,7 +34,7 @@ class ProjectStructureController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(UpdateProjectStructureRequest $request, ProjectStructure $projectStructure)
+    public function update(UpdateProjectStructureRequest $request, ProjectStructure $structure)
     {
         //
     }
@@ -59,7 +42,7 @@ class ProjectStructureController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(ProjectStructure $projectStructure)
+    public function destroy(ProjectStructure $structure)
     {
         //
     }

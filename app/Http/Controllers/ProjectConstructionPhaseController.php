@@ -16,13 +16,6 @@ class ProjectConstructionPhaseController extends Controller
         //
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
-    }
 
     /**
      * Store a newly created resource in storage.
@@ -35,15 +28,7 @@ class ProjectConstructionPhaseController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(ProjectConstructionPhase $projectConstructionPhase)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(ProjectConstructionPhase $projectConstructionPhase)
+    public function show(ProjectConstructionPhase $constructionPhase)
     {
         //
     }
@@ -51,7 +36,7 @@ class ProjectConstructionPhaseController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(UpdateProjectConstructionPhaseRequest $request, ProjectConstructionPhase $projectConstructionPhase)
+    public function update(UpdateProjectConstructionPhaseRequest $request, ProjectConstructionPhase $constructionPhase)
     {
         //
     }
@@ -59,7 +44,7 @@ class ProjectConstructionPhaseController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(ProjectConstructionPhase $projectConstructionPhase)
+    public function destroy(ProjectConstructionPhase $constructionPhase)
     {
         //
     }
