@@ -37,6 +37,11 @@ class ProjectJob extends Model
         'messages' => 'array',
     ];
 
+    public function job()
+    {
+        return $this->belongsTo(Job::class, 'job_code', 'code');
+    }
+
     public function projectStructure()
     {
         return $this->belongsTo(ProjectStructure::class);
