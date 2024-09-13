@@ -1,0 +1,44 @@
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    /**
+     * Run the migrations.
+     */
+    public function up(): void
+    {
+        Schema::create('project_jobs', function (Blueprint $table) {
+            $table->id();
+            $table->timestamps();
+
+            $table->string('job_code');
+            $table->integer('project_structure_id');
+
+            $table->string('width')->nullable(true)->default(null);
+            $table->string('height')->nullable(true)->default(null);
+            $table->string('area')->nullable(true)->default(null);
+            $table->json('admins_ids')->default('[]');
+            $table->integer('supervisor_id');
+            $table->string('event_type')->nullable(true)->default(null);
+            $table->timestamp('scheduled_start_date')->nullable(true)->default(null);
+            $table->timestamp('scheduled_end_date')->nullable(true)->default(null);
+            $table->timestamp('started_at')->nullable(true)->default(null);
+            $table->timestamp('ended_at')->nullable(true)->default(null);
+            $table->string('status')->default('WaitingApproval');
+            $table->json('final_report')->nullable(true)->default(null);
+            $table->json('messages')->default('[]');
+        });
+    }
+
+    /**
+     * Reverse the migrations.
+     */
+    public function down(): void
+    {
+        Schema::dropIfExists('project_jobs');
+    }
+};
