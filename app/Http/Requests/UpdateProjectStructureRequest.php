@@ -37,7 +37,6 @@ class UpdateProjectStructureRequest extends FormRequest
             'default_phases.construction.*.name' => ['required', 'string', 'max:255'],
             'default_phases.construction.*.description' => ['required', 'string', 'max:255'],
             'default_phases.construction.*.expense_code' => ['required', 'string', 'max:255'],
-            'default_phases.construction.*.icon' => ['required', 'string', 'max:255'],
             'default_phases.construction.*.color' => ['required', 'string', 'max:255'],
             'default_phases.construction.*.average_days' => ['required', 'integer'],
             'default_phases.construction.*.tasks' => ['required', 'array'],

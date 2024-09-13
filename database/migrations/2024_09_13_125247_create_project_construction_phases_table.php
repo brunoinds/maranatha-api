@@ -19,8 +19,7 @@ return new class extends Migration
 
             $table->string('name');
             $table->string('description')->nullable(true)->default(null);
-            $table->string('icon')->nullable(true)->default(null);
-            $table->string('color')->nullable(true)->default(null);
+            $table->string('color');
             $table->string('status')->default('WaitingToStart');
             $table->timestamp('scheduled_start_date');
             $table->timestamp('scheduled_end_date');

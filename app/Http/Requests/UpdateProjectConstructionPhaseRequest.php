@@ -27,7 +27,6 @@ class UpdateProjectConstructionPhaseRequest extends FormRequest
             'expense_code' => ['required', 'string', 'max:255'],
             'name' => ['required', 'string', 'max:255'],
             'description' => ['nullable', 'string', 'max:255'],
-            'icon' => ['nullable', 'string', 'max:255'],
             'color' => ['nullable', 'string', 'max:255'],
             'status' => ['string', Rule::in(ProjectConstructionPhaseStatus::toArray())],
             'scheduled_start_date' => ['date'],
