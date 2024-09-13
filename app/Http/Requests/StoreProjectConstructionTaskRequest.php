@@ -11,7 +11,7 @@ class StoreProjectConstructionTaskRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -22,7 +22,23 @@ class StoreProjectConstructionTaskRequest extends FormRequest
     public function rules(): array
     {
         return [
-            //
+            'project_job_id' => ['required', 'integer', 'exists:project_jobs,id'],
+            'project_construction_phase_id' => ['required', 'integer', 'exists:project_construction_phases,id'],
+            'name' => ['required', 'string', 'max:255'],
+            'description' => ['nullable', 'string', 'max:255'],
+            'status' => ['string', 'max:255'],
+            'scheduled_start_date' => ['date'],
+            'scheduled_end_date' => ['date'],
+            'started_at' => ['nullable', 'date'],
+            'ended_at' => ['nullable', 'date'],
+            'count_workers' => ['integer'],
+            'progress' => ['integer'],
+            'daily_reports' => ['array'],
+            'daily_reports.*.date' => ['required', 'date'],
+            'daily_reports.*.progress' => ['required', 'integer'],
+            'daily_reports.*.count_workers' => ['required', 'integer'],
+            'daily_reports.*.notes' => ['string'],
+            'daily_reports.*.attachments_ids' => ['array'],
         ];
     }
 }

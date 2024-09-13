@@ -22,7 +22,6 @@ class UpdateProjectConstructionPhaseRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'project_job_id' => ['required', 'integer', 'exists:project_jobs,id'],
             'expense_code' => ['required', 'string', 'max:255'],
             'name' => ['required', 'string', 'max:255'],
             'description' => ['nullable', 'string', 'max:255'],
