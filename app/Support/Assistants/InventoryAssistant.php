@@ -63,6 +63,10 @@ class InventoryAssistant{
 
         //Complete list of products with products that are not in the warehouse:
         $productsInWarehouseIds = $productsInWarehouse->pluck('inventory_product_id')->toArray();
+
+        //Remove duplicates:
+        $productsInWarehouseIds = array_unique($productsInWarehouseIds);
+
         $productsNotInWarehouse = InventoryProduct::whereNotIn('id', $productsInWarehouseIds)->get();
 
         foreach ($productsNotInWarehouse as $product){
