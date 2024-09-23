@@ -494,6 +494,9 @@ class BalanceAssistant{
         ];
     }
     public static function createBalanceExpenseFromReport(Report $report, float|null $amountOverride = null):Balance{
+        //Delete previous balances with report_id and model = Expense to avoid duplicates:
+        Balance::where('report_id', $report->id)->where('model', BalanceModel::Expense)->delete();
+
         $balance = Balance::create([
             'description' => 'Gastos del reporte "' . $report->title . '"',
             'user_id' => $report->user_id,

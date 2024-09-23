@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use App\Helpers\Enums\ProjectConstructionPhaseStatus;
+use App\Helpers\Enums\ProjectConstructionTaskStatus;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
@@ -35,10 +36,20 @@ class StoreProjectConstructionPhaseRequest extends FormRequest
             'started_at' => ['nullable', 'date'],
             'ended_at' => ['nullable', 'date'],
             'progress' => ['integer'],
-            'final_report' => ['nullable', 'array'],
+            'tasks' => ['present', 'array'],
+            'tasks.*.name' => ['required', 'string', 'max:255'],
+            'tasks.*.description' => ['nullable', 'string', 'max:255'],
+            'tasks.*.status' => ['string', Rule::in(ProjectConstructionTaskStatus::toArray())],
+            'tasks.*.scheduled_start_date' => ['date'],
+            'tasks.*.scheduled_end_date' => ['date'],
+            'tasks.*.started_at' => ['nullable', 'date'],
+            'tasks.*.ended_at' => ['nullable', 'date'],
+            'tasks.*.count_workers' => ['integer', 'min:0'],
+            'tasks.*.progress' => ['integer', 'min:0'],
+            /*'final_report' => ['nullable', 'array'],
             'final_report.attachments_ids' => ['present', 'array'],
             'final_report.attachments_ids.*' => ['string'],
-            'final_report.notes' => ['string'],
+            'final_report.notes' => ['string'],*/
         ];
     }
 }

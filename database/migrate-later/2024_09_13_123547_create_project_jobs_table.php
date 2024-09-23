@@ -18,9 +18,9 @@ return new class extends Migration
             $table->string('job_code');
             $table->integer('project_structure_id');
 
-            $table->string('width')->nullable(true)->default(null);
-            $table->string('length')->nullable(true)->default(null);
-            $table->string('area')->nullable(true)->default(null);
+            $table->float('width', 8, 2)->default(0);
+            $table->float('length', 8, 2)->default(0);
+            $table->float('area', 8, 2)->default(0);
             $table->json('admins_ids')->default('[]');
             $table->integer('supervisor_id');
             $table->string('event_type');

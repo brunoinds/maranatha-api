@@ -27,9 +27,9 @@ class StoreProjectJobRequest extends FormRequest
         return [
             'job_code' => ['required', 'string', 'max:255'],
             'project_structure_id' => ['required', 'integer', 'exists:project_structures,id'],
-            'width' => ['nullable', 'string', 'max:255'],
-            'length' => ['nullable', 'string', 'max:255'],
-            'area' => ['nullable', 'string', 'max:255'],
+            'width' => ['required', 'numeric'],
+            'length' => ['required', 'numeric'],
+            'area' => ['required', 'numeric'],
             'admins_ids' => ['array'],
             'admins_ids.*' => ['integer', 'exists:users,id'],
             'supervisor_id' => ['required', 'integer', 'exists:users,id'],

@@ -23,6 +23,11 @@ class ProjectStructure extends Model
     ];
 
     protected $casts = [
-        'default_phases' => 'array',
+        'default_phases' => 'object',
+        'axes_count' => 'integer',
+        'beams_count' => 'integer',
+        'columns_count' => 'integer',
+        'stringers_count' => 'integer',
+        'facades_count' => 'integer',
     ];
 }

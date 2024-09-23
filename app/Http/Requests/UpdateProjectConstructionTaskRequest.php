@@ -5,6 +5,7 @@ namespace App\Http\Requests;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 use App\Helpers\Enums\ProjectConstructionPhaseStatus;
+use App\Helpers\Enums\ProjectConstructionTaskStatus;
 
 class UpdateProjectConstructionTaskRequest extends FormRequest
 {
@@ -33,11 +34,11 @@ class UpdateProjectConstructionTaskRequest extends FormRequest
             'ended_at' => ['nullable', 'date'],
             'count_workers' => ['integer'],
             'progress' => ['integer'],
-            'daily_reports' => ['array'],
+            'daily_reports' => ['present','array'],
             'daily_reports.*.date' => ['required', 'date'],
             'daily_reports.*.progress' => ['required', 'integer'],
             'daily_reports.*.count_workers' => ['required', 'integer'],
-            'daily_reports.*.notes' => ['string'],
+            'daily_reports.*.notes' => ['nullable', 'string'],
             'daily_reports.*.attachments_ids' => ['array'],
         ];
     }

@@ -16,7 +16,6 @@ class ProjectConstructionPhase extends Model
         'expense_code',
         'name',
         'description',
-        'icon',
         'color',
         'status',
         'scheduled_start_date',
@@ -39,5 +38,24 @@ class ProjectConstructionPhase extends Model
     public function tasks()
     {
         return $this->hasMany(ProjectConstructionTask::class);
+    }
+
+    public function refreshProgress()
+    {
+        $tasks = $this->tasks;
+        $totalProgress = 0;
+        $totalTasks = 0;
+        foreach ($tasks as $task) {
+            $totalProgress += $task->progress;
+            $totalTasks++;
+        }
+        $this->progress = $totalTasks > 0 ? $totalProgress / $totalTasks : 0;
+        $this->save();
+    }
+
+    public function delete()
+    {
+        $this->tasks()->delete();
+        return parent::delete();
     }
 }

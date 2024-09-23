@@ -37,9 +37,9 @@ Route::get('/app/{any}', function ($file) {
         $filePath = resource_path('ionic/' . $file);
         $mime = MimeType::from($filePath);
         $headers = ['Content-Type' => $mime];
-    
+
         File::exists($filePath) or abort(404, 'File not found!');
-    
+
         return Response::file($filePath, $headers);
     }else{
         $filePath = resource_path('ionic/index.html');
@@ -54,7 +54,7 @@ Route::get('/resources/public/{any}', function ($file) {
     //Add headers for cors:
     header('Access-Control-Allow-Origin: *');
     header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS');
-    
+
 
     $filePath = resource_path('public/' . $file);
     $mime = MimeType::from($filePath);
@@ -77,5 +77,29 @@ Route::get('/resources/service-workers/one-signal-sw.js', function () {
 
     return Response::file($filePath, $headers);
 });
+
+Route::get('/public/storage/{any}', function ($file) {
+    $internalPaths = explode('/', $file);
+
+
+    //Add headers for cors:
+    header('Access-Control-Allow-Origin: *');
+    header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS');
+
+
+
+    $filePath = storage_path('app/public/' . $file); //resource_path('public/' . $file);
+
+
+    if (str_contains($filePath, 'images') || str_contains($filePath, 'avatars') || str_contains($filePath, 'projects')) {
+        $mime = 'image/png';
+    }else{
+        $mime = MimeType::from($filePath);
+    }
+    $headers = ['Content-Type' => $mime];
+    File::exists($filePath) or abort(404, 'File not found!');
+
+    return Response::file($filePath, $headers);
+})->where('any', '.*');
 
 require __DIR__.'/auth.php';

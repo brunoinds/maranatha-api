@@ -28,7 +28,7 @@ class InventoryWarehouseIncomeController extends Controller
     {
         $validated = $request->validated();
 
-        if ($validated['image'] !== null){
+        if (isset($validated['image']) && $validated['image'] !== null){
             $imageValidation = Toolbox::validateImageBase64($validated['image']);
             if ($imageValidation->isImage){
                 if (!$imageValidation->isValid){
@@ -56,7 +56,7 @@ class InventoryWarehouseIncomeController extends Controller
             'inventory_warehouse_id' => $validated['inventory_warehouse_id'],
         ]);
 
-        if ($validated['image'] !== null){
+        if (isset($validated['image']) && $validated['image'] !== null){
             $wasSuccessfull = $inventoryWarehouseIncome->setImageFromBase64($validated['image']);
             if (!$wasSuccessfull) {
                 $inventoryWarehouseIncome->delete();
@@ -128,7 +128,7 @@ class InventoryWarehouseIncomeController extends Controller
         $validated = $request->validated();
 
         $imageBase64 = null;
-        if ($validated['image'] !== null){
+        if (isset($validated['image']) && $validated['image'] !== null){
             $imageValidation = Toolbox::validateImageBase64($validated['image']);
             $imageBase64 = $validated['image'];
             unset($validated['image']);

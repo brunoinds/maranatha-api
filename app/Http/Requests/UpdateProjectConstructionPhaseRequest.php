@@ -35,8 +35,9 @@ class UpdateProjectConstructionPhaseRequest extends FormRequest
             'ended_at' => ['nullable', 'date'],
             'progress' => ['integer'],
             'final_report' => ['nullable', 'array'],
-            'final_report.attachments_ids' => ['present', 'array'],
+            'final_report.attachments_ids' => ['array'],
             'final_report.attachments_ids.*' => ['string'],
+            'final_report.attachments_base64.*' => ['string'],
             'final_report.notes' => ['string'],
         ];
     }

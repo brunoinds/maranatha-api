@@ -316,6 +316,15 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::apiResource('structures', ProjectStructureController::class);
         Route::apiResource('construction-phases', ProjectConstructionPhaseController::class);
         Route::apiResource('construction-tasks', ProjectConstructionTaskController::class);
+
+
+        Route::post('construction-tasks/{constructionTask}/daily-reports', ProjectConstructionTaskController::class . '@storeDailyReport');
+
+
+        Route::get('jobs/{job}/chat', ProjectJobController::class . '@listChatMessages');
+        Route::post('jobs/{job}/chat', ProjectJobController::class . '@storeChatMessage');
+        Route::get('jobs/chat-attachments/{chatAttachmentId}', ProjectJobController::class . '@showChatAttachment');
+
     });
 });
 

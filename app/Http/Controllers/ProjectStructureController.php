@@ -13,14 +13,17 @@ class ProjectStructureController extends Controller
      */
     public function index()
     {
-        //
+        return response()->json(ProjectStructure::all());
     }
     /**
      * Store a newly created resource in storage.
      */
     public function store(StoreProjectStructureRequest $request)
     {
-        //
+        $validated = $request->validated();
+
+        $structure = ProjectStructure::create($validated);
+        return response()->json(['message' => 'Project structure created successfully', 'structure' => $structure]);
     }
 
     /**
@@ -28,7 +31,7 @@ class ProjectStructureController extends Controller
      */
     public function show(ProjectStructure $structure)
     {
-        //
+        return response()->json($structure);
     }
 
     /**
@@ -36,7 +39,10 @@ class ProjectStructureController extends Controller
      */
     public function update(UpdateProjectStructureRequest $request, ProjectStructure $structure)
     {
-        //
+        $validated = $request->validated();
+
+        $structure->update($validated);
+        return response()->json(['message' => 'Project structure updated successfully', 'structure' => $structure]);
     }
 
     /**
@@ -44,6 +50,7 @@ class ProjectStructureController extends Controller
      */
     public function destroy(ProjectStructure $structure)
     {
-        //
+        $structure->delete();
+        return response()->json(['message' => 'Project structure deleted successfully']);
     }
 }

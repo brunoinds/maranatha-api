@@ -2,7 +2,7 @@
 
 namespace App\Helpers\Enums;
 
-enum ProjectEventType: string
+enum ProjectJobEventType: string
 {
     case NewConstruction = 'NewConstruction';
     case Renovation = 'Renovation';
