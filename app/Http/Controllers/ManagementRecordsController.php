@@ -560,12 +560,12 @@ class ManagementRecordsController extends Controller
 
         $validatedData = array_merge($defaults, $validatedData);
 
-        /*if (RecordsCache::getRecord('inventoryProductsLoansKardex', $validatedData)){
+        if (RecordsCache::getRecord('inventoryProductsLoansKardex', $validatedData)){
             return response()->json([
                 ...RecordsCache::getRecord('inventoryProductsLoansKardex', $validatedData),
                 'is_cached' => true
             ]);
-        }*/
+        }
 
         $record = new RecordInventoryProductsLoansKardex([
             'warehouseId' => $validatedData['warehouse_id'],

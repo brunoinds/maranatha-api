@@ -287,6 +287,8 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::get('inventory/products/items/{inventoryProductItem}/loans', InventoryProductItemController::class . '@loans');
 
 
+        Route::post('inventory/warehouses/{warehouse}/outcome-resume-analisys', InventoryWarehouseController::class . '@listOutcomeResumeAnalisys');
+
         Route::get('inventory/warehouses/{warehouse}/incomes', InventoryWarehouseController::class . '@listIncomes');
         Route::get('inventory/warehouses/{warehouse}/outcomes', InventoryWarehouseController::class . '@listOutcomes');
         Route::get('inventory/warehouses/{warehouse}/outcome-requests', InventoryWarehouseController::class . '@listOutcomeRequests');
@@ -294,6 +296,8 @@ Route::middleware(['auth:sanctum'])->group(function () {
 
         Route::get('inventory/warehouses/{warehouse}/products', InventoryWarehouseController::class . '@listProducts');
         Route::get('inventory/warehouses/{warehouse}/stock', InventoryWarehouseController::class . '@listStock');
+        Route::get('inventory/warehouses/{warehouse}/products/{product}/items', InventoryWarehouseController::class . '@listProductItems');
+
 
         Route::get('inventory/warehouse-outcome-requests/{warehouseOutcomeRequest}/chat', InventoryWarehouseOutcomeRequestController::class . '@listChatMessages');
         Route::post('inventory/warehouse-outcome-requests/{warehouseOutcomeRequest}/chat', InventoryWarehouseOutcomeRequestController::class . '@storeChatMessage');
@@ -306,6 +310,8 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::get('inventory/warehouse-outcome-requests/{warehouseOutcomeRequest}/loans', InventoryWarehouseOutcomeRequestController::class . '@listLoans');
 
         Route::get('inventory/warehouse-incomes/{inventoryWarehouseIncome}/products', InventoryWarehouseIncomeController::class . '@listProductsItems');
+        Route::get('inventory/warehouse-incomes/{inventoryWarehouseIncome}/products-state', InventoryWarehouseIncomeController::class . '@listProductsState');
+
         Route::get('inventory/warehouse-incomes/{inventoryWarehouseIncome}/image', InventoryWarehouseIncomeController::class . '@showImage');
 
     });

@@ -11,6 +11,7 @@ use App\Models\Expense;
 use App\Helpers\Enums\MoneyType;
 use Illuminate\Support\Facades\Storage;
 use Intervention\Image\Facades\Image;
+use App\Models\InventoryProduct;
 
 class InventoryWarehouseIncome extends Model
 {
@@ -63,7 +64,7 @@ class InventoryWarehouseIncome extends Model
 
     public function amount()
     {
-        return $this->items->sum('buy_amount');
+        return $this->items()->sum('buy_amount');
     }
 
     public function setImageFromBase64(string $base64Image):bool{

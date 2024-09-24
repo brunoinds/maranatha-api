@@ -83,24 +83,31 @@ class RecordInventoryProductsKardex
                 $query = $query->where('job_code', $options['jobCode']);
             }
 
-            return $query->orderBy('date')->get();
+            return $query->orderBy('date');
         })();
 
 
+
         $incomes->each((function($income) use (&$list, $options){
-            $income->items->groupBy('inventory_product_id')->each((function($productItems, $productId) use ($income, &$list, $options){
+            $productsIdsInIncome = $income->items()
+                ->groupBy('inventory_product_id')
+                ->select('inventory_product_id')
+                ->pluck('inventory_product_id')
+                ->unique();
+
+            $productsIdsInIncome->each((function($productId) use ($income, &$list, $options){
                 if ($options['productId'] !== null && $options['productId'] != $productId){
                     return;
                 }
 
-
+                $productItems = $income->items()->where('inventory_product_id', $productId);
 
                 $product = InventoryProduct::find($productId);
 
                 $balance = [
-                    'quantity' => $productItems->count(),
-                    'amount' => $productItems->first()->buy_amount,
-                    'total' => $productItems->count() * $productItems->first()->buy_amount,
+                    'quantity' => (clone $productItems)->count(),
+                    'amount' => (clone $productItems)->first()?->buy_amount ?? 0,
+                    'total' => (clone $productItems)->count() * ((clone $productItems)->first()?->buy_amount ?? 0),
                 ];
 
                 if (count($list) > 0){
@@ -170,7 +177,7 @@ class RecordInventoryProductsKardex
                 })();
 
                 $outcomes->each((function($outcome) use ($income, &$list, &$balance, $product, &$internalListIndex){
-                    $itemsSold = $outcome->items->where('inventory_warehouse_income_id', $income->id)
+                    $itemsSold = $outcome->items()->where('inventory_warehouse_income_id', $income->id)
                                                 ->where('status', InventoryProductItemStatus::Sold)
                                                 ->where('inventory_product_id', $product->id);
 

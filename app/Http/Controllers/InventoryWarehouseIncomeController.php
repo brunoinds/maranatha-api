@@ -6,6 +6,8 @@ use App\Http\Requests\StoreInventoryWarehouseIncomeRequest;
 use App\Http\Requests\UpdateInventoryWarehouseIncomeRequest;
 use App\Models\InventoryWarehouseIncome;
 use App\Models\InventoryProductItem;
+use App\Models\InventoryProduct;
+
 use App\Helpers\Toolbox;
 use App\Support\Toolbox\TString;
 use Illuminate\Support\Facades\Storage;
@@ -22,6 +24,63 @@ class InventoryWarehouseIncomeController extends Controller
     public function listProductsItems(InventoryWarehouseIncome $inventoryWarehouseIncome)
     {
         return response()->json($inventoryWarehouseIncome->items, 200);
+    }
+
+    public function listProductsState(InventoryWarehouseIncome $inventoryWarehouseIncome)
+    {
+        $inventoryProductIds = $inventoryWarehouseIncome->items()
+            ->groupBy('inventory_product_id')
+            ->pluck('inventory_product_id')
+            ->flatten()
+            ->unique()
+            ->toArray();
+
+
+        $products = [];
+        foreach ($inventoryProductIds as $productId){
+            $product = InventoryProduct::find($productId);
+            $quantity = $inventoryWarehouseIncome->items()->where('inventory_product_id', $productId)->count();
+            $amount = $inventoryWarehouseIncome->items()->where('inventory_product_id', $productId)->first()->buy_amount;
+
+
+            $sellings = [
+                'in_stock' => [
+                    'count' => $inventoryWarehouseIncome->items()->where('inventory_product_id', $productId)->whereNull('inventory_warehouse_outcome_id')->count()
+                ],
+                'sold' => [
+                    'count' => $inventoryWarehouseIncome->items()->where('inventory_product_id', $productId)->whereNotNull('inventory_warehouse_outcome_id')->count(),
+                    'details' => (function() use ($inventoryWarehouseIncome, $productId){
+                        $outcomesIds = $inventoryWarehouseIncome->items()
+                            ->where('inventory_product_id', $productId)
+                            ->whereNotNull('inventory_warehouse_outcome_id')
+                            ->groupBy('inventory_warehouse_outcome_id')
+                            ->pluck('inventory_warehouse_outcome_id')
+                            ->flatten()
+                            ->unique()
+                            ->toArray();
+
+                        $outcomes = [];
+                        foreach ($outcomesIds as $outcomeId){
+                            $count = $inventoryWarehouseIncome->items()->where('inventory_product_id', $productId)->where('inventory_warehouse_outcome_id', $outcomeId)->count();
+                            $outcomes[] = [
+                                'outcome_id' => $outcomeId,
+                                'count' => $count,
+                            ];
+                        }
+                        return $outcomes;
+                    })()
+                ]
+            ];
+
+            $products[] = [
+                'product' => $product,
+                'quantity' => $quantity,
+                'amount' => $amount,
+                'sellings' => $sellings,
+            ];
+        }
+
+        return response()->json($products, 200);
     }
 
     public function store(StoreInventoryWarehouseIncomeRequest $request)

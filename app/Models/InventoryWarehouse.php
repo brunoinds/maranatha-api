@@ -10,6 +10,7 @@ use App\Models\InventoryWarehouseOutcome;
 use App\Support\Assistants\InventoryAssistant;
 use App\Models\InventoryWarehouseOutcomeRequest;
 use App\Models\InventoryWarehouseProductItemLoan;
+use App\Models\User;
 
 
 
@@ -46,6 +47,11 @@ class InventoryWarehouse extends Model
     public function loans()
     {
         return $this->hasMany(InventoryWarehouseProductItemLoan::class);
+    }
+
+    public function items()
+    {
+        return $this->hasMany(InventoryProductItem::class);
     }
 
 
