@@ -137,7 +137,7 @@ class InventoryWarehouseController extends Controller
         return response()->json($stock);
     }
 
-    public function listOutcomeResumeAnalisys(InventoryWarehouse $warehouse)
+    public function listOutcomeResumeAnalisysOld(InventoryWarehouse $warehouse)
     {
         $validated = request()->validate([
             'products' => 'required|array',
@@ -252,6 +252,138 @@ class InventoryWarehouseController extends Controller
 
         return response()->json($outcomeResume);
     }
+
+
+    public function listOutcomeResumeAnalisys(InventoryWarehouse $warehouse)
+    {
+        $validated = request()->validate([
+            'products' => 'required|array',
+            'products.*.product_id' => 'required|exists:inventory_products,id',
+            'products.*.quantity' => 'required|numeric|min:0',
+            'products.*.do_loan' => 'required|boolean',
+        ]);
+
+        $productsResume = [];
+        $batchSize = 900; // Keep it below 999 to avoid SQLite's limit
+
+        foreach ($validated['products'] as $product) {
+            // Split the product quantity into manageable batches for SQLite
+            $quantity = $product['quantity'];
+            $productItemsIdsChosen = [];
+
+            // Continue fetching in batches until we reach the desired quantity
+            $offset = 0;
+            while ($quantity > 0) {
+                $limit = min($quantity, $batchSize);
+                $batchIds = InventoryProductItem::where('inventory_product_id', $product['product_id'])
+                    ->where('inventory_warehouse_id', $warehouse->id)
+                    ->where('status', 'InStock')
+                    ->orderBy('order', 'asc')
+                    ->offset($offset)
+                    ->limit($limit)
+                    ->select('id')
+                    ->pluck('id')
+                    ->toArray();
+
+                $productItemsIdsChosen = array_merge($productItemsIdsChosen, $batchIds);
+
+                // Decrease the remaining quantity and increase the offset
+                $quantity -= $limit;
+                $offset += $limit;
+            }
+
+            $itemsChosenToSellBuyCurrenciesFounds = InventoryProductItem::whereIn('id', $productItemsIdsChosen)
+                ->groupBy('buy_currency')
+                ->pluck('buy_currency')
+                ->flatten()
+                ->unique()
+                ->toArray();
+
+            $prices = [];
+            foreach ($itemsChosenToSellBuyCurrenciesFounds as $buyCurrency) {
+                $itemsChosenToSellBuyAmount = InventoryProductItem::whereIn('id', $productItemsIdsChosen)
+                    ->where('buy_currency', $buyCurrency)
+                    ->sum('buy_amount');
+                $itemsChosenToSellBuyCount = InventoryProductItem::whereIn('id', $productItemsIdsChosen)
+                    ->where('buy_currency', $buyCurrency)
+                    ->count();
+
+                $prices[] = [
+                    'currency' => $buyCurrency,
+                    'amount' => $itemsChosenToSellBuyAmount,
+                    'count' => $itemsChosenToSellBuyCount,
+                ];
+            }
+
+            $itemsChosenToSellAggregation = InventoryProductItem::whereIn('id', $productItemsIdsChosen)
+                ->groupBy(['buy_currency', 'buy_amount'])
+                ->select('buy_currency', 'buy_amount', DB::raw('COUNT(*) as count'), DB::raw('SUM(buy_amount) as total_buy_amount'))
+                ->get()->toArray();
+
+            $productsResume[] = [
+                'product_id' => $product['product_id'],
+                'quantity' => $product['quantity'],
+                'do_loan' => $product['do_loan'],
+                'items_ids' => $productItemsIdsChosen,
+                'items_aggregated' => collect($itemsChosenToSellAggregation)->map(function ($item) {
+                    return [
+                        'currency' => $item['buy_currency'],
+                        'unit_amount' => $item['buy_amount'],
+                        'count' => $item['count'],
+                        'total_amount' => $item['total_buy_amount'],
+                    ];
+                })->toArray(),
+                'prices' => $prices,
+            ];
+        }
+
+        $outcomeResume = [
+            'products' => $productsResume,
+            'summary' => [
+                'prices' => (function () use ($productsResume) {
+                    $prices = [];
+                    foreach ($productsResume as $productResume) {
+                        foreach ($productResume['prices'] as $price) {
+                            $found = false;
+                            foreach ($prices as $index => $priceFound) {
+                                if ($priceFound['currency'] === $price['currency']) {
+                                    $prices[$index]['amount'] += $price['amount'];
+                                    $prices[$index]['count'] += $price['count'];
+                                    $found = true;
+                                    break;
+                                }
+                            }
+                            if (!$found) {
+                                $prices[] = $price;
+                            }
+                        }
+                    }
+                    return $prices;
+                })(),
+                'items_to_loan' => (function () use ($productsResume) {
+                    $items = [];
+                    foreach ($productsResume as $productResume) {
+                        if ($productResume['do_loan']) {
+                            $items = array_merge($items, $productResume['items_ids']);
+                        }
+                    }
+                    return $items;
+                })(),
+                'items_to_sell' => (function () use ($productsResume) {
+                    $items = [];
+                    foreach ($productsResume as $productResume) {
+                        if (!$productResume['do_loan']) {
+                            $items = array_merge($items, $productResume['items_ids']);
+                        }
+                    }
+                    return $items;
+                })(),
+            ]
+        ];
+
+        return response()->json($outcomeResume);
+    }
+
 
 
     /**

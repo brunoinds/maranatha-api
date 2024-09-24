@@ -307,6 +307,8 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::get('inventory/chat-attachments/{chatAttachmentId}', InventoryWarehouseOutcomeRequestController::class . '@showChatAttachment');
 
         Route::get('inventory/warehouse-outcomes/{inventoryWarehouseOutcome}/products', InventoryWarehouseOutcomeController::class . '@listProductsItems');
+        Route::get('inventory/warehouse-outcomes/{inventoryWarehouseOutcome}/resume-analisys', InventoryWarehouseOutcomeController::class . '@resumeAnalisys');
+
         Route::get('inventory/warehouse-outcome-requests/{warehouseOutcomeRequest}/loans', InventoryWarehouseOutcomeRequestController::class . '@listLoans');
 
         Route::get('inventory/warehouse-incomes/{inventoryWarehouseIncome}/products', InventoryWarehouseIncomeController::class . '@listProductsItems');

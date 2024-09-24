@@ -13,6 +13,9 @@ use App\Support\Creators\Inventory\WarehouseOutcome\PDFCreator;
 use Illuminate\Support\Str;
 use Spatie\TemporaryDirectory\TemporaryDirectory;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\DB;
+
+
 class InventoryWarehouseOutcomeController extends Controller
 {
     public function index()
@@ -23,6 +26,86 @@ class InventoryWarehouseOutcomeController extends Controller
     public function create()
     {
         //
+    }
+
+
+    public function resumeAnalisys(InventoryWarehouseOutcome $inventoryWarehouseOutcome)
+    {
+        $productsIds = $inventoryWarehouseOutcome->items()->groupBy('inventory_product_id')->select('inventory_product_id')->pluck('inventory_product_id')->toArray();
+
+        $productsResume = [];
+        foreach ($productsIds as $productId) {
+            $itemsChosenToSellBuyCurrenciesFounds = $inventoryWarehouseOutcome->items()->where('inventory_product_id', $productId)
+                ->groupBy('buy_currency')
+                ->pluck('buy_currency')
+                ->flatten()
+                ->unique()
+                ->toArray();
+
+
+            $prices = [];
+            foreach ($itemsChosenToSellBuyCurrenciesFounds as $buyCurrency) {
+                $itemsChosenToSellBuyAmount = $inventoryWarehouseOutcome->items()->where('inventory_product_id', $productId)->where('buy_currency', $buyCurrency)->sum('buy_amount');
+                $itemsChosenToSellBuyCount = $inventoryWarehouseOutcome->items()->where('inventory_product_id', $productId)->where('buy_currency', $buyCurrency)->count();
+
+                $prices[] = [
+                    'currency' => $buyCurrency,
+                    'amount' => $itemsChosenToSellBuyAmount,
+                    'count' => $itemsChosenToSellBuyCount,
+                ];
+            }
+
+            $itemsChosenToSellAggregation = $inventoryWarehouseOutcome->items()->where('inventory_product_id', $productId)
+                ->groupBy(['buy_currency', 'buy_amount'])
+                ->select('buy_currency', 'buy_amount', DB::raw('COUNT(*) as count'), DB::raw('SUM(buy_amount) as total_buy_amount'))
+                ->get()->toArray();
+
+            $productsResume[] = [
+                'product_id' => $productId,
+                'quantity' => $inventoryWarehouseOutcome->items()->where('inventory_product_id', $productId)->count(),
+                'do_loan' => false,
+                'items_aggregated' => collect($itemsChosenToSellAggregation)->map(function ($item) {
+                    $return = [
+                        'currency' => $item['buy_currency'],
+                        'unit_amount' => $item['buy_amount'],
+                        'count' => $item['count'],
+                        'total_amount' => $item['total_buy_amount'],
+                    ];
+                    return $return;
+                })->toArray(),
+                'prices' => $prices,
+            ];
+        }
+
+
+        $outcomeResume = [
+            'products' => $productsResume,
+            'summary' => [
+                'prices' => (function() use ($productsResume){
+                    //Based on each producsResume prices, calculate the total amount to sell, returning an array [{currency: string, amount: number, count: number}]:
+                    $prices = [];
+                    foreach ($productsResume as $productResume){
+                        foreach ($productResume['prices'] as $price){
+                            $found = false;
+                            foreach ($prices as $index => $priceFound){
+                                if ($priceFound['currency'] === $price['currency']){
+                                    $prices[$index]['amount'] += $price['amount'];
+                                    $prices[$index]['count'] += $price['count'];
+                                    $found = true;
+                                    break;
+                                }
+                            }
+                            if (!$found){
+                                $prices[] = $price;
+                            }
+                        }
+                    }
+                    return $prices;
+                })()
+            ]
+        ];
+
+        return response()->json($outcomeResume);
     }
 
     public function listProductsItems(InventoryWarehouseOutcome $inventoryWarehouseOutcome)
@@ -95,7 +178,6 @@ class InventoryWarehouseOutcomeController extends Controller
 
     public function downloadPDF(InventoryWarehouseOutcome $warehouseOutcome)
     {
-        //ddh($warehouseOutcome->warehouse->country);
         $pdf = PDFCreator::new($warehouseOutcome);
         $content = $pdf->create([])->output();
 
