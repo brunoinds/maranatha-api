@@ -249,6 +249,10 @@ class InventoryWarehouseController extends Controller
                 'prices' => (function () use ($productsResume) {
                     $prices = [];
                     foreach ($productsResume as $productResume) {
+                        if ($productResume['do_loan']) {
+                            continue;
+                        }
+
                         foreach ($productResume['prices'] as $price) {
                             $found = false;
                             foreach ($prices as $index => $priceFound) {
