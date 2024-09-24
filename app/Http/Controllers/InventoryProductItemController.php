@@ -6,6 +6,7 @@ use App\Http\Requests\StoreInventoryProductItemRequest;
 use App\Http\Requests\UpdateInventoryProductItemRequest;
 use App\Models\InventoryProductItem;
 use App\Models\User;
+use App\Support\Cache\DataCache;
 
 
 class InventoryProductItemController extends Controller
@@ -75,6 +76,8 @@ class InventoryProductItemController extends Controller
         $validated = $request->validated();
 
         $item->update($validated);
+
+        DataCache::clearRecord('warehouseStockList', [$item->inventory_warehouse_id]);
 
         return response()->json($item);
     }

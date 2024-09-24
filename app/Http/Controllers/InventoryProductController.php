@@ -7,6 +7,7 @@ use App\Http\Requests\UpdateInventoryProductRequest;
 use App\Models\InventoryProduct;
 use Illuminate\Http\Request;
 use  App\Support\Search\GoogleImages\GoogleImageSearch;
+use App\Support\Cache\DataCache;
 
 class InventoryProductController extends Controller
 {
@@ -33,7 +34,7 @@ class InventoryProductController extends Controller
     {
         $validated = $request->validated();
         $product = InventoryProduct::create($validated);
-
+        $product->clearStockCaches();
         return response()->json(['message' => 'Product created', 'product' => $product->toArray()]);
     }
 
@@ -46,7 +47,7 @@ class InventoryProductController extends Controller
     {
         $validated = $request->validated();
         $product->update($validated);
-
+        $product->clearStockCaches();
         return response()->json(['message' => 'Product updated', 'product' => $product->toArray()]);
     }
 

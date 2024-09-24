@@ -8,6 +8,7 @@ use App\Models\InventoryWarehouse;
 use App\Models\InventoryProductItem;
 use App\Models\InventoryProduct;
 use Illuminate\Support\Facades\DB;
+use App\Support\Cache\DataCache;
 
 class InventoryWarehouseController extends Controller
 {
@@ -129,8 +130,21 @@ class InventoryWarehouseController extends Controller
 
     public function listStock(InventoryWarehouse $warehouse)
     {
+        if (DataCache::getRecord('warehouseStockList', [$warehouse->id])){
+            return response()->json([
+                'items' => DataCache::getRecord('warehouseStockList', [$warehouse->id]),
+                'is_cached' => true
+            ]);
+        }
+
         $stock = $warehouse->stock();
-        return response()->json($stock);
+
+        DataCache::storeRecord('warehouseStockList', [$warehouse->id], $stock);
+
+        return response()->json([
+            'items' => $stock,
+            'is_cached' => false
+        ]);
     }
 
     public function listOutcomeResumeAnalisys(InventoryWarehouse $warehouse)
@@ -306,6 +320,8 @@ class InventoryWarehouseController extends Controller
     {
         $validated = $request->validated();
         $warehouse = InventoryWarehouse::create($validated);
+
+        DataCache::clearRecord('warehouseStockList', [$warehouse->id]);
         return response()->json(['message' => 'Warehouse created', 'warehouse' => $warehouse->toArray()]);
     }
 
@@ -334,6 +350,7 @@ class InventoryWarehouseController extends Controller
      */
     public function destroy(InventoryWarehouse $warehouse)
     {
+        DataCache::clearRecord('warehouseStockList', [$warehouse->id]);
         $warehouse->delete();
         return response()->json(['message' => 'Warehouse deleted successfully']);
     }

@@ -15,6 +15,7 @@ use Illuminate\Support\Str;
 use App\Models\InventoryWarehouseOutcomeRequest;
 use App\Helpers\Enums\InventoryWarehouseOutcomeRequestStatus;
 use OneSignal;
+use App\Support\Cache\DataCache;
 
 class InventoryWarehouseProductItemLoanController extends Controller
 {
@@ -64,6 +65,10 @@ class InventoryWarehouseProductItemLoanController extends Controller
             $inventoryWarehouseOutcomeRequest->changeStatus(InventoryWarehouseOutcomeRequestStatus::Dispatched);
         }
 
+
+        DataCache::clearRecord('warehouseStockList', [$validated['inventory_warehouse_id']]);
+
+
         return response()->json(['message' => 'Préstamo de productos realizado con éxito', 'loans' => $loans], 201);
     }
 
@@ -102,13 +107,6 @@ class InventoryWarehouseProductItemLoanController extends Controller
         return response()->json($loans);
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(InventoryWarehouseProductItemLoan $warehouseLoan)
-    {
-        //
-    }
 
     /**
      * Update the specified resource in storage.
@@ -196,6 +194,9 @@ class InventoryWarehouseProductItemLoanController extends Controller
         }
 
         $warehouseLoan->update($validated);
+
+        DataCache::clearRecord('warehouseStockList', [$warehouseLoan->inventory_warehouse_id]);
+
 
         if (env('APP_ENV') !== 'local'){
             foreach ($notifications as $notification) {

@@ -15,6 +15,7 @@ use App\Models\InventoryWarehouseIncome;
 use App\Models\InventoryWarehouseOutcomeRequest;
 
 use App\Support\Toolbox\TString;
+use App\Support\Cache\DataCache;
 
 class InventoryWarehouseOutcome extends Model
 {
@@ -95,6 +96,8 @@ class InventoryWarehouseOutcome extends Model
             $item->sell_currency = $item->buy_currency;
             $item->save();
         });
+
+        DataCache::clearRecord('warehouseStockList', [$this->inventory_warehouse_id]);
     }
 
 
@@ -142,6 +145,8 @@ class InventoryWarehouseOutcome extends Model
                 $i++;
             });
         }
+
+        DataCache::clearRecord('warehouseStockList', [$this->inventory_warehouse_id]);
     }
 
     public function delete()

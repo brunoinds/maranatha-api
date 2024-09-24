@@ -9,6 +9,10 @@ use App\Models\InventoryProduct;
 use App\Models\InventoryWarehouse;
 use App\Helpers\Enums\InventoryProductItemStatus;
 use App\Models\InventoryWarehouseProductItemLoan;
+use App\Models\InventoryWarehouseIncome;
+use App\Models\InventoryWarehouseOutcome;
+use App\Support\Cache\DataCache;
+
 
 
 class InventoryProductItem extends Model
@@ -74,6 +78,7 @@ class InventoryProductItem extends Model
 
     public function delete()
     {
+        DataCache::clearRecord('warehouseStockList', [$this->inventory_warehouse_id]);
         $this->loans()->delete();
         parent::delete();
     }

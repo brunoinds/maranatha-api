@@ -10,6 +10,7 @@ use App\Helpers\Enums\InventoryProductItemStatus;
 use App\Helpers\Enums\InventoryProductUnit;
 use App\Models\InventoryProductsPack;
 use App\Models\InventoryWarehouseProductItemLoan;
+use App\Support\Cache\DataCache;
 
 
 
@@ -50,12 +51,21 @@ class InventoryProduct extends Model
         return $this->items()->avg('amount');
     }
 
+    public function clearStockCaches()
+    {
+        InventoryWarehouse::all()->each(function($warehouse){
+            DataCache::clearRecord('warehouseStockList', [$warehouse->id]);
+        });
+    }
 
     public function delete()
     {
+
         $this->items()->each(function($item){
             $item->delete();
         });
+
+        $this->clearStockCaches();
 
         //Delete product on InventoryProductsPack that contains this product, that has an attribute products that is an array of objects like: [{product_id: 1, quantity: 1}]'
         $productPacks = InventoryProductsPack::all();

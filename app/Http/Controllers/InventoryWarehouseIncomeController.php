@@ -11,6 +11,7 @@ use App\Models\InventoryProduct;
 use App\Helpers\Toolbox;
 use App\Support\Toolbox\TString;
 use Illuminate\Support\Facades\Storage;
+use App\Support\Cache\DataCache;
 
 
 
@@ -147,6 +148,9 @@ class InventoryWarehouseIncomeController extends Controller
                 $i++;
             }
         }
+
+        DataCache::clearRecord('warehouseStockList', [$validated['inventory_warehouse_id']]);
+
         return response()->json(['message' => 'Inventory warehouse income created', 'income' => $inventoryWarehouseIncome], 200);
     }
 
@@ -215,11 +219,15 @@ class InventoryWarehouseIncomeController extends Controller
             }
         }
 
+        DataCache::clearRecord('warehouseStockList', [$warehouseIncome->inventory_warehouse_id]);
+
         return response()->json(['message' => 'Inventory warehouse income updated', 'income' => $warehouseIncome], 200);
     }
 
     public function destroy(InventoryWarehouseIncome $warehouseIncome)
     {
+        DataCache::clearRecord('warehouseStockList', [$warehouseIncome->inventory_warehouse_id]);
+
         $warehouseIncome->delete();
         return response()->json(['message' => 'Inventory warehouse income deleted'], 200);
     }

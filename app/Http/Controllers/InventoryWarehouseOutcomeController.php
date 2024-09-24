@@ -14,6 +14,7 @@ use Illuminate\Support\Str;
 use Spatie\TemporaryDirectory\TemporaryDirectory;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\DB;
+use App\Support\Cache\DataCache;
 
 
 class InventoryWarehouseOutcomeController extends Controller
@@ -113,8 +114,6 @@ class InventoryWarehouseOutcomeController extends Controller
         return response()->json($inventoryWarehouseOutcome->items, 200);
     }
 
-
-
     public function store(StoreInventoryWarehouseOutcomeRequest $request)
     {
         $validated = $request->validated();
@@ -160,6 +159,8 @@ class InventoryWarehouseOutcomeController extends Controller
             $inventoryWarehouseOutcomeRequest->changeStatus(InventoryWarehouseOutcomeRequestStatus::Dispatched);
         }
 
+        DataCache::clearRecord('warehouseStockList', [$validated['inventory_warehouse_id']]);
+
         return response()->json(['message' => 'Inventory warehouse outcome created', 'outcome' => $inventoryWarehouseOutcome], 200);
     }
 
@@ -172,6 +173,9 @@ class InventoryWarehouseOutcomeController extends Controller
     {
         $validated = $request->validated();
         $warehouseOutcome->update($validated);
+
+        DataCache::clearRecord('warehouseStockList', [$warehouseOutcome->inventory_warehouse_id]);
+
         return response()->json(['message' => 'Inventory warehouse outcome updated', 'outcome' => $warehouseOutcome], 200);
 
     }
@@ -198,6 +202,8 @@ class InventoryWarehouseOutcomeController extends Controller
 
     public function destroy(InventoryWarehouseOutcome $warehouseOutcome)
     {
+        DataCache::clearRecord('warehouseStockList', [$warehouseOutcome->inventory_warehouse_id]);
+
         $warehouseOutcome->delete();
         return response()->json(['message' => 'Inventory warehouse outcome deleted'], 200);
     }

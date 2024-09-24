@@ -12,6 +12,7 @@ use App\Helpers\Enums\MoneyType;
 use Illuminate\Support\Facades\Storage;
 use Intervention\Image\Facades\Image;
 use App\Models\InventoryProduct;
+use App\Support\Cache\DataCache;
 
 class InventoryWarehouseIncome extends Model
 {
@@ -67,7 +68,8 @@ class InventoryWarehouseIncome extends Model
         return $this->items()->sum('buy_amount');
     }
 
-    public function setImageFromBase64(string $base64Image):bool{
+    public function setImageFromBase64(string $base64Image):bool
+    {
         $imageResource = Image::make($base64Image);
         $imageEncoded = $imageResource->encode('png')->getEncoded();
 
@@ -80,7 +82,8 @@ class InventoryWarehouseIncome extends Model
         $this->save();
         return $wasSuccessfull;
     }
-    public function deleteImage(): void{
+    public function deleteImage(): void
+    {
         $path = 'warehouse-incomes/' . $this->id;
         Storage::disk('public')->delete($path);
 
@@ -93,6 +96,7 @@ class InventoryWarehouseIncome extends Model
     public function delete()
     {
         $this->items()->delete();
+        DataCache::clearRecord('warehouseStockList', [$this->inventory_warehouse_id]);
         return parent::delete();
     }
 }
