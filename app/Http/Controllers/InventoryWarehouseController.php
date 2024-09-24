@@ -7,10 +7,6 @@ use App\Http\Requests\UpdateInventoryWarehouseRequest;
 use App\Models\InventoryWarehouse;
 use App\Models\InventoryProductItem;
 use App\Models\InventoryProduct;
-use App\Models\InventoryWarehouseIncome;
-use App\Models\InventoryWarehouseOutcome;
-use App\Models\InventoryWarehouseProductItemLoan;
-use App\Models\InventoryWarehouseOutcomeRequest;
 use Illuminate\Support\Facades\DB;
 
 class InventoryWarehouseController extends Controller
@@ -264,7 +260,7 @@ class InventoryWarehouseController extends Controller
         ]);
 
         $productsResume = [];
-        $batchSize = 900; // Keep it below 999 to avoid SQLite's limit
+        $batchSize = 400; // Keep it below 999 to avoid SQLite's limit
 
         foreach ($validated['products'] as $product) {
             // Split the product quantity into manageable batches for SQLite
