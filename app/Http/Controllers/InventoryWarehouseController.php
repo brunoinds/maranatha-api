@@ -260,7 +260,7 @@ class InventoryWarehouseController extends Controller
         ]);
 
         $productsResume = [];
-        $batchSize = 400; // Keep it below 999 to avoid SQLite's limit
+        $batchSize = 100; // Keep it below 999 to avoid SQLite's limit
 
         foreach ($validated['products'] as $product) {
             // Split the product quantity into manageable batches for SQLite
