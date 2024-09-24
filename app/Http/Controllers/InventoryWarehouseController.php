@@ -310,6 +310,7 @@ class InventoryWarehouseController extends Controller
                     'count' => $itemsChosenToSellBuyCount,
                 ];
             }
+            ddh('There');
 
             $itemsChosenToSellAggregation = InventoryProductItem::whereIn('id', $productItemsIdsChosen)
                 ->groupBy(['buy_currency', 'buy_amount'])
