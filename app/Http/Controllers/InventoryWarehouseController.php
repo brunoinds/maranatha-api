@@ -260,7 +260,7 @@ class InventoryWarehouseController extends Controller
         ]);
 
         $productsResume = [];
-        $batchSize = 100; // Keep it below 999 to avoid SQLite's limit
+        $batchSize = 900; // Keep it below 999 to avoid SQLite's limit
 
         foreach ($validated['products'] as $product) {
             // Split the product quantity into manageable batches for SQLite
@@ -310,7 +310,6 @@ class InventoryWarehouseController extends Controller
                     'count' => $itemsChosenToSellBuyCount,
                 ];
             }
-            ddh('There');
 
             $itemsChosenToSellAggregation = InventoryProductItem::whereIn('id', $productItemsIdsChosen)
                 ->groupBy(['buy_currency', 'buy_amount'])
