@@ -73,6 +73,10 @@ class InventoryWarehouseIncomeController extends Controller
                 ]
             ];
 
+            if (is_null($product)){
+                continue;
+            }
+
             $products[] = [
                 'product' => $product,
                 'quantity' => $quantity,
