@@ -21,8 +21,9 @@ class RecordInventoryProductsLoansKardex
 
     private DateTime|null $startDate = null;
     private DateTime|null $endDate = null;
-    private string|null $warehouseId = null;
+    private array|null $warehouseIds = null;
     private string|null $productId = null;
+    private array|null $categories = null;
 
 
     /**
@@ -33,13 +34,15 @@ class RecordInventoryProductsLoansKardex
         * @param DateTime|null $options['endDate']
         * @param string|null $options['warehouseId']
         * @param string|null $options['productId']
+        * @param string|null $options['categories']
      */
 
     public function __construct(array $options){
         $this->startDate = $options['startDate'] ?? null;
         $this->endDate = $options['endDate'] ?? null;
-        $this->warehouseId = $options['warehouseId'] ?? null;
+        $this->warehouseIds = $options['warehouseIds'] ?? null;
         $this->productId = $options['productId'] ?? null;
+        $this->categories = $options['categories'] ?? null;
     }
 
     private function getKardex():Collection
@@ -47,8 +50,9 @@ class RecordInventoryProductsLoansKardex
         $options = [
             'startDate' => $this->startDate,
             'endDate' => $this->endDate,
-            'warehouseId' => $this->warehouseId,
-            'productId' => $this->productId
+            'warehouseIds' => $this->warehouseIds,
+            'productId' => $this->productId,
+            'categories' => $this->categories
         ];
 
         $list = [];
@@ -62,8 +66,8 @@ class RecordInventoryProductsLoansKardex
         if ($options['endDate'] !== null){
             $query = $query->where('loaned_at', '<=', $options['endDate']);
         }
-        if ($options['warehouseId'] !== null){
-            $query = $query->where('inventory_warehouse_id', $options['warehouseId']);
+        if ($options['warehouseIds'] !== null){
+            $query = $query->whereIn('inventory_warehouse_id', $options['warehouseIds']);
         }
 
 
@@ -71,9 +75,21 @@ class RecordInventoryProductsLoansKardex
         $loans = $query->orderBy('loaned_at')->get();
 
         $productsLoans = $loans->groupBy('inventory_product_item_id')->map(function($productLoans) use ($options){
-            if ($options['productId'] !== null && $productLoans->first()->productItem->product->id != $options['productId']){
-                return null;
+
+
+            if ($options['productId'] || $options['categories']){
+                $product = $productLoans->first()->productItem->product;
+
+                if ($options['productId'] !== null && $product->id != $options['productId']){
+                    return null;
+                }
+
+                if ($options['categories'] !== null && !in_array($product->category, $options['categories'])){
+                    return null;
+                }
             }
+
+
             return (object) [
                 'product' => $productLoans->first()->productItem->product,
                 'productItem' => $productLoans->first()->productItem,
@@ -251,8 +267,9 @@ class RecordInventoryProductsLoansKardex
             'query' => [
                 'startDate' => $this->startDate,
                 'endDate' => $this->endDate,
-                'warehouseId' => $this->warehouseId,
-                'productId' => $this->productId
+                'warehouseIds' => $this->warehouseIds,
+                'productId' => $this->productId,
+                'categories' => $this->categories
             ],
         ];
     }

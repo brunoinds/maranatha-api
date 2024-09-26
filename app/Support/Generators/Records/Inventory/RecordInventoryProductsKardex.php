@@ -18,10 +18,11 @@ class RecordInventoryProductsKardex
     private DateTime|null $startDate = null;
     private DateTime|null $endDate = null;
     private string|null $moneyType = null;
-    private string|null $warehouseId = null;
+    private array|null $warehouseIds = null;
     private string|null $expenseCode = null;
     private string|null $jobCode = null;
     private string|null $productId = null;
+    private array|null $categories = null;
 
 
     /**
@@ -31,20 +32,22 @@ class RecordInventoryProductsKardex
         * @param DateTime|null $options['startDate']
         * @param DateTime|null $options['endDate']
         * @param string|null $options['moneyType']
-        * @param string|null $options['warehouseId']
+        * @param string|null $options['warehouseIds']
         * @param string|null $options['expenseCode']
         * @param string|null $options['jobCode']
         * @param string|null $options['productId']
+        * @param string|null $options['categories']
      */
 
     public function __construct(array $options){
         $this->startDate = $options['startDate'] ?? null;
         $this->endDate = $options['endDate'] ?? null;
         $this->moneyType = $options['moneyType'] ?? null;
-        $this->warehouseId = $options['warehouseId'] ?? null;
+        $this->warehouseIds = $options['warehouseIds'] ?? null;
         $this->expenseCode = $options['expenseCode'] ?? null;
         $this->jobCode = $options['jobCode'] ?? null;
         $this->productId = $options['productId'] ?? null;
+        $this->categories = $options['categories'] ?? null;
     }
 
     private function getKardex():Collection
@@ -53,10 +56,11 @@ class RecordInventoryProductsKardex
             'startDate' => $this->startDate,
             'endDate' => $this->endDate,
             'moneyType' => $this->moneyType,
-            'warehouseId' => $this->warehouseId,
+            'warehouseIds' => $this->warehouseIds,
             'expenseCode' => $this->expenseCode,
             'jobCode' => $this->jobCode,
-            'productId' => $this->productId
+            'productId' => $this->productId,
+            'categories' => $this->categories
         ];
 
         $list = [];
@@ -73,8 +77,8 @@ class RecordInventoryProductsKardex
             if ($options['moneyType'] !== null){
                 $query = $query->where('currency', $options['moneyType']);
             }
-            if ($options['warehouseId'] !== null){
-                $query = $query->where('inventory_warehouse_id', $options['warehouseId']);
+            if ($options['warehouseIds'] !== null){
+                $query = $query->whereIn('inventory_warehouse_id', $options['warehouseIds']);
             }
             if ($options['expenseCode'] !== null){
                 $query = $query->where('expense_code', $options['expenseCode']);
@@ -82,7 +86,6 @@ class RecordInventoryProductsKardex
             if ($options['jobCode'] !== null){
                 $query = $query->where('job_code', $options['jobCode']);
             }
-
             return $query->orderBy('date');
         })();
 
@@ -103,6 +106,12 @@ class RecordInventoryProductsKardex
                 $productItems = $income->items()->where('inventory_product_id', $productId);
 
                 $product = InventoryProduct::find($productId);
+
+                if ($options['categories'] !== null){
+                    if (!in_array($product->category, $options['categories'])){
+                        return;
+                    }
+                }
 
                 $balance = [
                     'quantity' => (clone $productItems)->count(),
@@ -381,10 +390,11 @@ class RecordInventoryProductsKardex
                 'startDate' => $this->startDate,
                 'endDate' => $this->endDate,
                 'moneyType' => $this->moneyType,
-                'warehouseId' => $this->warehouseId,
+                'warehouseIds' => $this->warehouseIds,
                 'expenseCode' => $this->expenseCode,
                 'jobCode' => $this->jobCode,
-                'productId' => $this->productId
+                'productId' => $this->productId,
+                'categories' => $this->categories
             ],
         ];
     }

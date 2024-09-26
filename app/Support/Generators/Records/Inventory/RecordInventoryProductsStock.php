@@ -14,40 +14,42 @@ use App\Helpers\Toolbox;
 class RecordInventoryProductsStock
 {
 
-    private string|null $warehouseId = null;
+    private array|null $warehouseIds = null;
     private string|null $productId = null;
     private  string|null $brand = null;
-    private  string|null $category = null;
+    private  array|null $categories = null;
     private  string|null $status = null;
 
     /**
         * RecordInventoryProductsStock constructor.
 
         * @param array $options
-        * @param string|null $options['category']
+        * @param string|null $options['categories']
         * @param string|null $options['brand']
         * @param string|null $options['status']
-        * @param string|null $options['warehouseId']
+        * @param string|null $options['warehouseIds']
         * @param string|null $options['productId']
+
+
      */
 
 
 
     public function __construct(array $options){
-        $this->warehouseId = $options['warehouseId'] ?? null;
+        $this->warehouseIds = $options['warehouseIds'] ?? null;
         $this->productId = $options['productId'] ?? null;
         $this->brand = $options['brand'] ?? null;
-        $this->category = $options['category'] ?? null;
+        $this->categories = $options['categories'] ?? null;
         $this->status = $options['status'] ?? null;
     }
 
     private function getProductsItems():Collection
     {
         $options = [
-            'warehouseId' => $this->warehouseId,
+            'warehouseIds' => $this->warehouseIds,
             'productId' => $this->productId,
             'brand' => $this->brand,
-            'category' => $this->category,
+            'categories' => $this->categories,
             'status' => $this->status
         ];
 
@@ -59,8 +61,8 @@ class RecordInventoryProductsStock
         if ($options['brand'] !== null){
             $query = $query->where('brand', $options['brand']);
         }
-        if ($options['category'] !== null){
-            $query = $query->where('category', $options['category']);
+        if ($options['categories'] !== null){
+            $query = $query->whereIn('category', $options['categories']);
         }
         if ($options['status'] !== null){
             $query = $query->where('status', $options['status']);
@@ -71,8 +73,8 @@ class RecordInventoryProductsStock
             $productsItemsQuery = InventoryProductItem::query()
                 ->where('inventory_product_id', $product->id);
 
-            if ($options['warehouseId'] !== null){
-                $productsItemsQuery = $productsItemsQuery->where('inventory_warehouse_id', $options['warehouseId']);
+            if ($options['warehouseIds'] !== null){
+                $productsItemsQuery = $productsItemsQuery->whereIn('inventory_warehouse_id', $options['warehouseIds']);
             }
 
             $allInStockProductsCount = $productsItemsQuery->where('status', InventoryProductItemStatus::InStock)->count();
@@ -163,10 +165,10 @@ class RecordInventoryProductsStock
         return [
             'data' => $this->createTable(),
             'query' => [
-                'warehouseId' => $this->warehouseId,
+                'warehouseIds' => $this->warehouseIds,
                 'productId' => $this->productId,
                 'brand' => $this->brand,
-                'category' => $this->category,
+                'categories' => $this->categories,
                 'status' => $this->status
             ],
         ];

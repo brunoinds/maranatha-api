@@ -12,30 +12,34 @@ class RecordInventoryProductsBalance
 {
 
     private string|null $moneyType = null;
-    private string|null $warehouseId = null;
+    private array|null $warehouseIds = null;
     private string|null $productId = null;
+    private array|null $categories = null;
 
     /**
         * RecordInventoryProductsBalance constructor.
 
         * @param array $options
         * @param string|null $options['moneyType']
-        * @param string|null $options['warehouseId']
+        * @param string|null $options['warehouseIds']
         * @param string|null $options['productId']
+                * @param string|null $options['categories']
      */
 
     public function __construct(array $options){
         $this->moneyType = $options['moneyType'] ?? null;
-        $this->warehouseId = $options['warehouseId'] ?? null;
+        $this->warehouseIds = $options['warehouseIds'] ?? null;
         $this->productId = $options['productId'] ?? null;
+        $this->categories = $options['categories'] ?? null;
     }
 
     private function getProductsItems():Collection
     {
         $options = [
             'moneyType' => $this->moneyType,
-            'warehouseId' => $this->warehouseId,
-            'productId' => $this->productId
+            'warehouseIds' => $this->warehouseIds,
+            'productId' => $this->productId,
+            'categories' => $this->categories
         ];
 
         $query = InventoryProductItem::query();
@@ -43,8 +47,8 @@ class RecordInventoryProductsBalance
         if ($options['moneyType'] !== null){
             $query = $query->where('buy_currency', $options['moneyType']);
         }
-        if ($options['warehouseId'] !== null){
-            $query = $query->where('inventory_warehouse_id', $options['warehouseId']);
+        if ($options['warehouseIds'] !== null){
+            $query = $query->whereIn('inventory_warehouse_id', $options['warehouseIds']);
         }
         if ($options['productId'] !== null){
             $query = $query->where('inventory_product_id', $options['productId']);
@@ -59,8 +63,8 @@ class RecordInventoryProductsBalance
                     if ($options['moneyType'] !== null){
                         $query = $query->where('buy_currency', $options['moneyType']);
                     }
-                    if ($options['warehouseId'] !== null){
-                        $query = $query->where('inventory_warehouse_id', $options['warehouseId']);
+                    if ($options['warehouseIds'] !== null){
+                        $query = $query->whereIn('inventory_warehouse_id', $options['warehouseIds']);
                     }
                     if ($options['productId'] !== null){
                         $query = $query->where('inventory_product_id', $options['productId']);
@@ -68,6 +72,12 @@ class RecordInventoryProductsBalance
 
                     $productItems = $query->where('buy_currency', $item->buy_currency)
                         ->where('buy_amount', $item->buy_amount);
+
+                    if ($options['categories'] !== null){
+                        if (!in_array((clone $productItems)->first()->product->category, $options['categories'])){
+                            return;
+                        }
+                    }
 
                     $items[] = [
                         'id' => (clone $productItems)->first()->product->id,
@@ -159,8 +169,9 @@ class RecordInventoryProductsBalance
             'data' => $this->createTable(),
             'query' => [
                 'moneyType' => $this->moneyType,
-                'warehouseId' => $this->warehouseId,
-                'productId' => $this->productId
+                'warehouseIds' => $this->warehouseIds,
+                'productId' => $this->productId,
+                'categories' => $this->categories
             ],
         ];
     }

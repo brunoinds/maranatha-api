@@ -414,20 +414,24 @@ class ManagementRecordsController extends Controller
     {
         $validatedData = request()->validate([
             'money_type' => 'nullable|string',
-            'warehouse_id' => 'nullable|string',
+            'warehouse_ids' => 'nullable|array',
+            'warehouse_ids.*' => 'string',
             'expense_code' => 'nullable|string',
             'job_code' => 'nullable|string',
             'product_id' => 'nullable|string',
+            'categories' => 'nullable|array',
+            'categories.*' => 'string',
         ]);
 
         $defaults = [
             'money_type' => null,
-            'warehouse_id' => null,
+            'warehouse_ids' => null,
             'expense_code' => null,
             'job_code' => null,
             'product_id' => null,
             'start_date' => null,
             'end_date' => null,
+            'categories' => null,
         ];
 
         $validatedData = array_merge($defaults, $validatedData);
@@ -443,10 +447,11 @@ class ManagementRecordsController extends Controller
             'startDate' => ($validatedData['start_date']) ? new DateTime($validatedData['start_date']) : null,
             'endDate' => ($validatedData['end_date']) ? new DateTime($validatedData['end_date']) : null,
             'moneyType' => $validatedData['money_type'],
-            'warehouseId' => $validatedData['warehouse_id'],
+            'warehouseIds' => $validatedData['warehouse_ids'],
             'expenseCode' => $validatedData['expense_code'],
             'jobCode' => $validatedData['job_code'],
             'productId' => $validatedData['product_id'],
+            'categories' => $validatedData['categories'],
         ]);
 
         $document = $record->generate();
@@ -463,14 +468,18 @@ class ManagementRecordsController extends Controller
     {
         $validatedData = request()->validate([
             'money_type' => 'nullable|string',
-            'warehouse_id' => 'nullable|string',
+            'warehouse_ids' => 'nullable|array',
+            'warehouse_ids.*' => 'string',
             'product_id' => 'nullable|string',
+            'categories' => 'nullable|array',
+            'categories.*' => 'string',
         ]);
 
         $defaults = [
             'money_type' => null,
-            'warehouse_id' => null,
+            'warehouse_ids' => null,
             'product_id' => null,
+            'categories' => null,
         ];
 
         $validatedData = array_merge($defaults, $validatedData);
@@ -484,8 +493,9 @@ class ManagementRecordsController extends Controller
 
         $record = new RecordInventoryProductsBalance([
             'moneyType' => $validatedData['money_type'],
-            'warehouseId' => $validatedData['warehouse_id'],
+            'warehouseIds' => $validatedData['warehouse_ids'],
             'productId' => $validatedData['product_id'],
+            'categories' => $validatedData['categories'],
         ]);
 
         $document = $record->generate();
@@ -501,19 +511,21 @@ class ManagementRecordsController extends Controller
     public function inventoryProductsStock()
     {
         $validatedData = request()->validate([
-            'warehouse_id' => 'nullable|string',
+            'warehouse_ids' => 'nullable|array',
+            'warehouse_ids.*' => 'string',
             'product_id' => 'nullable|string',
             'brand' => 'nullable|string',
-            'category' => 'nullable|string',
             'status' => 'nullable|string',
+            'categories' => 'nullable|array',
+            'categories.*' => 'string',
         ]);
 
         $defaults = [
-            'warehouse_id' => null,
+            'warehouse_ids' => null,
             'product_id' => null,
             'brand' => null,
-            'category' => null,
             'status' => null,
+            'categories' => null,
         ];
 
         $validatedData = array_merge($defaults, $validatedData);
@@ -526,11 +538,11 @@ class ManagementRecordsController extends Controller
         }
 
         $record = new RecordInventoryProductsStock([
-            'warehouseId' => $validatedData['warehouse_id'],
+            'warehouseIds' => $validatedData['warehouse_ids'],
             'productId' => $validatedData['product_id'],
             'brand' => $validatedData['brand'],
-            'category' => $validatedData['category'],
             'status' => $validatedData['status'],
+            'categories' => $validatedData['categories'],
         ]);
 
         $document = $record->generate();
@@ -545,17 +557,21 @@ class ManagementRecordsController extends Controller
     public function inventoryProductsLoansKardex()
     {
         $validatedData = request()->validate([
-            'warehouse_id' => 'nullable|string',
+            'warehouse_ids' => 'nullable|array',
+            'warehouse_ids.*' => 'string',
             'product_id' => 'nullable|string',
             'start_date' => 'nullable|date',
             'end_date' => 'nullable|date',
+            'categories' => 'nullable|array',
+            'categories.*' => 'string',
         ]);
 
         $defaults = [
-            'warehouse_id' => null,
+            'warehouse_ids' => null,
             'product_id' => null,
             'start_date' => null,
             'end_date' => null,
+            'categories' => null,
         ];
 
         $validatedData = array_merge($defaults, $validatedData);
@@ -568,10 +584,11 @@ class ManagementRecordsController extends Controller
         }
 
         $record = new RecordInventoryProductsLoansKardex([
-            'warehouseId' => $validatedData['warehouse_id'],
+            'warehouseIds' => $validatedData['warehouse_ids'],
             'productId' => $validatedData['product_id'],
             'startDate' => ($validatedData['start_date']) ? new DateTime($validatedData['start_date']) : null,
             'endDate' => ($validatedData['end_date']) ? new DateTime($validatedData['end_date']) : null,
+            'categories' => $validatedData['categories'],
         ]);
 
         $document = $record->generate();
