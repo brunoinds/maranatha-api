@@ -28,6 +28,7 @@ class StoreInventoryProductRequest extends FormRequest
             'name' => ['required', 'string', 'max:1000'],
             'description' => ['string', 'nullable', 'max:1000'],
             'category' => ['string','nullable', 'max:255'],
+            'sub_category' => ['string', 'nullable', 'max:255'],
             'brand' => ['string','nullable', 'max:255'],
             'presentation' => ['string','nullable', 'max:255'],
             'unit' => ['string', Rule::in(InventoryProductUnit::toArray())],

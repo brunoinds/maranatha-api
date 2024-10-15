@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 
-use App\Support\Assistants\ApplicationNativeAssistant;
+use App\Utils\Assistants\ApplicationNativeAssistant;
 use OneSignal;
 
 class ApplicationNativeController extends Controller

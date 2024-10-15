@@ -21,6 +21,7 @@ class InventoryProduct extends Model
         'name',
         'description',
         'category',
+        'sub_category',
         'brand',
         'presentation',
         'unit',
