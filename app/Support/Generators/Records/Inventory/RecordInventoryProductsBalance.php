@@ -15,6 +15,7 @@ class RecordInventoryProductsBalance
     private array|null $warehouseIds = null;
     private string|null $productId = null;
     private array|null $categories = null;
+    private array|null $subCategories = null;
 
     /**
         * RecordInventoryProductsBalance constructor.
@@ -23,7 +24,8 @@ class RecordInventoryProductsBalance
         * @param string|null $options['moneyType']
         * @param string|null $options['warehouseIds']
         * @param string|null $options['productId']
-                * @param string|null $options['categories']
+        * @param string|null $options['categories']
+        * @param string|null $options['subCategories']
      */
 
     public function __construct(array $options){
@@ -31,6 +33,7 @@ class RecordInventoryProductsBalance
         $this->warehouseIds = $options['warehouseIds'] ?? null;
         $this->productId = $options['productId'] ?? null;
         $this->categories = $options['categories'] ?? null;
+        $this->subCategories = $options['subCategories'] ?? null;
     }
 
     private function getProductsItems():Collection
@@ -39,7 +42,8 @@ class RecordInventoryProductsBalance
             'moneyType' => $this->moneyType,
             'warehouseIds' => $this->warehouseIds,
             'productId' => $this->productId,
-            'categories' => $this->categories
+            'categories' => $this->categories,
+            'subCategories' => $this->subCategories
         ];
 
         $query = InventoryProductItem::query();
@@ -79,10 +83,17 @@ class RecordInventoryProductsBalance
                         }
                     }
 
+                    if ($options['subCategories'] !== null){
+                        if (!in_array((clone $productItems)->first()->product->sub_category, $options['subCategories'])){
+                            return;
+                        }
+                    }
+
                     $items[] = [
                         'id' => (clone $productItems)->first()->product->id,
                         'name' => (clone $productItems)->first()->product->name,
                         'category' => (clone $productItems)->first()->product->category,
+                        'sub_category' => (clone $productItems)->first()->product->sub_category,
                         'currency' => (clone $productItems)->first()->buy_currency,
                         'warehouse' => (clone $productItems)->first()->warehouse->name,
                         'income_quantity' => (clone $productItems)->count(),
@@ -104,6 +115,7 @@ class RecordInventoryProductsBalance
                 'product_id' => $item['id'],
                 'product_name' => $item['name'],
                 'category' => $item['category'],
+                'sub_category' => $item['sub_category'],
                 'currency' => $item['currency'],
                 'warehouse' => $item['warehouse'],
                 'income_quantity' => $item['income_quantity'],
@@ -129,6 +141,10 @@ class RecordInventoryProductsBalance
                 [
                     'title' => 'Categoria',
                     'key' => 'category'
+                ],
+                [
+                    'title' => 'Sub Categoria',
+                    'key' => 'sub_category'
                 ],
                 [
                     'title' => 'Almacen',
@@ -171,7 +187,8 @@ class RecordInventoryProductsBalance
                 'moneyType' => $this->moneyType,
                 'warehouseIds' => $this->warehouseIds,
                 'productId' => $this->productId,
-                'categories' => $this->categories
+                'categories' => $this->categories,
+                'subCategories' => $this->subCategories
             ],
         ];
     }

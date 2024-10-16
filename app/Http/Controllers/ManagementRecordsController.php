@@ -421,6 +421,8 @@ class ManagementRecordsController extends Controller
             'product_id' => 'nullable|string',
             'categories' => 'nullable|array',
             'categories.*' => 'string',
+            'sub_categories' => 'nullable|array',
+            'sub_categories.*' => 'string',
         ]);
 
         $defaults = [
@@ -432,6 +434,7 @@ class ManagementRecordsController extends Controller
             'start_date' => null,
             'end_date' => null,
             'categories' => null,
+            'sub_categories' => null,
         ];
 
         $validatedData = array_merge($defaults, $validatedData);
@@ -452,6 +455,7 @@ class ManagementRecordsController extends Controller
             'jobCode' => $validatedData['job_code'],
             'productId' => $validatedData['product_id'],
             'categories' => $validatedData['categories'],
+            'subCategories' => $validatedData['sub_categories'],
         ]);
 
         $document = $record->generate();
@@ -473,6 +477,8 @@ class ManagementRecordsController extends Controller
             'product_id' => 'nullable|string',
             'categories' => 'nullable|array',
             'categories.*' => 'string',
+            'sub_categories' => 'nullable|array',
+            'sub_categories.*' => 'string',
         ]);
 
         $defaults = [
@@ -480,6 +486,7 @@ class ManagementRecordsController extends Controller
             'warehouse_ids' => null,
             'product_id' => null,
             'categories' => null,
+            'sub_categories' => null,
         ];
 
         $validatedData = array_merge($defaults, $validatedData);
@@ -496,6 +503,7 @@ class ManagementRecordsController extends Controller
             'warehouseIds' => $validatedData['warehouse_ids'],
             'productId' => $validatedData['product_id'],
             'categories' => $validatedData['categories'],
+            'subCategories' => $validatedData['sub_categories'],
         ]);
 
         $document = $record->generate();
@@ -518,6 +526,8 @@ class ManagementRecordsController extends Controller
             'status' => 'nullable|string',
             'categories' => 'nullable|array',
             'categories.*' => 'string',
+            'sub_categories' => 'nullable|array',
+            'sub_categories.*' => 'string',
         ]);
 
         $defaults = [
@@ -526,6 +536,7 @@ class ManagementRecordsController extends Controller
             'brand' => null,
             'status' => null,
             'categories' => null,
+            'sub_categories' => null,
         ];
 
         $validatedData = array_merge($defaults, $validatedData);
@@ -543,6 +554,7 @@ class ManagementRecordsController extends Controller
             'brand' => $validatedData['brand'],
             'status' => $validatedData['status'],
             'categories' => $validatedData['categories'],
+            'subCategories' => $validatedData['sub_categories'],
         ]);
 
         $document = $record->generate();
@@ -564,6 +576,8 @@ class ManagementRecordsController extends Controller
             'end_date' => 'nullable|date',
             'categories' => 'nullable|array',
             'categories.*' => 'string',
+            'sub_categories' => 'nullable|array',
+            'sub_categories.*' => 'string',
         ]);
 
         $defaults = [
@@ -572,6 +586,7 @@ class ManagementRecordsController extends Controller
             'start_date' => null,
             'end_date' => null,
             'categories' => null,
+            'sub_categories' => null,
         ];
 
         $validatedData = array_merge($defaults, $validatedData);
@@ -589,6 +604,7 @@ class ManagementRecordsController extends Controller
             'startDate' => ($validatedData['start_date']) ? new DateTime($validatedData['start_date']) : null,
             'endDate' => ($validatedData['end_date']) ? new DateTime($validatedData['end_date']) : null,
             'categories' => $validatedData['categories'],
+            'subCategories' => $validatedData['sub_categories'],
         ]);
 
         $document = $record->generate();

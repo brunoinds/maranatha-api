@@ -18,6 +18,7 @@ class RecordInventoryProductsStock
     private string|null $productId = null;
     private  string|null $brand = null;
     private  array|null $categories = null;
+    private array|null $subCategories = null;
     private  string|null $status = null;
 
     /**
@@ -25,6 +26,7 @@ class RecordInventoryProductsStock
 
         * @param array $options
         * @param string|null $options['categories']
+        * @param string|null $options['subCategories']
         * @param string|null $options['brand']
         * @param string|null $options['status']
         * @param string|null $options['warehouseIds']
@@ -40,6 +42,7 @@ class RecordInventoryProductsStock
         $this->productId = $options['productId'] ?? null;
         $this->brand = $options['brand'] ?? null;
         $this->categories = $options['categories'] ?? null;
+        $this->subCategories = $options['subCategories'] ?? null;
         $this->status = $options['status'] ?? null;
     }
 
@@ -50,6 +53,7 @@ class RecordInventoryProductsStock
             'productId' => $this->productId,
             'brand' => $this->brand,
             'categories' => $this->categories,
+            'subCategories' => $this->subCategories,
             'status' => $this->status
         ];
 
@@ -63,6 +67,9 @@ class RecordInventoryProductsStock
         }
         if ($options['categories'] !== null){
             $query = $query->whereIn('category', $options['categories']);
+        }
+        if ($options['subCategories'] !== null){
+            $query = $query->whereIn('sub_category', $options['subCategories']);
         }
         if ($options['status'] !== null){
             $query = $query->where('status', $options['status']);
@@ -87,6 +94,7 @@ class RecordInventoryProductsStock
                 'id' => $product->id,
                 'name' => $product->name,
                 'category' => $product->category,
+                'sub_category' => $product->sub_category,
                 'brand' => $product->brand,
                 'quantity_total' => $productsItemsQuery->count(),
                 'quantity_in_stock' => $allInStockProductsCount,
@@ -124,6 +132,10 @@ class RecordInventoryProductsStock
             [
                 'title' => 'Categoría',
                 'key' => 'category'
+            ],
+            [
+                'title' => 'Sub Categoría',
+                'key' => 'sub_category'
             ],
             [
                 'title' => 'En Stock',
@@ -169,6 +181,7 @@ class RecordInventoryProductsStock
                 'productId' => $this->productId,
                 'brand' => $this->brand,
                 'categories' => $this->categories,
+                'subCategories' => $this->subCategories,
                 'status' => $this->status
             ],
         ];

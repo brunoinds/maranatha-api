@@ -23,6 +23,7 @@ class RecordInventoryProductsKardex
     private string|null $jobCode = null;
     private string|null $productId = null;
     private array|null $categories = null;
+    private array|null $subCategories = null;
 
 
     /**
@@ -37,6 +38,8 @@ class RecordInventoryProductsKardex
         * @param string|null $options['jobCode']
         * @param string|null $options['productId']
         * @param string|null $options['categories']
+        * @param string|null $options['subCategories']
+
      */
 
     public function __construct(array $options){
@@ -48,6 +51,7 @@ class RecordInventoryProductsKardex
         $this->jobCode = $options['jobCode'] ?? null;
         $this->productId = $options['productId'] ?? null;
         $this->categories = $options['categories'] ?? null;
+        $this->subCategories = $options['subCategories'] ?? null;
     }
 
     private function getKardex():Collection
@@ -60,7 +64,8 @@ class RecordInventoryProductsKardex
             'expenseCode' => $this->expenseCode,
             'jobCode' => $this->jobCode,
             'productId' => $this->productId,
-            'categories' => $this->categories
+            'categories' => $this->categories,
+            'subCategories' => $this->subCategories
         ];
 
         $list = [];
@@ -109,6 +114,12 @@ class RecordInventoryProductsKardex
 
                 if ($options['categories'] !== null){
                     if (!in_array($product->category, $options['categories'])){
+                        return;
+                    }
+                }
+
+                if ($options['subCategories'] !== null){
+                    if (!in_array($product->sub_category, $options['subCategories'])){
                         return;
                     }
                 }
@@ -240,6 +251,7 @@ class RecordInventoryProductsKardex
                 'order' => $item['order'] ?? '',
                 'product' => $item['product']?->name ?? '',
                 'category' => $item['product']?->category ?? '',
+                'sub_category' => $item['product']?->sub_category ?? '',
                 'date' => ($item['date'] !== null) ? Carbon::parse($item['date'])->format('d/m/Y') : '',
                 'currency' => $item['currency'] ?? '',
                 'job' => $item['job']?->code ?? '',
@@ -296,6 +308,10 @@ class RecordInventoryProductsKardex
                 [
                     'title' => 'Categoría',
                     'key' => 'category'
+                ],
+                [
+                    'title' => 'Sub Categoría',
+                    'key' => 'sub_category'
                 ],
                 [
                     'title' => 'Operación',
@@ -394,7 +410,8 @@ class RecordInventoryProductsKardex
                 'expenseCode' => $this->expenseCode,
                 'jobCode' => $this->jobCode,
                 'productId' => $this->productId,
-                'categories' => $this->categories
+                'categories' => $this->categories,
+                'subCategories' => $this->subCategories
             ],
         ];
     }
