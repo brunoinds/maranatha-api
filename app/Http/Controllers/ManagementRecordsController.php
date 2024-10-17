@@ -423,6 +423,8 @@ class ManagementRecordsController extends Controller
             'categories.*' => 'string',
             'sub_categories' => 'nullable|array',
             'sub_categories.*' => 'string',
+            'start_date' => 'nullable|date',
+            'end_date' => 'nullable|date',
         ]);
 
         $defaults = [
@@ -435,6 +437,8 @@ class ManagementRecordsController extends Controller
             'end_date' => null,
             'categories' => null,
             'sub_categories' => null,
+            'start_date' => null,
+            'end_date' => null,
         ];
 
         $validatedData = array_merge($defaults, $validatedData);

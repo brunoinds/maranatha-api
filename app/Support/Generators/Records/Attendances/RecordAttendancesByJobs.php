@@ -103,6 +103,8 @@ class RecordAttendancesByJobs
             return [
                 'attendance_id' => $attendanceId,
                 'attendance_created_at' => explode('/~/', $code)[1],
+                'user' => $attendance->user->name,
+                'description' => $attendance->description,
                 'attendance_from_date' => $attendanceFromDate,
                 'attendance_to_date' => $attendanceToDate,
                 'job_code' => explode('/~/', $code)[2],
@@ -202,6 +204,14 @@ class RecordAttendancesByJobs
             [
                 'title' => 'Fecha Fin Reporte',
                 'key' => 'attendance_to_date',
+            ],
+            [
+                'title' => 'Usuário',
+                'key' => 'user',
+            ],
+            [
+                'title' => 'Descripción',
+                'key' => 'description',
             ],
             [
                 'title' => 'Supervisor',

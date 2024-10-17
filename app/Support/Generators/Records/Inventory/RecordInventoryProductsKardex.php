@@ -112,6 +112,10 @@ class RecordInventoryProductsKardex
 
                 $product = InventoryProduct::find($productId);
 
+                if ($product->is_loanable){
+                    return;
+                }
+
                 if ($options['categories'] !== null){
                     if (!in_array($product->category, $options['categories'])){
                         return;
@@ -141,6 +145,7 @@ class RecordInventoryProductsKardex
                         'expense' => null,
                         'ticket_type' => null,
                         'ticket_number' => null,
+                        'operation_id' => null,
                         'user' => null,
                         'commerce_number' => null,
                         'warehouse' => null,
@@ -168,6 +173,7 @@ class RecordInventoryProductsKardex
                     'expense' => $income->expense,
                     'ticket_type' => $income->ticket_type,
                     'ticket_number' => $income->ticket_number,
+                    'operation_id' => null,
                     'user' => $income->user,
                     'commerce_number' => $income->commerce_number,
                     'warehouse' => $income->warehouse,
@@ -272,9 +278,9 @@ class RecordInventoryProductsKardex
                 })(),
                 'operation_id' => (function() use ($item){
                     if ($item['income'] !== null){
-                        return 'ENT-#00' . $item['income']->id;
+                        return 'ENT-#00' . $item['income']->id . '-' . $item['income']->ticket_number;
                     }elseif ($item['outcome'] !== null){
-                        return 'SAL-#00' . $item['outcome']->id;
+                        return 'SAL-#00' . $item['outcome']->id . '-' . $item['outcome']->ticket_number;
                     }else{
                         return '';
                     }
