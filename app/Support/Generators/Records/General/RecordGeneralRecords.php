@@ -438,19 +438,19 @@ class RecordGeneralRecords
                     'key' => 'username',
                 ],
                 [
-                    'title' => 'Fecha de Creación',
+                    'title' => 'Fecha de Registro',
                     'key' => 'created_at',
                 ],
                 [
-                    'title' => 'Tipo de Boleta',
+                    'title' => 'Comprobante',
                     'key' => 'ticket_type',
                 ],
                 [
-                    'title' => 'Número de Boleta',
+                    'title' => 'Série y Número',
                     'key' => 'ticket_number',
                 ],
                 [
-                    'title' => 'Fecha de Inicio',
+                    'title' => 'Fecha de Comprobante',
                     'key' => 'ticket_start_date',
                 ],
                 [
