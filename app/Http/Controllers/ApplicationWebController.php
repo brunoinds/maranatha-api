@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 
-use App\Utils\Assistants\ApplicationWebAssistant;
+use App\Support\Assistants\ApplicationWebAssistant;
 
 
 class ApplicationWebController extends Controller
