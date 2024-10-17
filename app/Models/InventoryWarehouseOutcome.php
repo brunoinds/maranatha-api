@@ -40,6 +40,11 @@ class InventoryWarehouseOutcome extends Model
         return $this->hasMany(InventoryProductItem::class, 'inventory_warehouse_outcome_id');
     }
 
+    public function products()
+    {
+        return $this->hasManyThrough(InventoryProduct::class, InventoryProductItem::class, 'inventory_warehouse_outcome_id', 'id', 'id', 'inventory_product_id');
+    }
+
     public function job()
     {
         return $this->belongsTo(Job::class, 'job_code', 'code');

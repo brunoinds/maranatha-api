@@ -14,6 +14,8 @@ use App\Support\Generators\Records\Inventory\RecordInventoryProductsKardex;
 use App\Support\Generators\Records\Inventory\RecordInventoryProductsBalance;
 use App\Support\Generators\Records\Inventory\RecordInventoryProductsStock;
 use App\Support\Generators\Records\Inventory\RecordInventoryProductsLoansKardex;
+use App\Support\Generators\Records\General\RecordGeneralRecords;
+
 use DateTime;
 use Carbon\Carbon;
 use App\Support\Cache\RecordsCache;
@@ -570,6 +572,7 @@ class ManagementRecordsController extends Controller
             'is_cached' => false
         ]);
     }
+
     public function inventoryProductsLoansKardex()
     {
         $validatedData = request()->validate([
@@ -614,6 +617,58 @@ class ManagementRecordsController extends Controller
         $document = $record->generate();
 
         RecordsCache::storeRecord('inventoryProductsLoansKardex', $validatedData, $document);
+
+        return response()->json([
+            ...$document,
+            'is_cached' => false
+        ]);
+    }
+
+
+    public function generalRecords()
+    {
+        $validatedData = request()->validate([
+            'start_date' => 'nullable|date',
+            'end_date' => 'nullable|date',
+            'country' => 'nullable|string',
+            'money_type' => 'nullable|string',
+            'expense_code' => 'nullable|string',
+            'job_code' => 'nullable|string',
+            'type' => 'nullable|string',
+        ]);
+
+        $defaults = [
+            'start_date' => null,
+            'end_date' => null,
+            'country' => null,
+            'money_type' => null,
+            'expense_code' => null,
+            'job_code' => null,
+            'type' => null,
+        ];
+
+        $validatedData = array_merge($defaults, $validatedData);
+
+        if (RecordsCache::getRecord('generalRecords', $validatedData)){
+            return response()->json([
+                ...RecordsCache::getRecord('generalRecords', $validatedData),
+                'is_cached' => true
+            ]);
+        }
+
+        $record = new RecordGeneralRecords([
+            'startDate' => ($validatedData['start_date']) ? new DateTime($validatedData['start_date']) : null,
+            'endDate' => ($validatedData['end_date']) ? new DateTime($validatedData['end_date']) : null,
+            'country' => $validatedData['country'],
+            'moneyType' => $validatedData['money_type'],
+            'expenseCode' => $validatedData['expense_code'],
+            'jobCode' => $validatedData['job_code'],
+            'type' => $validatedData['type'],
+        ]);
+
+        $document = $record->generate();
+
+        RecordsCache::storeRecord('generalRecords', $validatedData, $document);
 
         return response()->json([
             ...$document,

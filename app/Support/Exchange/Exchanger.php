@@ -55,6 +55,8 @@ class ExchangeDate{
             return BRL::convertFromDollar($this->date, $amount);
         }elseif ($to === MoneyType::PYG){
             return PYG::convertFromDollar($this->date, $amount);
+        }elseif ($to === MoneyType::USD){
+            return $amount;
         }
     }
 }
