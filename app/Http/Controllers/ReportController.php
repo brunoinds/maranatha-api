@@ -132,10 +132,10 @@ class ReportController extends Controller
 
         $report->save();
 
-        if ($previousStatus !== $report->status && env('APP_ENV') === 'production'){
+        /* if ($previousStatus !== $report->status && env('APP_ENV') === 'production'){
             $excelOutput = ReportGenerator::generateExcelOutput();
             Excel::updateDBSheet($excelOutput);
-        }
+        } */
         if ($previousStatus === ReportStatus::Draft && $report->status === ReportStatus::Submitted){
             //Send notification
             $user = $report->user()->get()->first();
