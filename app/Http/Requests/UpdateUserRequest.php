@@ -30,6 +30,7 @@ class UpdateUserRequest extends FormRequest
             'password' => [Password::defaults()],
             'roles' => ['array'],
             'permissions' => ['array'],
+            'metadata' => ['array'],
         ];
     }
 }
