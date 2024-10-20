@@ -210,6 +210,15 @@ class InventoryWarehouseIncomeController extends Controller
             }
         }
 
+        if ($validated['currency'] !== $warehouseIncome->currency){
+            InventoryProductItem::where('inventory_warehouse_income_id', $warehouseIncome->id)
+                ->update([
+                    'buy_currency' => $validated['currency'],
+                    'sell_currency' => $validated['currency'],
+                ]);
+        }
+
+
         $warehouseIncome->update($validated);
         if ($imageBase64 !== null){
             $warehouseIncome->deleteImage();
@@ -224,6 +233,72 @@ class InventoryWarehouseIncomeController extends Controller
         }
 
         DataCache::clearRecord('warehouseStockList', [$warehouseIncome->inventory_warehouse_id]);
+
+
+        $resuméInfo = [];
+
+        if (isset($validated['products_changes'])){
+            foreach ($validated['products_changes'] as $productChange) {
+                if (isset($productChange['amount']) && $productChange['amount']){
+                    $warehouseIncome->items()
+                        ->where('inventory_product_id', $productChange['product_id'])
+                        ->update([
+                            'buy_amount' => $productChange['amount'],
+                            'sell_amount' => $productChange['amount'],
+                        ]);
+                }
+
+                if (isset($productChange['replaces_by_product_id']) && $productChange['replaces_by_product_id']){
+                    $warehouseIncome->items()
+                        ->where('inventory_product_id', $productChange['product_id'])
+                        ->update([
+                            'inventory_product_id' => $productChange['replaces_by_product_id'],
+                        ]);
+                }
+
+
+                if (isset($productChange['quantity']) && !is_null($productChange['quantity']) && $warehouseIncome->items()->where('inventory_product_id', $productChange['product_id'])->count() !== (int) $productChange['quantity']){
+                    $items = $warehouseIncome->items()->where('inventory_product_id', $productChange['product_id']);
+
+                    if ($items->count() < $productChange['quantity']){
+                        //Create new items:
+                        $itemsCountToCreate = $productChange['quantity'] - $items->count();
+
+                        $lastOrder = InventoryProductItem::orderBy('order', 'desc')->first();
+                        $lastOrder = $lastOrder ? $lastOrder->order : -1;
+
+                        $i = 0;
+                        while ($i < $itemsCountToCreate) {
+                            $buyAmount = (isset($productChange['amount'])) ? $productChange['amount'] : $items->first()->buy_amount;
+                            $sellAmount = (isset($productChange['amount'])) ? $productChange['amount'] : $items->first()->sell_amount;
+                            $productId = (isset($productChange['replaces_by_product_id'])) ? $productChange['replaces_by_product_id'] : $productChange['product_id'];
+
+                            InventoryProductItem::create([
+                                'batch' => TString::generateRandomBatch(),
+                                'order' => $lastOrder + $i + 1,
+                                'buy_amount' => (float) $buyAmount,
+                                'sell_amount' => (float) $sellAmount,
+                                'buy_currency' => $validated['currency'],
+                                'sell_currency' => $validated['currency'],
+                                'inventory_product_id' => $productId,
+                                'inventory_warehouse_id' => $warehouseIncome->inventory_warehouse_id,
+                                'inventory_warehouse_income_id' => $warehouseIncome->id,
+                            ]);
+                            $i++;
+                        }
+                    }elseif ($items->count() > $productChange['quantity']){
+                        //Delete items:
+                        $itemsCountToDelete = $items->count() - $productChange['quantity'];
+                        //Delete the last items, based on the order column:
+
+                        $itemsToDelete = $items->orderBy('order', 'desc')->take($itemsCountToDelete)->get();
+                        foreach ($itemsToDelete as $itemToDelete){
+                            $itemToDelete->delete();
+                        }
+                    }
+                }
+            }
+        }
 
         return response()->json(['message' => 'Inventory warehouse income updated', 'income' => $warehouseIncome], 200);
     }
