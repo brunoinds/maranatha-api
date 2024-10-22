@@ -309,6 +309,22 @@ class InventoryWarehouseOutcomeRequestController extends Controller
 
         unset($validated['status']);
 
+
+        if (isset($validated['requested_products']) && !is_null($validated['requested_products'])){
+            foreach ($validated['requested_products'] as &$requestedProduct) {
+                $requestedProduct['quantity'] = (int) $requestedProduct['quantity'];
+                $requestedProduct['product_id'] = (int) $requestedProduct['product_id'];
+            }
+        }
+
+        if (isset($validated['received_products']) && !is_null($validated['received_products'])){
+            foreach ($validated['received_products'] as &$receivedProduct) {
+                $receivedProduct['quantity'] = (int) $receivedProduct['quantity'];
+                $receivedProduct['product_id'] = (int) $receivedProduct['product_id'];
+            }
+        }
+
+
         $warehouseOutcomeRequest->update($validated);
 
         $warehouseOutcomeRequest->changeStatus(InventoryWarehouseOutcomeRequestStatus::from($status));
