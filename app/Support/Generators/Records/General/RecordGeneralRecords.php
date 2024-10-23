@@ -61,8 +61,8 @@ class RecordGeneralRecords
         //Get filtered reports data:
         $invoicesInSpan = Invoice::query()
                     ->with(['report', 'report.user'])
-                    ->join('reports', 'invoices.report_id', '=', 'reports.id')
                     ->join('jobs', 'invoices.job_code', '=', 'jobs.code')
+                    ->join('reports', 'invoices.report_id', '=', 'reports.id')
                     ->where('invoices.date', '>=', $this->startDate)
                     ->where('invoices.date', '<=', $this->endDate)
                     ->where(function($query){
@@ -467,11 +467,11 @@ class RecordGeneralRecords
                     'key' => 'country',
                 ],
                 [
-                    'title' => 'Código de Trabajo',
+                    'title' => 'Job',
                     'key' => 'job_code',
                 ],
                 [
-                    'title' => 'Código de Gasto',
+                    'title' => 'Expense',
                     'key' => 'expense_code',
                 ],
                 [
