@@ -10,6 +10,7 @@ use App\Models\InventoryProduct;
 use App\Models\InventoryWarehouseOutcome;
 use App\Helpers\Enums\InventoryProductItemStatus;
 use App\Helpers\Toolbox;
+use App\Models\Job;
 
 
 class RecordInventoryProductsKardex
@@ -260,7 +261,7 @@ class RecordInventoryProductsKardex
                 'sub_category' => $item['product']?->sub_category ?? '',
                 'date' => ($item['date'] !== null) ? Carbon::parse($item['date'])->format('d/m/Y') : '',
                 'currency' => $item['currency'] ?? '',
-                'job' => $item['job']?->code ?? '',
+                'job' => Job::sanitizeName($item['job']?->code) ?? '',
                 'expense' => $item['expense']?->code ?? '',
                 'ticket_type' => $item['ticket_type'] ?? '',
                 'ticket_number' => $item['ticket_number'] ?? '',

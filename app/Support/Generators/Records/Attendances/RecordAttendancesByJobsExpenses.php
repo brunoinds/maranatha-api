@@ -88,7 +88,7 @@ class RecordAttendancesByJobsExpenses
             $jobZone = explode('/~/', $identificator)[2];
 
             return [
-                'job' => $jobCode . ' - ' . $jobs->where('code', $jobCode)->first()->name,
+                'job' => Job::sanitizeCode($jobCode) . ' - ' . $jobs->where('code', $jobCode)->first()->name,
                 'job_zone' => $jobZone,
                 'expense' => $expenseCode . ' - ' . $expenses->where('code', $expenseCode)->first()->name,
                 'spendings' => collect($spendings)->map(function($spending){

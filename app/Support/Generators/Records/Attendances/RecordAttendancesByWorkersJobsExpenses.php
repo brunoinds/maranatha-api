@@ -573,7 +573,8 @@ class RecordAttendancesByWorkersJobsExpenses
     }
 
 
-    public function generate():array{
+    public function generate():array
+    {
         return [
             'data' => $this->createTable(),
             'query' => [

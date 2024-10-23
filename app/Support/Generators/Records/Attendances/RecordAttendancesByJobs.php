@@ -17,8 +17,7 @@ use Carbon\CarbonPeriod;
 use App\Models\Invoice;
 use Brunoinds\SunatDolarLaravel\Exchange;
 use App\Models\Attendance;
-
-
+use App\Models\Job;
 
 class RecordAttendancesByJobs
 {
@@ -107,7 +106,7 @@ class RecordAttendancesByJobs
                 'description' => $attendance->description,
                 'attendance_from_date' => $attendanceFromDate,
                 'attendance_to_date' => $attendanceToDate,
-                'job_code' => explode('/~/', $code)[2],
+                'job_code' => Job::sanitizeCode(explode('/~/', $code)[2]),
                 'expense_code' => explode('/~/', $code)[3],
                 'worker_dni' => explode('/~/', $code)[4],
                 'supervisor' => explode('/~/', $code)[5],

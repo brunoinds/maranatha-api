@@ -6,15 +6,8 @@ use Illuminate\Support\Collection;
 use DateTime;
 use Carbon\Carbon;
 use App\Models\InventoryWarehouseProductItemLoan;
-use App\Models\InventoryWarehouse;
-use App\Models\User;
-use App\Models\InventoryWarehouseIncome;
-use App\Models\InventoryProduct;
-use App\Models\InventoryWarehouseOutcome;
 use App\Helpers\Enums\InventoryProductItemStatus;
 use App\Helpers\Enums\InventoryWarehouseProductItemLoanStatus;
-use App\Helpers\Toolbox;
-use App\Models\InventoryProductItem;
 
 class RecordInventoryProductsLoansKardex
 {

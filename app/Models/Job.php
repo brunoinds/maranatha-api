@@ -25,4 +25,15 @@ class Job extends Model
 
     protected $casts = [
     ];
+
+
+
+    public static function sanitizeCode(string $code): string
+    {
+        if (str_contains($code, '-')) {
+            $code = explode('-', $code)[0];
+            $code = trim($code);
+        }
+        return strtoupper($code);
+    }
 }

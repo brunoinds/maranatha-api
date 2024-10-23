@@ -20,6 +20,7 @@ use App\Models\InventoryWarehouseOutcome;
 use App\Models\InventoryProductItem;
 use App\Models\AttendanceDayWorker;
 use App\Helpers\Enums\InventoryProductItemStatus;
+use App\Models\Job;
 
 
 
@@ -104,7 +105,7 @@ class RecordGeneralRecords
                 'description' => $invoice['description'],
                 'country' => $invoice['country'],
 
-                'job_code' => $invoice['job_code'],
+                'job_code' => Job::sanitizeCode($invoice['job_code']),
                 'expense_code' => $invoice['expense_code'],
 
                 'money_type' => $invoice['report']['money_type'],
@@ -165,7 +166,7 @@ class RecordGeneralRecords
                 'attendance_from_date' => $attendanceFromDate,
                 'attendance_to_date' => $attendanceToDate,
                 'country' => $attendance->job->country,
-                'job_code' => explode('/~/', $code)[2],
+                'job_code' => Job::sanitizeCode(explode('/~/', $code)[2]),
                 'expense_code' => explode('/~/', $code)[3],
                 'worker_dni' => explode('/~/', $code)[4],
                 'supervisor' => explode('/~/', $code)[5],
@@ -262,7 +263,7 @@ class RecordGeneralRecords
                 'description' => $attendance['description'],
                 'country' => $attendance['country'],
 
-                'job_code' => $attendance['job_code'],
+                'job_code' => Job::sanitizeCode($attendance['job_code']),
                 'expense_code' => $attendance['expense_code'],
 
                 'money_type' => MoneyType::PEN,
@@ -384,7 +385,7 @@ class RecordGeneralRecords
                         })->unique()->implode(', '),
                         'country' => $outcome->warehouse->country,
 
-                        'job_code' => $outcome->job_code,
+                        'job_code' => Job::sanitizeCode($outcome->job_code),
                         'expense_code' => $outcome->expense_code,
 
                         'money_type' => $income->currency,

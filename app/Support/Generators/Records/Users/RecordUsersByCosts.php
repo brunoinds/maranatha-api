@@ -18,6 +18,7 @@ use App\Helpers\Enums\ReportStatus;
 use App\Models\User;
 use App\Support\Exchange\Exchanger;
 use App\Helpers\Enums\MoneyType;
+use App\Models\Job;
 
 
 class RecordUsersByCosts
@@ -176,7 +177,10 @@ class RecordUsersByCosts
         $spendings = collect($this->getUserWorkersCosts());
         $invoices = collect($this->getUserInvoicesCosts());
 
-        $body = $spendings->merge($invoices)->sortByDesc('date')->toArray();
+        $body = $spendings->merge($invoices)->sortByDesc('date')->map(function($item){
+            $item['job_code'] = Job::sanitizeCode($item['job_code']);
+            return $item;
+        })->toArray();
 
         $body = array_column($body, null);
 

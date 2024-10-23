@@ -16,6 +16,7 @@ use Carbon\Carbon;
 use Carbon\CarbonPeriod;
 use App\Models\Invoice;
 use Brunoinds\SunatDolarLaravel\Exchange;
+use App\Models\Job;
 
 
 class RecordJobsByCosts
@@ -237,7 +238,7 @@ class RecordJobsByCosts
 
         $body = collect($jobs)->map(function($job){
             return [
-                'job_code' => $job['job_code'],
+                'job_code' => Job::sanitizeCode($job['job_code']),
                 'invoices' => $job['invoices']['amount']['USD'],
                 'workers' => $job['workers']['amount']['USD'],
                 'total_dollars' => $job['totals']['amount']['USD'],

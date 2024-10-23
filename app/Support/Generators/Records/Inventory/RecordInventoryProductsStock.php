@@ -6,8 +6,6 @@ use Illuminate\Support\Collection;
 use App\Helpers\Enums\InventoryProductItemStatus;
 use App\Models\InventoryProductItem;
 use App\Models\InventoryProduct;
-use App\Models\InventoryWarehouse;
-
 use App\Helpers\Toolbox;
 
 
@@ -31,8 +29,6 @@ class RecordInventoryProductsStock
         * @param string|null $options['status']
         * @param string|null $options['warehouseIds']
         * @param string|null $options['productId']
-
-
      */
 
 
@@ -84,11 +80,18 @@ class RecordInventoryProductsStock
                 $productsItemsQuery = $productsItemsQuery->whereIn('inventory_warehouse_id', $options['warehouseIds']);
             }
 
+            if ($productsItemsQuery->count() === 0){
+                return null;
+            }
+
             $allInStockProductsCount = $productsItemsQuery->where('status', InventoryProductItemStatus::InStock)->count();
             $allLoanedProductsCount = $productsItemsQuery->where('status', InventoryProductItemStatus::Loaned)->count();
             $allInRepairProductsCount = $productsItemsQuery->where('status', InventoryProductItemStatus::InRepair)->count();
             $allWriteOffProductsCount = $productsItemsQuery->where('status', InventoryProductItemStatus::WriteOff)->count();
             $allSoldProductsCount = $productsItemsQuery->where('status', InventoryProductItemStatus::Sold)->count();
+
+
+
 
             $productItemData = [
                 'id' => $product->id,
@@ -104,8 +107,9 @@ class RecordInventoryProductsStock
                 'quantity_sold' => $allSoldProductsCount,
             ];
             return $productItemData;
+        })->filter(function($product){
+            return $product !== null;
         });
-
 
         return collect($products);
     }
