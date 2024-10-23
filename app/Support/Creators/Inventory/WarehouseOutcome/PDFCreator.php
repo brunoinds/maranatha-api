@@ -164,7 +164,15 @@ class PDFCreator
         collect($productsIds)->each(function($productId) use (&$productsImages){
             $product = InventoryProduct::find($productId);
             if ($product->image !== null){
-                $productsImages[$product->id] = base64_encode(file_get_contents($product->image));
+
+                //Try catch file_get_contents, if error, append null:
+                $image = @file_get_contents($product->image);
+
+                if ($image !== false){
+                    $productsImages[$product->id] = base64_encode($image);
+                }else{
+                    $productsImages[$product->id] = null;
+                }
             }else{
                 $productsImages[$product->id] = null;
             }
