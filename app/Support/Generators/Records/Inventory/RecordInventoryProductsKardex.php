@@ -261,7 +261,7 @@ class RecordInventoryProductsKardex
                 'sub_category' => $item['product']?->sub_category ?? '',
                 'date' => ($item['date'] !== null) ? Carbon::parse($item['date'])->format('d/m/Y') : '',
                 'currency' => $item['currency'] ?? '',
-                'job' => Job::sanitizeName($item['job']?->code) ?? '',
+                'job' => Job::sanitizeCode($item['job']?->code) ?? '',
                 'expense' => $item['expense']?->code ?? '',
                 'ticket_type' => $item['ticket_type'] ?? '',
                 'ticket_number' => $item['ticket_number'] ?? '',

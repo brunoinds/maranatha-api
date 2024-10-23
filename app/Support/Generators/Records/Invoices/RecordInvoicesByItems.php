@@ -110,7 +110,7 @@ class RecordInvoicesByItems
                 'invoice_date' => Carbon::parse($invoice['date'])->format('d/m/Y'),
                 'ticket_number' => $invoice['ticket_number'],
                 'invoice_description' => $invoice['description'],
-                'job_code' => Job::sanitizeName($invoice['job_code']),
+                'job_code' => Job::sanitizeCode($invoice['job_code']),
                 'expense_code' => $invoice['expense_code'],
                 'invoice_amount' => number_format($invoice['amount'], 2),
                 'report_amount' => number_format($invoice['report']->amount(), 2),
