@@ -283,8 +283,12 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::get('inventory/warehouse-outcomes/{warehouseOutcome}/download-pdf', [
             InventoryWarehouseOutcomeController::class, 'downloadPDF'
         ]);
-        Route::get('inventory/warehouse-outcome-requests/{warehouseOutcomeRequest}/download-pdf', [
-            InventoryWarehouseOutcomeRequestController::class, 'downloadPDF'
+        Route::get('inventory/warehouse-outcome-requests/{warehouseOutcomeRequest}/requested/download-pdf', [
+            InventoryWarehouseOutcomeRequestController::class, 'downloadRequestedPDF'
+        ]);
+
+        Route::get('inventory/warehouse-outcome-requests/{warehouseOutcomeRequest}/dispatched/download-pdf', [
+            InventoryWarehouseOutcomeRequestController::class, 'downloadDispatchedPDF'
         ]);
 
         Route::get('inventory/products/items/{inventoryProductItem}/loans', InventoryProductItemController::class . '@loans');

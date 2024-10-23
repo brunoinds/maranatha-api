@@ -11,7 +11,8 @@ use App\Helpers\Toolbox;
 use Illuminate\Support\Facades\Storage;
 use Intervention\Image\Facades\Image;
 use OneSignal;
-use App\Support\Creators\Inventory\WarehouseOutcomeRequest\PDFCreator;
+use App\Support\Creators\Inventory\WarehouseOutcomeRequest\PDFCreator as RequestedPDFCreator;
+use App\Support\Creators\Inventory\WarehouseOutcome\PDFCreator as DispatchedPDFCreator;
 use Spatie\TemporaryDirectory\TemporaryDirectory;
 use App\Models\InventoryWarehouse;
 
@@ -347,9 +348,37 @@ class InventoryWarehouseOutcomeRequestController extends Controller
         return response()->json(['message' => 'Warehouse outcome request deleted']);
     }
 
-    public function downloadPDF(InventoryWarehouseOutcomeRequest $warehouseOutcomeRequest)
+    public function downloadRequestedPDF(InventoryWarehouseOutcomeRequest $warehouseOutcomeRequest)
     {
-        $pdf = PDFCreator::new($warehouseOutcomeRequest);
+        $pdf = RequestedPDFCreator::new($warehouseOutcomeRequest);
+
+        $content = $pdf->create([])->output();
+
+        $documentName = Str::slug($warehouseOutcomeRequest->id, '-') . '.pdf';
+
+        $temporaryDirectory = (new TemporaryDirectory())->create();
+        $tempPath = $temporaryDirectory->path($documentName);
+
+        file_put_contents($tempPath, $content);
+
+        return response()
+            ->download($tempPath, $documentName, [
+                'Content-Encoding' => 'base64',
+                'Content-Length' => filesize($tempPath),
+            ])->deleteFileAfterSend(true);
+    }
+
+
+    public function downloadDispatchedPDF(InventoryWarehouseOutcomeRequest $warehouseOutcomeRequest)
+    {
+        $pdf = DispatchedPDFCreator::new();
+
+        $pdf->addOutcomeRequest($warehouseOutcomeRequest);
+
+        if ($warehouseOutcomeRequest->outcome){
+            $pdf->addOutcome($warehouseOutcomeRequest->outcome);
+        }
+
         $content = $pdf->create([])->output();
 
         $documentName = Str::slug($warehouseOutcomeRequest->id, '-') . '.pdf';

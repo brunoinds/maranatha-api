@@ -182,7 +182,9 @@ class InventoryWarehouseOutcomeController extends Controller
 
     public function downloadPDF(InventoryWarehouseOutcome $warehouseOutcome)
     {
-        $pdf = PDFCreator::new($warehouseOutcome);
+        $pdf = PDFCreator::new();
+        $pdf->addOutcome($warehouseOutcome);
+
         $content = $pdf->create([])->output();
 
         $documentName = Str::slug($warehouseOutcome->id, '-') . '.pdf';
