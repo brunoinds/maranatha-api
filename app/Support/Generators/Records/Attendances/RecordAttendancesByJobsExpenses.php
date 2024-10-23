@@ -91,6 +91,7 @@ class RecordAttendancesByJobsExpenses
                 'job' => Job::sanitizeCode($jobCode) . ' - ' . $jobs->where('code', $jobCode)->first()->name,
                 'job_zone' => $jobZone,
                 'expense' => $expenseCode . ' - ' . $expenses->where('code', $expenseCode)->first()->name,
+                'country' => $jobs->where('code', $jobCode)->first()->country,
                 'spendings' => collect($spendings)->map(function($spending){
                     $spending = Toolbox::toObject($spending);
                     $spending->amountInSoles = (function() use ($spending){
@@ -139,6 +140,7 @@ class RecordAttendancesByJobsExpenses
             $return = [
                 'job' => $item['job'],
                 'job_zone' => $item['job_zone'],
+                'country' => $item['country'],
                 'expense' => $item['expense'],
                 'amount_in_soles' => $item['totals']['amount_in_soles'],
                 'amount_in_dollars' => $item['totals']['amount_in_dollars'],
@@ -225,6 +227,10 @@ class RecordAttendancesByJobsExpenses
             [
                 'title' => 'Zona',
                 'key' => 'job_zone',
+            ],
+            [
+                'title' => 'País',
+                'key' => 'country',
             ]
         ];
 

@@ -112,6 +112,7 @@ class RecordAttendancesByJobs
                 'supervisor' => explode('/~/', $code)[5],
                 'worker_name' => explode('/~/', $code)[6],
                 'job_zone' => explode('/~/', $code)[7],
+                'country' => $attendance->job->country,
                 'spendings' => collect($spendings)->map(function($spending){
                     $spending = Toolbox::toObject($spending);
                     $spending->amountInSoles = (function() use ($spending){
@@ -239,6 +240,10 @@ class RecordAttendancesByJobs
             [
                 'title' => 'Job Zone',
                 'key' => 'job_zone',
+            ],
+            [
+                'title' => 'País',
+                'key' => 'country',
             ],
             [
                 'title' => 'Expense',
