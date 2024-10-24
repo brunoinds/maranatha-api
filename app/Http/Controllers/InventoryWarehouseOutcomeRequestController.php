@@ -11,11 +11,11 @@ use App\Helpers\Toolbox;
 use Illuminate\Support\Facades\Storage;
 use Intervention\Image\Facades\Image;
 use OneSignal;
-use App\Support\Creators\Inventory\WarehouseOutcomeRequest\PDFCreator as RequestedPDFCreator;
-use App\Support\Creators\Inventory\WarehouseOutcome\PDFCreator as DispatchedPDFCreator;
 use Spatie\TemporaryDirectory\TemporaryDirectory;
 use App\Models\InventoryWarehouse;
 
+use App\Support\Creators\Inventory\WarehouseOutcomeRequestRequestedProducts\WarehouseOutcomeRequestRequestedProductsPdfCreator;
+use App\Support\Creators\Inventory\WarehouseOutcomeRequestDispatchedProducts\WarehouseOutcomeRequestDispatchedProductsPdfCreator;
 
 
 
@@ -350,9 +350,11 @@ class InventoryWarehouseOutcomeRequestController extends Controller
 
     public function downloadRequestedPDF(InventoryWarehouseOutcomeRequest $warehouseOutcomeRequest)
     {
-        $pdf = RequestedPDFCreator::new($warehouseOutcomeRequest);
+        $pdf = WarehouseOutcomeRequestRequestedProductsPdfCreator::new($warehouseOutcomeRequest);
 
-        $content = $pdf->create([])->output();
+        $withImages = request()->query('withImages') === 'true' ? true : false;
+
+        $content = $pdf->create(['withImages' => $withImages])->output();
 
         $documentName = Str::slug($warehouseOutcomeRequest->id, '-') . '.pdf';
 
@@ -371,15 +373,11 @@ class InventoryWarehouseOutcomeRequestController extends Controller
 
     public function downloadDispatchedPDF(InventoryWarehouseOutcomeRequest $warehouseOutcomeRequest)
     {
-        $pdf = DispatchedPDFCreator::new();
+        $pdf = WarehouseOutcomeRequestDispatchedProductsPdfCreator::new($warehouseOutcomeRequest);
 
-        $pdf->addOutcomeRequest($warehouseOutcomeRequest);
+        $withImages = request()->query('withImages') === 'true' ? true : false;
 
-        if ($warehouseOutcomeRequest->outcome){
-            $pdf->addOutcome($warehouseOutcomeRequest->outcome);
-        }
-
-        $content = $pdf->create([])->output();
+        $content = $pdf->create(['withImages' => $withImages])->output();
 
         $documentName = Str::slug($warehouseOutcomeRequest->id, '-') . '.pdf';
 

@@ -1,80 +1,63 @@
 <?php
 
 
-namespace App\Support\Creators\Inventory\WarehouseOutcome;
+namespace App\Support\Creators\Inventory\WarehouseOutcomeRequestDispatchedProducts;
 
 use App\Helpers\Toolbox;
-use App\Models\InventoryWarehouseOutcome;
 use App\Models\InventoryProduct;
 use App\Models\InventoryWarehouseOutcomeRequest;
-use App\Models\Report;
-use App\Support\Assistants\ReportAssistant;
-use DateTime;
+use App\Models\InventoryWarehouseOutcome;
 use Carbon\Carbon;
 use Dompdf\Dompdf;
-use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Facades\Cache;
 use chillerlan\QRCode\QRCode;
 
 
-class PDFCreator
+class WarehouseOutcomeRequestDispatchedProductsPdfCreator
 {
     private $html = '';
 
+    private InventoryWarehouseOutcomeRequest $outcomeRequest;
     private InventoryWarehouseOutcome|null $outcome = null;
-    private InventoryWarehouseOutcomeRequest|null $outcomeRequest = null;
 
-    private function __construct()
-    {
-
-    }
-
-
-    public function addOutcomeRequest(InventoryWarehouseOutcomeRequest $outcomeRequest)
+    private function __construct(InventoryWarehouseOutcomeRequest $outcomeRequest)
     {
         $this->outcomeRequest = $outcomeRequest;
-    }
-    public function addOutcome(InventoryWarehouseOutcome $outcome)
-    {
-        $this->outcome = $outcome;
+
+        if (!is_null($outcomeRequest->outcome)){
+            $this->outcome = $outcomeRequest->outcome;
+        }
     }
 
-    private function loadTemplate()
+
+    private function loadTemplate($options = ['withImages' => true])
     {
-        $this->html = file_get_contents(base_path('app/Support/Creators/Inventory/WarehouseOutcome/PDFTemplate.html'));
+        if ($options['withImages']){
+            $this->html = file_get_contents(base_path('app/Support/Creators/Inventory/WarehouseOutcomeRequestDispatchedProducts/Templates/WithImages.html'));
+        }else{
+            $this->html = file_get_contents(base_path('app/Support/Creators/Inventory/WarehouseOutcomeRequestDispatchedProducts/Templates/WithoutImages.html'));
+        }
     }
+
     private function loadPlaceholders()
     {
-        if (!is_null($this->outcome)){
-            $this->html = str_replace('{{$warehouseName}}', $this->outcome->warehouse->name, $this->html);
-            $this->html = str_replace('{{$warehouseZone}}', $this->outcome->warehouse->zone, $this->html);
-            $this->html = str_replace('{{$warehouseCountry}}', Toolbox::countryName($this->outcome->warehouse->country), $this->html);
-            $this->html = str_replace('{{$outcomeId}}', $this->outcome->id, $this->html);
-            $this->html = str_replace('{{$date}}', Carbon::parse($this->outcome->date)->format('d/m/y'), $this->html);
-            $this->html = str_replace('{{$job}}', $this->outcome->job_code . ' - ' .$this->outcome->job?->name, $this->html);
-            $this->html = str_replace('{{$expense}}', $this->outcome->expense_code . ' - ' .$this->outcome->expense?->name, $this->html);
-            $this->html = str_replace('{{$outcomeRequestId}}', $this->outcome->request?->id, $this->html);
-            $this->html = str_replace('{{$dispatchedBy}}', $this->outcome->user?->name, $this->html);
-            $this->html = str_replace('{{$requestedBy}}', $this->outcome->request?->user->name, $this->html);
-        }elseif (!is_null($this->outcomeRequest)){
-            $this->html = str_replace('{{$warehouseName}}', $this->outcomeRequest->warehouse->name, $this->html);
-            $this->html = str_replace('{{$warehouseZone}}', $this->outcomeRequest->warehouse->zone, $this->html);
-            $this->html = str_replace('{{$warehouseCountry}}', Toolbox::countryName($this->outcomeRequest->warehouse->country), $this->html);
-            $this->html = str_replace('{{$outcomeId}}', $this->outcomeRequest->id, $this->html);
-            $this->html = str_replace('{{$date}}', Carbon::parse($this->outcomeRequest->date)->format('d/m/y'), $this->html);
-            $this->html = str_replace('{{$job}}', $this->outcomeRequest->job_code . ' - ' .$this->outcomeRequest->job?->name, $this->html);
-            $this->html = str_replace('{{$expense}}', $this->outcomeRequest->expense_code . ' - ' .$this->outcomeRequest->expense?->name, $this->html);
-            $this->html = str_replace('{{$outcomeRequestId}}', $this->outcomeRequest->id, $this->html);
-            $this->html = str_replace('{{$dispatchedBy}}', '-', $this->html);
-            $this->html = str_replace('{{$requestedBy}}', $this->outcomeRequest?->user->name, $this->html);
-        }
+        $this->html = str_replace('{{$warehouseName}}', $this->outcomeRequest->warehouse->name, $this->html);
+        $this->html = str_replace('{{$warehouseZone}}', $this->outcomeRequest->warehouse->zone, $this->html);
+        $this->html = str_replace('{{$warehouseCountry}}', Toolbox::countryName($this->outcomeRequest->warehouse->country), $this->html);
+        $this->html = str_replace('{{$date}}', Carbon::parse($this->outcomeRequest->date)->format('d/m/y'), $this->html);
+        $this->html = str_replace('{{$job}}', $this->outcomeRequest->job_code . ' - ' .$this->outcomeRequest->job?->name, $this->html);
+        $this->html = str_replace('{{$expense}}', $this->outcomeRequest->expense_code . ' - ' .$this->outcomeRequest->expense?->name, $this->html);
+        $this->html = str_replace('{{$outcomeRequestId}}', $this->outcomeRequest->id, $this->html);
+        $this->html = str_replace('{{$requestedBy}}', $this->outcomeRequest->user->name, $this->html);
+        $this->html = str_replace('{{$dispatchedBy}}', $this->outcomeRequest->outcome?->user?->name, $this->html);
+
 
 
         $maranathaLogoUrl = 'https://is1-ssl.mzstatic.com/image/thumb/Purple221/v4/ef/ca/d2/efcad26f-b207-0931-2a0a-93c13cf8d8b4/AppIcon-0-0-1x_U007epad-0-85-220.png/492x0w.webp';
         $logoBase64Src = 'data:image/png;base64,' . base64_encode(file_get_contents($maranathaLogoUrl));
         $this->html = str_replace('{{$maranathaLogo}}', $logoBase64Src, $this->html);
     }
-    private function loadItemsInTable($items)
+
+    private function loadItemsWithImages($items)
     {
         $data = $items;
         $items = '';
@@ -109,8 +92,7 @@ class PDFCreator
         $this->html = str_replace('{{$tableRows}}', $items, $this->html);
         $this->html = str_replace('{{$tableTotals}}', $finalPrice, $this->html);
     }
-
-    private function loadItemsResumeInTable($items)
+    private function loadItemsWithoutImages($items)
     {
         $data = $items;
         $items = '';
@@ -133,15 +115,23 @@ class PDFCreator
             $finalPrice .= $price;
         }
 
-        $this->html = str_replace('{{$tableRowsResume}}', $items, $this->html);
-        $this->html = str_replace('{{$tableTotalsResume}}', $finalPrice, $this->html);
+        $this->html = str_replace('{{$tableRows}}', $items, $this->html);
+        $this->html = str_replace('{{$tableTotals}}', $finalPrice, $this->html);
     }
 
-    private function getItems()
+
+    private function loadQRCode()
+    {
+        $link = env('APP_URL') . '/app/inventory/outcome-requests/' . $this->outcomeRequest->id . '?view-mode=Dispacher';
+        $qrcode = (new QRCode)->render($link);
+        $this->html = str_replace('{{$qrCode}}', $qrcode, $this->html);
+    }
+
+
+
+    private function getItems($options = ['withImages' => true])
     {
         $productsIds = [];
-
-
 
         if (!is_null($this->outcome)){
             $this->outcome->items->groupBy(function($item){
@@ -151,20 +141,17 @@ class PDFCreator
             });
         }
 
-        if (!is_null($this->outcomeRequest)){
-            $this->outcomeRequest->loans->groupBy(function($item){
-                return $item->inventory_product_item_id;
-            })->each(function($groupedItems) use (&$productsIds){
-                $productsIds[] = $groupedItems->first()->productItem->product->id;
-            });
-        }
+        $this->outcomeRequest->loans->groupBy(function($item){
+            return $item->inventory_product_item_id;
+        })->each(function($groupedItems) use (&$productsIds){
+            $productsIds[] = $groupedItems->first()->productItem->product->id;
+        });
 
         $productsImages = [];
 
-        collect($productsIds)->each(function($productId) use (&$productsImages){
+        collect($productsIds)->each(function($productId) use (&$productsImages, &$options){
             $product = InventoryProduct::find($productId);
-            if ($product->image !== null){
-
+            if ($product->image !== null && $options['withImages']){
                 //Try catch file_get_contents, if error, append null:
                 $image = @file_get_contents($product->image);
 
@@ -243,7 +230,6 @@ class PDFCreator
                     $productImage = null;
                 }
 
-
                 $items[] = [
                     'index' => $i,
                     'image' => $productImage,
@@ -256,8 +242,6 @@ class PDFCreator
                 ];
             });
         }
-
-
 
 
         $finalPrices = [];
@@ -277,41 +261,32 @@ class PDFCreator
     }
 
 
-    private function loadQRCode()
+
+    public function create($options = ['withImages' => true]) : Dompdf
     {
-        if (is_null($this->outcome)){
-            $link = env('APP_URL') . '/app/inventory/outcome-requests/' . $this->outcomeRequest->id. '?view-mode=Dispacher';
+        $this->loadTemplate($options);
+        $this->loadPlaceholders();
+
+        $items = $this->getItems($options);
+
+        if ($options['withImages']){
+            $this->loadItemsWithImages($items);
         }else{
-            $link = env('APP_URL') . '/app/inventory/warehouses/' . $this->outcome->inventory_warehouse_id;
+            $this->loadItemsWithoutImages($items);
         }
-
-        $qrcode = (new QRCode)->render($link);
-        $this->html = str_replace('{{$qrCode}}', $qrcode, $this->html);
-    }
-
-
-    public function create($options = []) : Dompdf
-    {
-        $this->loadTemplate();
-        $this->loadPlaceholders($this->outcome);
-
-        $items = $this->getItems();
-
-        $this->loadItemsInTable($items);
-        $this->loadItemsResumeInTable($items);
         $this->loadQrCode();
+
 
         $dompdf = new Dompdf();
         $dompdf->getOptions()->setChroot([base_path('public') . '/storage/']);
-
         $dompdf->loadHtml($this->html);
         $dompdf->setPaper('A4', 'portrait');
         $dompdf->render();
         return $dompdf;
     }
 
-    public static function new()
+    public static function new(InventoryWarehouseOutcomeRequest $outcomeRequest)
     {
-        return new self();
+        return new self($outcomeRequest);
     }
 }

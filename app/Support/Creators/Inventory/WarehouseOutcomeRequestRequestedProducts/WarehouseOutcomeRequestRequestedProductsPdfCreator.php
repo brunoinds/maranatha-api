@@ -1,22 +1,17 @@
 <?php
 
 
-namespace App\Support\Creators\Inventory\WarehouseOutcomeRequest;
+namespace App\Support\Creators\Inventory\WarehouseOutcomeRequestRequestedProducts;
 
 use App\Helpers\Toolbox;
 use App\Models\InventoryProduct;
 use App\Models\InventoryWarehouseOutcomeRequest;
-use App\Models\Report;
-use App\Support\Assistants\ReportAssistant;
-use DateTime;
 use Carbon\Carbon;
 use Dompdf\Dompdf;
-use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Facades\Cache;
 use chillerlan\QRCode\QRCode;
 
 
-class PDFCreator
+class WarehouseOutcomeRequestRequestedProductsPdfCreator
 {
     private $html = '';
 
@@ -25,17 +20,18 @@ class PDFCreator
     private function __construct(InventoryWarehouseOutcomeRequest $outcome)
     {
         $this->outcome = $outcome;
-        $this->loadTemplate($outcome);
-        $this->loadPlaceholders($outcome);
-        $this->loadItemsInTable();
-        $this->loadQrCode();
     }
 
 
-    private function loadTemplate()
+    private function loadTemplate($options = ['withImages' => true])
     {
-        $this->html = file_get_contents(base_path('app/Support/Creators/Inventory/WarehouseOutcomeRequest/PDFTemplate.html'));
+        if ($options['withImages']){
+            $this->html = file_get_contents(base_path('app/Support/Creators/Inventory/WarehouseOutcomeRequestRequestedProducts/Templates/WithImages.html'));
+        }else{
+            $this->html = file_get_contents(base_path('app/Support/Creators/Inventory/WarehouseOutcomeRequestRequestedProducts/Templates/WithoutImages.html'));
+        }
     }
+
     private function loadPlaceholders(InventoryWarehouseOutcomeRequest $outcome)
     {
         $this->html = str_replace('{{$warehouseName}}', $outcome->warehouse->name, $this->html);
@@ -52,17 +48,19 @@ class PDFCreator
         $logoBase64Src = 'data:image/png;base64,' . base64_encode(file_get_contents($maranathaLogoUrl));
         $this->html = str_replace('{{$maranathaLogo}}', $logoBase64Src, $this->html);
     }
-    private function loadItemsInTable()
+
+    private function loadItemsInTable($options = ['withImages' => true])
     {
         $productsImagesLoaded = [];
-        collect($this->outcome->requested_products)->each(function($item) use (&$productsImagesLoaded ){
+        collect($this->outcome->requested_products)->each(function($item) use (&$productsImagesLoaded, $options){
+            if (!$options['withImages']){
+                $productsImagesLoaded[$item['product_id']] = null;
+                return;
+            }
+
             $product = InventoryProduct::find($item['product_id']);
-
-
-            //Try catch file_get_contents, if error, append null:
             if ($product->image !== null){
                 $image = @file_get_contents($product->image);
-
                 if ($image !== false){
                     $productsImagesLoaded[$product->id] = base64_encode($image);
                 }else{
@@ -78,7 +76,7 @@ class PDFCreator
 
         $items = '';
         $iteration = 0;
-        collect($this->outcome->requested_products)->each(function($item) use (&$items, &$iteration, &$productsImagesLoaded){
+        collect($this->outcome->requested_products)->each(function($item) use (&$items, &$iteration, &$productsImagesLoaded, $options){
             $i = ++$iteration;
 
             $product = InventoryProduct::find($item['product_id']);
@@ -95,14 +93,25 @@ class PDFCreator
             }
 
 
-            $items .= "<tr>
-                <td>$i</td>
-                <td>$productImage</td>
-                <td>$productName</td>
-                <td>$productDescription</td>
-                <td>$productBrand</td>
-                <td>$productQuantity</td>
-            </tr>";
+            if ($options['withImages']){
+                $items .= "
+                    <tr>
+                        <td>$i</td>
+                        <td>$productImage</td>
+                        <td>$productName</td>
+                        <td>$productDescription</td>
+                        <td>$productBrand</td>
+                        <td>$productQuantity</td>
+                    </tr>";
+            }else{
+                $items .= "
+                <tr>
+                    <td>$i</td>
+                    <td>$productName</td>
+                    <td>$productBrand</td>
+                    <td>$productQuantity</td>
+                </tr>";
+            }
         });
 
 
@@ -122,11 +131,16 @@ class PDFCreator
 
 
 
-    public function create($options = []) : Dompdf
+    public function create($options = ['withImages' => true]) : Dompdf
     {
+        $this->loadTemplate($options);
+        $this->loadPlaceholders($this->outcome);
+        $this->loadItemsInTable($options);
+        $this->loadQrCode();
+
+
         $dompdf = new Dompdf();
         $dompdf->getOptions()->setChroot([base_path('public') . '/storage/']);
-
         $dompdf->loadHtml($this->html);
         $dompdf->setPaper('A4', 'portrait');
         $dompdf->render();

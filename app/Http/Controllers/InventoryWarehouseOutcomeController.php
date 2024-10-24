@@ -9,7 +9,7 @@ use App\Models\InventoryProductItem;
 use App\Helpers\Enums\InventoryProductItemStatus;
 use App\Models\InventoryWarehouseOutcomeRequest;
 use App\Helpers\Enums\InventoryWarehouseOutcomeRequestStatus;
-use App\Support\Creators\Inventory\WarehouseOutcome\PDFCreator;
+use App\Support\Creators\Inventory\WarehouseOutcomeProducts\WarehouseOutcomeProductsPdfCreator;
 use Illuminate\Support\Str;
 use Spatie\TemporaryDirectory\TemporaryDirectory;
 use Illuminate\Support\Facades\Storage;
@@ -28,7 +28,6 @@ class InventoryWarehouseOutcomeController extends Controller
     {
         //
     }
-
 
     public function resumeAnalisys(InventoryWarehouseOutcome $inventoryWarehouseOutcome)
     {
@@ -182,10 +181,11 @@ class InventoryWarehouseOutcomeController extends Controller
 
     public function downloadPDF(InventoryWarehouseOutcome $warehouseOutcome)
     {
-        $pdf = PDFCreator::new();
-        $pdf->addOutcome($warehouseOutcome);
+        $pdf = WarehouseOutcomeProductsPdfCreator::new($warehouseOutcome);
 
-        $content = $pdf->create([])->output();
+        $withImages = request()->query('withImages') === 'true' ? true : false;
+
+        $content = $pdf->create(['withImages' => $withImages])->output();
 
         $documentName = Str::slug($warehouseOutcome->id, '-') . '.pdf';
 

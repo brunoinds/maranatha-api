@@ -54,6 +54,8 @@ table.items{
     border-collapse: collapse;
     font-size: 10px;
     font-family: helvetica;
+    width: 100%;
+    border: 2px solid black;
 }
 table.items td, table.items th {
     border-width: 0.5px;
@@ -81,6 +83,16 @@ table.items tr[totals] td{
     padding: 6px 6px;
     font-weight: bold;
     font-size: 10px;
+}
+table.items tr[totals] > td:nth-child(1){
+    text-align: right;
+    font-size: 14px;
+}
+table.items tr[totals] > td:nth-child(2){
+    font-weight: bold;
+    font-size: 14px;
+    white-space: nowrap;
+    text-align: right;
 }
 table.items tr[totals] > td:nth-child(3){
     width: 100%;
@@ -162,9 +174,6 @@ table.items tr > td:nth-child(2) > img{
     color: gray;
 }
 
-
-
-
 </style>
 </head>
 <body>
@@ -184,12 +193,11 @@ table.items tr > td:nth-child(2) > img{
                     />
             </td>
         </tr>
-
     </table>
     <main>
 
         <section class="title">
-            <h1>Pedido de Productos #00{{$outcomeRequestId}}</h1>
+            <h1>Orden de Despacho #00{{$outcomeId}}</h1>
         </section>
 
         <section class="details">
@@ -200,6 +208,14 @@ table.items tr > td:nth-child(2) > img{
                     </td>
                     <td>
                         <h2>{{$date}}</h2>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <h2>DESPACHADO POR:</h2>
+                    </td>
+                    <td>
+                        <h2>{{$dispatchedBy}}</h2>
                     </td>
                 </tr>
                 <tr>
@@ -220,6 +236,14 @@ table.items tr > td:nth-child(2) > img{
                 </tr>
                 <tr>
                     <td>
+                        <h2>PEDIDO:</h2>
+                    </td>
+                    <td>
+                        <h2>#00{{$outcomeRequestId}}</h2>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
                         <h2>SOLICITADO POR:</h2>
                     </td>
                     <td>
@@ -232,9 +256,9 @@ table.items tr > td:nth-child(2) > img{
         <br><br><br>
 
 
-        <h3>Productos solicitados:</h3>
+        <h3>Productos despachados:</h3>
         <br>
-        <table class="items" style="width: 100%; border: 2px solid black;">
+        <table class="items">
             <thead>
                 <th>#</th>
                 <th>FOTO</th>
@@ -242,11 +266,13 @@ table.items tr > td:nth-child(2) > img{
                 <th>DETALLE</th>
                 <th>MARCA</th>
                 <th>CANTIDAD</th>
+                <th>PRECIO</th>
+                <th>TOTAL</th>
             </thead>
             <tbody>
                 {{$tableRows}}
                 <tr totals>
-                    <td style="text-align: right; font-size: 14px; " colspan="5">Total</td><td style="font-weight: bold; font-size: 14px; white-space: nowrap; text-align: right;">{{$tableTotals}}</td>
+                    <td colspan="7">Total</td><td>{{$tableTotals}}</td>
                 </tr>
             </tbody>
         </table>
