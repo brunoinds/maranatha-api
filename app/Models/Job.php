@@ -28,8 +28,11 @@ class Job extends Model
 
 
 
-    public static function sanitizeCode(string $code): string
+    public static function sanitizeCode(string|null $code): string|null
     {
+        if (is_null($code)) {
+            return null;
+        }
         if (str_contains($code, '-')) {
             $code = explode('-', $code)[0];
             $code = trim($code);
