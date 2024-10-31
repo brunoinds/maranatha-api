@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Cache;
 use Spatie\TemporaryDirectory\TemporaryDirectory;
 use Illuminate\Support\Str;
+use App\Models\Job;
 
 class CustomPDF extends \setasign\Fpdi\Fpdi {
     function RoundedRect($x, $y, $w, $h, $r, $corners = '1234', $style = '')
@@ -200,7 +201,7 @@ class ReportPDFCreator
                 $invoiceDescription = str_replace($matches[0], "($amount)", $invoiceDescription);
             }
 
-            $jobCode = ReportAssistant::jobCodeOverride($invoice->job_code);
+            $jobCode = ReportAssistant::jobCodeOverride(Job::sanitizeCode($invoice->job_code));
 
             $invoicesItemsHtml .= "<tr>
                 <td>$date</td>
@@ -291,12 +292,12 @@ class ReportPDFCreator
                     'type' => 'pdf',
                     'src' => $fileSrc,
                     'invoice' => $invoice,
-                    'text' => $jobName.' '.$invoice->job_code . ' - '.$invoice->expense_code . "\n" .$invoiceDescription
+                    'text' => $jobName.' '.Job::sanitizeCode($invoice->job_code) . ' - '.$invoice->expense_code . "\n" .$invoiceDescription
                 ];
             }else{
                 $imagesItemsHtml .= '
                     <article>
-                        <h1>'.$jobName.' '.$invoice->job_code . ' - '.$invoice->expense_code . '<br> '.$invoiceDescription.'</h1>
+                        <h1>'.$jobName.' '.Job::sanitizeCode($invoice->job_code) . ' - '.$invoice->expense_code . '<br> '.$invoiceDescription.'</h1>
                         <img src="'.$fileSrc.'">
                     </article>
                 ';

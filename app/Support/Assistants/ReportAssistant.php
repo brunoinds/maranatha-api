@@ -5,6 +5,7 @@ namespace App\Support\Assistants;
 use App\Helpers\Toolbox;
 use App\Models\Report;
 use \avadim\FastExcelWriter\Excel;
+use App\Models\Job;
 
 class ReportAssistant{
     public static function generateExcelDocument(Report $report): Excel{
@@ -147,7 +148,7 @@ class ReportAssistant{
                 $dateFormatedLocal,
                 $invoice->ticket_number,
                 $invoiceDescription,
-                self::jobCodeOverride($invoice->job_code),
+                self::jobCodeOverride(Job::sanitizeCode($invoice->job_code)),
                 $invoice->expense_code,
                 ($j + 1),
                 $invoice->amount,
