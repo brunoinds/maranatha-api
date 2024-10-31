@@ -1,4 +1,4 @@
-<?php 
+<?php
 
 namespace App\Support\Exchange\Currencies;
 
@@ -8,6 +8,11 @@ use Illuminate\Support\Facades\Log;
 
 class PEN{
     public static function convertFromDollar(DateTime $date, float $amount){
+        //Check if float is zero:
+        if($amount == 0){
+            return 0;
+        }
+
         try {
             \Brunoinds\SunatDolarLaravel\Exchange::useStore(\App\Support\Exchange\Adapters\PENAdapter::getStore());
             return \Brunoinds\SunatDolarLaravel\Exchange::on($date)->convert(\Brunoinds\SunatDolarLaravel\Enums\Currency::USD, $amount)->to(\Brunoinds\SunatDolarLaravel\Enums\Currency::PEN);
@@ -17,6 +22,11 @@ class PEN{
         }
     }
     public static function convertToDollar(DateTime $date, float $amount){
+        //Check if float is zero:
+        if($amount == 0){
+            return 0;
+        }
+
         try {
             \Brunoinds\SunatDolarLaravel\Exchange::useStore(\App\Support\Exchange\Adapters\PENAdapter::getStore());
             return \Brunoinds\SunatDolarLaravel\Exchange::on($date)->convert(\Brunoinds\SunatDolarLaravel\Enums\Currency::PEN, $amount)->to(\Brunoinds\SunatDolarLaravel\Enums\Currency::USD);

@@ -1,4 +1,4 @@
-<?php 
+<?php
 
 namespace App\Support\Exchange\Currencies;
 
@@ -8,6 +8,11 @@ use Illuminate\Support\Facades\Log;
 
 class PYG{
     public static function convertFromDollar(DateTime $date, float $amount){
+        //Check if float is zero:
+        if($amount == 0){
+            return 0;
+        }
+
         try {
             \Brunoinds\ParaguayDolarLaravel\Exchange::useStore(\App\Support\Exchange\Adapters\PYGAdapter::getStore());
             return \Brunoinds\ParaguayDolarLaravel\Exchange::on($date)->convert(\Brunoinds\ParaguayDolarLaravel\Enums\Currency::USD, $amount)->to(\Brunoinds\ParaguayDolarLaravel\Enums\Currency::PYG);
@@ -17,6 +22,11 @@ class PYG{
         }
     }
     public static function convertToDollar(DateTime $date, float $amount){
+        //Check if float is zero:
+        if($amount == 0){
+            return 0;
+        }
+
         try {
             \Brunoinds\ParaguayDolarLaravel\Exchange::useStore(\App\Support\Exchange\Adapters\PYGAdapter::getStore());
             return \Brunoinds\ParaguayDolarLaravel\Exchange::on($date)->convert(\Brunoinds\ParaguayDolarLaravel\Enums\Currency::PYG, $amount)->to(\Brunoinds\ParaguayDolarLaravel\Enums\Currency::USD);

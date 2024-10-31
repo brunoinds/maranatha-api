@@ -1,4 +1,4 @@
-<?php 
+<?php
 
 namespace App\Support\Exchange\Currencies;
 
@@ -8,6 +8,12 @@ use Illuminate\Support\Facades\Log;
 
 class BRL{
     public static function convertFromDollar(DateTime $date, float $amount){
+        //Check if float is zero:
+        if($amount == 0){
+            return 0;
+        }
+
+
         try {
             \Brunoinds\FrankfurterLaravel\Exchange::useStore(\App\Support\Exchange\Adapters\BRLAdapter::getStore());
             return \Brunoinds\FrankfurterLaravel\Exchange::on($date)->convert(\Brunoinds\FrankfurterLaravel\Enums\Currency::USD, $amount)->to(\Brunoinds\FrankfurterLaravel\Enums\Currency::BRL);
@@ -17,6 +23,11 @@ class BRL{
         }
     }
     public static function convertToDollar(DateTime $date, float $amount){
+        //Check if float is zero:
+        if($amount == 0){
+            return 0;
+        }
+
         try {
             \Brunoinds\FrankfurterLaravel\Exchange::useStore(\App\Support\Exchange\Adapters\BRLAdapter::getStore());
             return \Brunoinds\FrankfurterLaravel\Exchange::on($date)->convert(\Brunoinds\FrankfurterLaravel\Enums\Currency::BRL, $amount)->to(\Brunoinds\FrankfurterLaravel\Enums\Currency::USD);
