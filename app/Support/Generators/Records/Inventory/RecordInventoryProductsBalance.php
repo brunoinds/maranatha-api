@@ -5,6 +5,7 @@ namespace App\Support\Generators\Records\Inventory;
 use Illuminate\Support\Collection;
 use App\Helpers\Enums\InventoryProductItemStatus;
 use App\Models\InventoryProductItem;
+use App\Models\InventoryProductItemUncountable;
 use App\Helpers\Toolbox;
 
 
@@ -38,6 +39,7 @@ class RecordInventoryProductsBalance
 
     private function getProductsItems():Collection
     {
+        $instance = $this;
         $options = [
             'moneyType' => $this->moneyType,
             'warehouseIds' => $this->warehouseIds,
@@ -46,65 +48,135 @@ class RecordInventoryProductsBalance
             'subCategories' => $this->subCategories
         ];
 
-        $query = InventoryProductItem::query();
 
-        if ($options['moneyType'] !== null){
-            $query = $query->where('buy_currency', $options['moneyType']);
-        }
-        if ($options['warehouseIds'] !== null){
-            $query = $query->whereIn('inventory_warehouse_id', $options['warehouseIds']);
-        }
-        if ($options['productId'] !== null){
-            $query = $query->where('inventory_product_id', $options['productId']);
-        }
+        $countableItems = (function() use ($options, $instance){
+            $query = InventoryProductItem::query();
+
+            if ($options['moneyType'] !== null){
+                $query = $query->where('buy_currency', $options['moneyType']);
+            }
+            if ($options['warehouseIds'] !== null){
+                $query = $query->whereIn('inventory_warehouse_id', $options['warehouseIds']);
+            }
+            if ($options['productId'] !== null){
+                $query = $query->where('inventory_product_id', $options['productId']);
+            }
 
 
 
-        $items = [];
-        $query->groupBy(['buy_currency', 'buy_amount'])
-                ->select()->each(function($item) use (&$options, &$items){
-                    $query = InventoryProductItem::query();
-                    if ($options['moneyType'] !== null){
-                        $query = $query->where('buy_currency', $options['moneyType']);
-                    }
-                    if ($options['warehouseIds'] !== null){
-                        $query = $query->whereIn('inventory_warehouse_id', $options['warehouseIds']);
-                    }
-                    if ($options['productId'] !== null){
-                        $query = $query->where('inventory_product_id', $options['productId']);
-                    }
-
-                    $productItems = $query->where('buy_currency', $item->buy_currency)
-                        ->where('buy_amount', $item->buy_amount);
-
-                    if ($options['categories'] !== null){
-                        if (!in_array((clone $productItems)->first()->product->category, $options['categories'])){
-                            return;
+            $items = [];
+            $query->groupBy(['buy_currency', 'buy_amount'])
+                    ->select()->each(function($item) use (&$options, &$items){
+                        $query = InventoryProductItem::query();
+                        if ($options['moneyType'] !== null){
+                            $query = $query->where('buy_currency', $options['moneyType']);
                         }
-                    }
-
-                    if ($options['subCategories'] !== null){
-                        if (!in_array((clone $productItems)->first()->product->sub_category, $options['subCategories'])){
-                            return;
+                        if ($options['warehouseIds'] !== null){
+                            $query = $query->whereIn('inventory_warehouse_id', $options['warehouseIds']);
                         }
-                    }
+                        if ($options['productId'] !== null){
+                            $query = $query->where('inventory_product_id', $options['productId']);
+                        }
 
-                    $items[] = [
-                        'id' => (clone $productItems)->first()->product->id,
-                        'name' => (clone $productItems)->first()->product->name,
-                        'category' => (clone $productItems)->first()->product->category,
-                        'sub_category' => (clone $productItems)->first()->product->sub_category,
-                        'currency' => (clone $productItems)->first()->buy_currency,
-                        'warehouse' => (clone $productItems)->first()->warehouse->name,
-                        'income_quantity' => (clone $productItems)->count(),
-                        'outcome_quantity' => (clone $productItems)->where('status', InventoryProductItemStatus::Sold)->count(),
-                        'outcome_amount' => (clone $productItems)->where('status', InventoryProductItemStatus::Sold)->first()?->buy_amount ?? 0,
-                        'balance_quantity' => (clone $productItems)->count() - (clone $productItems)->where('status', InventoryProductItemStatus::Sold)->count(),
-                        'balance_total_amount' => ((clone $productItems)->count() - (clone $productItems)->where('status', InventoryProductItemStatus::Sold)->count()) * ((clone $productItems)->first()?->buy_amount ?? 0)
-                    ];
-                });
+                        $productItems = $query->where('buy_currency', $item->buy_currency)
+                            ->where('buy_amount', $item->buy_amount);
 
-        return collect($items);
+                        if ($options['categories'] !== null){
+                            if (!in_array((clone $productItems)->first()->product->category, $options['categories'])){
+                                return;
+                            }
+                        }
+
+                        if ($options['subCategories'] !== null){
+                            if (!in_array((clone $productItems)->first()->product->sub_category, $options['subCategories'])){
+                                return;
+                            }
+                        }
+
+                        $items[] = [
+                            'id' => (clone $productItems)->first()->product->id,
+                            'name' => (clone $productItems)->first()->product->name,
+                            'category' => (clone $productItems)->first()->product->category,
+                            'sub_category' => (clone $productItems)->first()->product->sub_category,
+                            'currency' => (clone $productItems)->first()->buy_currency,
+                            'warehouse' => (clone $productItems)->first()->warehouse->name,
+                            'income_quantity' => (clone $productItems)->count(),
+                            'outcome_quantity' => (clone $productItems)->where('status', InventoryProductItemStatus::Sold)->count(),
+                            'outcome_amount' => (clone $productItems)->where('status', InventoryProductItemStatus::Sold)->first()?->buy_amount ?? 0,
+                            'balance_quantity' => (clone $productItems)->count() - (clone $productItems)->where('status', InventoryProductItemStatus::Sold)->count(),
+                            'balance_total_amount' => ((clone $productItems)->count() - (clone $productItems)->where('status', InventoryProductItemStatus::Sold)->count()) * ((clone $productItems)->first()?->buy_amount ?? 0)
+                        ];
+                    });
+
+
+
+            return collect($items);
+        })();
+
+        $uncountableItems = (function() use ($options, $instance){
+            $query = InventoryProductItemUncountable::query();
+
+            if ($options['moneyType'] !== null){
+                $query = $query->where('buy_currency', $options['moneyType']);
+            }
+            if ($options['warehouseIds'] !== null){
+                $query = $query->whereIn('inventory_warehouse_id', $options['warehouseIds']);
+            }
+            if ($options['productId'] !== null){
+                $query = $query->where('inventory_product_id', $options['productId']);
+            }
+
+
+            $items = [];
+            $query->groupBy(['buy_currency', 'buy_amount'])
+                    ->select()->each(function($item) use (&$options, &$items){
+                        $query = InventoryProductItemUncountable::query();
+                        if ($options['moneyType'] !== null){
+                            $query = $query->where('buy_currency', $options['moneyType']);
+                        }
+                        if ($options['warehouseIds'] !== null){
+                            $query = $query->whereIn('inventory_warehouse_id', $options['warehouseIds']);
+                        }
+                        if ($options['productId'] !== null){
+                            $query = $query->where('inventory_product_id', $options['productId']);
+                        }
+
+                        $productItems = $query->where('buy_currency', $item->buy_currency)
+                            ->where('buy_amount', $item->buy_amount);
+
+                        if ($options['categories'] !== null){
+                            if (!in_array((clone $productItems)->first()->product->category, $options['categories'])){
+                                return;
+                            }
+                        }
+
+                        if ($options['subCategories'] !== null){
+                            if (!in_array((clone $productItems)->first()->product->sub_category, $options['subCategories'])){
+                                return;
+                            }
+                        }
+
+                        $items[] = [
+                            'id' => (clone $productItems)->first()->product->id,
+                            'name' => (clone $productItems)->first()->product->name,
+                            'category' => (clone $productItems)->first()->product->category,
+                            'sub_category' => (clone $productItems)->first()->product->sub_category,
+                            'currency' => (clone $productItems)->first()->buy_currency->value,
+                            'warehouse' => (clone $productItems)->first()->warehouse->name,
+                            'income_quantity' => (clone $productItems)->sum('quantity_inserted'),
+                            'outcome_quantity' => (clone $productItems)->sum('quantity_used'),
+                            'outcome_amount' => (clone $productItems)->first()->calculateSellPriceFromBuyPrice(1),
+                            'balance_quantity' => (clone $productItems)->sum('quantity_used'),
+                            'balance_total_amount' => (clone $productItems)->first()->calculateSellPriceFromBuyPrice((clone $productItems)->sum('quantity_used'))
+                        ];
+                    });
+
+
+
+            return collect($items);
+        })();
+
+        return collect($countableItems->merge($uncountableItems));
     }
 
     private function createTable():array{

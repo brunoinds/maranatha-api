@@ -42,9 +42,9 @@ class InventoryWarehouseOutcomeRequest extends Model
         'status' => InventoryWarehouseOutcomeRequestStatus::class
     ];
 
-    public function addRequestedProduct(int $product_id, int $quantity)
+    public function addRequestedProduct(int $product_id, float $quantity)
     {
-        $this->requested_products = array_merge($this->requested_products, [['product_id' => (int) $product_id, 'quantity' => (int) $quantity]]);
+        $this->requested_products = array_merge($this->requested_products, [['product_id' => (int) $product_id, 'quantity' => (float) $quantity]]);
         $this->save();
     }
 
@@ -249,6 +249,7 @@ class InventoryWarehouseOutcomeRequest extends Model
     {
         return $this->hasMany(InventoryProductItem::class, 'inventory_warehouse_outcome_request_id');
     }
+
 
     public function job()
     {

@@ -28,8 +28,11 @@ class StoreInventoryWarehouseOutcomeRequest extends FormRequest
             'job_code' => ['nullable', 'string', 'max:255'],
             'expense_code' => ['nullable', 'string', 'max:255'],
             'inventory_warehouse_id' => ['required', 'integer', 'exists:inventory_warehouses,id'],
-            'products_items' => ['required', 'array'],
+            'products_items' => ['present', 'array'],
             'products_items.*.id' => ['required', 'integer', 'exists:inventory_product_items,id'],
+            'products_items_uncountable' => ['present', 'array'],
+            'products_items_uncountable.*.id' => ['required', 'integer', 'exists:inventory_product_item_uncountables,id'],
+            'products_items_uncountable.*.quantity' => ['required', 'numeric', 'min:0'],
             'outcome_request_id' => ['nullable', 'integer', 'exists:inventory_warehouse_outcome_requests,id'],
         ];
     }

@@ -96,7 +96,7 @@ class RecordInventoryProductsKardex
         })();
 
 
-
+        //Get countable items
         $incomes->each((function($income) use (&$list, $options){
             $productsIdsInIncome = $income->items()
                 ->groupBy('inventory_product_id')
@@ -247,6 +247,169 @@ class RecordInventoryProductsKardex
             }));
         }));
 
+
+        //Get uncountable items
+        $incomes->each((function($income) use (&$list, $options){
+            $productsIdsInIncome = $income->uncountableItems()
+                ->groupBy('inventory_product_id')
+                ->select('inventory_product_id')
+                ->pluck('inventory_product_id')
+                ->unique();
+
+            $productsIdsInIncome->each((function($productId) use ($income, &$list, $options){
+                if ($options['productId'] !== null && $options['productId'] != $productId){
+                    return;
+                }
+
+                $productItems = $income->uncountableItems()->where('inventory_product_id', $productId);
+
+                $product = InventoryProduct::find($productId);
+
+                if ($options['categories'] !== null){
+                    if (!in_array($product->category, $options['categories'])){
+                        return;
+                    }
+                }
+
+                if ($options['subCategories'] !== null){
+                    if (!in_array($product->sub_category, $options['subCategories'])){
+                        return;
+                    }
+                }
+
+                $totalQuantity = (clone $productItems)->sum('quantity_inserted');
+
+                $balance = [
+                    'quantity' => $totalQuantity,
+                    'amount' => (clone $productItems)->first()->calculateSellPriceFromBuyPrice($totalQuantity),
+                    'total' => (clone $productItems)->sum('buy_amount'),
+                ];
+
+                if (count($list) > 0){
+                    //Add empty list item:
+                    $list[] = [
+                        'order' => null,
+                        'product' => null,
+                        'date' => null,
+                        'currency' => null,
+                        'job' => null,
+                        'expense' => null,
+                        'ticket_type' => null,
+                        'ticket_number' => null,
+                        'operation_id' => null,
+                        'user' => null,
+                        'commerce_number' => null,
+                        'warehouse' => null,
+                        'income' => null,
+                        'outcome' => null,
+                        'in_quantity' => null,
+                        'in_amount' => null,
+                        'in_total' => null,
+                        'out_quantity' => null,
+                        'out_amount' => null,
+                        'out_total' => null,
+                        'balance_quantity' => null,
+                        'balance_amount' => null,
+                        'balance_total' => null
+                    ];
+                }
+
+                $internalListIndex = 1;
+                $list[] = [
+                    'order' => $internalListIndex,
+                    'product' => $product,
+                    'date' => $income->date,
+                    'currency' => $income->currency,
+                    'job' => $income->job,
+                    'expense' => $income->expense,
+                    'ticket_type' => $income->ticket_type,
+                    'ticket_number' => $income->ticket_number,
+                    'operation_id' => null,
+                    'user' => $income->user,
+                    'commerce_number' => $income->commerce_number,
+                    'warehouse' => $income->warehouse,
+                    'income' => $income,
+                    'outcome' => null,
+                    'in_quantity' => $balance['quantity'],
+                    'in_amount' => $balance['amount'],
+                    'in_total' => $balance['total'],
+                    'out_quantity' => null,
+                    'out_amount' => null,
+                    'out_total' => null,
+                    'balance_quantity' => $balance['quantity'],
+                    'balance_amount' => $balance['amount'],
+                    'balance_total' => $balance['total']
+                ];
+
+                $outcomes = (function() use ($income, $product, $options){
+                    $query = InventoryWarehouseOutcome::query();
+                    if ($options['startDate'] !== null){
+                        $query = $query->where('date', '>=', $options['startDate']);
+                    }
+                    if ($options['endDate'] !== null){
+                        $query = $query->where('date', '<=', $options['endDate']);
+                    }
+
+                    return $query->orderBy('date')->get();
+                })();
+
+                $outcomes->each((function($outcome) use ($income, &$list, &$balance, $product, &$internalListIndex){
+                    $items = [];
+                    $outcome->uncountableItems()->where('inventory_warehouse_income_id', $income->id)
+                        ->where('inventory_product_id', $product->id)
+                        ->each(function($uncountableItem) use ($outcome, &$items){
+                            if (!isset($uncountableItem->outcomes_details[$outcome->id])){
+                                return;
+                            }
+                            $items[] = (object) [
+                                'outcome_id' => $outcome->id,
+                                'quantity' => $uncountableItem->outcomes_details[$outcome->id]['quantity'],
+                                'sell_amount' => $uncountableItem->outcomes_details[$outcome->id]['sell_amount'],
+                                'instance' => $uncountableItem
+                            ];
+                        });
+
+                    $itemsSold = collect($items);
+
+                    if ($itemsSold->count() === 0){
+                        return;
+                    }
+
+                    //Balance:
+                    $balance['quantity'] -= $itemsSold->sum('quantity');
+                    $balance['amount'] = $itemsSold->first()->instance->calculateSellPriceFromBuyPrice($itemsSold->sum('quantity'));
+                    $balance['total'] -= $itemsSold->sum('sell_amount');
+
+                    ++$internalListIndex;
+
+                    $list[] = [
+                        'order' => $internalListIndex,
+                        'product' => $product,
+                        'date' => $outcome->date,
+                        'currency' => $income->currency,
+                        'job' => $outcome->job,
+                        'expense' => $outcome->expense,
+                        'ticket_type' => $outcome->ticket_type,
+                        'ticket_number' => $outcome->ticket_number,
+                        'user' => $outcome->user,
+                        'commerce_number' => $outcome->commerce_number,
+                        'warehouse' => $outcome->warehouse,
+                        'income' => null,
+                        'outcome' => $outcome,
+                        'in_quantity' => null,
+                        'in_amount' => null,
+                        'in_total' => null,
+                        'out_quantity' => $itemsSold->sum('quantity'),
+                        'out_amount' => $itemsSold->sum('sell_amount'),
+                        'out_total' => $itemsSold->sum('sell_amount'),
+                        'balance_quantity' => $balance['quantity'],
+                        'balance_amount' => $balance['amount'],
+                        'balance_total' => $balance['total']
+                    ];
+                }));
+            }));
+        }));
+
         return collect($list);
     }
 
@@ -294,7 +457,7 @@ class RecordInventoryProductsKardex
                 'out_quantity' => ($item['out_quantity'] !== null) ? $item['out_quantity'] : '',
                 'out_amount' => ($item['out_amount'] !== null) ? Toolbox::moneyPrefix($item['currency']->value) . ' ' . number_format($item['out_amount'], 2) : '',
                 'out_total' => ($item['out_total'] !== null) ? Toolbox::moneyPrefix($item['currency']->value) . ' ' . number_format($item['out_total'], 2) : '',
-                'balance_quantity' => $item['balance_quantity'] ?? '',
+                'balance_quantity' => number_format($item['balance_quantity'], 2) ?? '',
                 'balance_amount' => ($item['balance_amount'] !== null) ? Toolbox::moneyPrefix($item['currency']->value) . ' ' . number_format($item['balance_amount'], 2) : '',
                 'balance_total' => ($item['balance_total'] !== null) ? Toolbox::moneyPrefix($item['currency']->value) . ' ' . number_format($item['balance_total'], 2) : '',
             ];

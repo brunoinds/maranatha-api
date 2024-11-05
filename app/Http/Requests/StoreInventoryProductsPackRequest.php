@@ -24,7 +24,7 @@ class StoreInventoryProductsPackRequest extends FormRequest
         return [
             'name' => ['required', 'string', 'max:1000'],
             'products.*.product_id' => ['required', 'integer', 'exists:inventory_products,id'],
-            'products.*.quantity' => ['required', 'integer', 'min:1'],
+            'products.*.quantity' => ['required', 'numeric', 'min:1'],
         ];
     }
 }

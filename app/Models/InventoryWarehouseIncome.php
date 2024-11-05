@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use App\Models\InventoryProductItem;
+use App\Models\InventoryProductItemUncountable;
 use App\Models\InventoryWarehouse;
 use App\Models\Job;
 use App\Models\Expense;
@@ -13,6 +14,7 @@ use Illuminate\Support\Facades\Storage;
 use Intervention\Image\Facades\Image;
 use App\Models\InventoryProduct;
 use App\Support\Cache\DataCache;
+
 
 class InventoryWarehouseIncome extends Model
 {
@@ -53,6 +55,11 @@ class InventoryWarehouseIncome extends Model
         return $this->hasMany(InventoryProductItem::class);
     }
 
+    public function uncountableItems()
+    {
+        return $this->hasMany(InventoryProductItemUncountable::class);
+    }
+
     public function job()
     {
         return $this->belongsTo(Job::class, 'job_code', 'code');
@@ -65,7 +72,12 @@ class InventoryWarehouseIncome extends Model
 
     public function amount()
     {
-        return $this->items()->sum('buy_amount');
+        return $this->items()->sum('buy_amount')  + $this->uncountableItems()->sum('buy_amount');
+    }
+
+    public function quantities()
+    {
+        return $this->items()->count() + $this->uncountableItems()->sum('quantity_inserted');
     }
 
     public function setImageFromBase64(string $base64Image):bool
@@ -96,6 +108,7 @@ class InventoryWarehouseIncome extends Model
     public function delete()
     {
         $this->items()->delete();
+        $this->uncountableItems()->delete();
         DataCache::clearRecord('warehouseStockList', [$this->inventory_warehouse_id]);
         return parent::delete();
     }

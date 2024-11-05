@@ -7,6 +7,7 @@ use App\Helpers\Enums\MoneyType;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use App\Models\InventoryProductItem;
+use App\Models\InventoryProductItemUncountable;
 use App\Models\InventoryWarehouse;
 use App\Models\Job;
 use App\Models\Expense;
@@ -20,6 +21,8 @@ use App\Support\Cache\DataCache;
 class InventoryWarehouseOutcome extends Model
 {
     use HasFactory;
+    use \Staudenmeir\EloquentJsonRelations\HasJsonRelationships;
+
 
     protected $fillable = [
         'description',
@@ -38,6 +41,12 @@ class InventoryWarehouseOutcome extends Model
     public function items()
     {
         return $this->hasMany(InventoryProductItem::class, 'inventory_warehouse_outcome_id');
+    }
+
+    public function uncountableItems()
+    {
+        return $this->hasManyJson(InventoryProductItemUncountable::class, 'inventory_warehouse_outcome_ids');
+
     }
 
     public function products()
@@ -67,13 +76,24 @@ class InventoryWarehouseOutcome extends Model
 
     public function amount()
     {
+        $outcome = $this;
         $currencies = MoneyType::toAssociativeArray(0);
-        $this->items->each(function ($item) use (&$currencies) {
+        $this->items()->each(function ($item) use (&$currencies) {
             if (!isset($currencies[$item->sell_currency])) {
                 $currencies[$item->sell_currency] = 0;
             }
             $currencies[$item->sell_currency] += $item->sell_amount;
         });
+
+        $this->uncountableItems()->each(function ($uncountableItem) use (&$currencies, $outcome) {
+            $outcomeDetails = $uncountableItem->outcomes_details[$outcome->id];
+            if (!isset($currencies[$outcomeDetails['sell_currency']])) {
+                $currencies[$outcomeDetails['sell_currency']] = 0;
+            }
+            $currencies[$outcomeDetails['sell_currency']] += $outcomeDetails['sell_amount'];
+        });
+
+
 
         foreach ($currencies as $currency => $amount) {
             if ($amount == 0) {
@@ -92,6 +112,19 @@ class InventoryWarehouseOutcome extends Model
         return $currencies;
     }
 
+    public function quantities()
+    {
+        $quantitiesSum = $this->items()->count();
+
+        $outcome = $this;
+        $this->uncountableItems()->each(function ($uncountableItem) use ($outcome, &$quantitiesSum) {
+            $outcomeDetails = $uncountableItem->outcomes_details[$outcome->id];
+            $quantitiesSum += $outcomeDetails['quantity'];
+        });
+
+        return $quantitiesSum;
+    }
+
     public function markProductsItemsAsInStock()
     {
         $this->items()->each(function ($item) {
@@ -108,11 +141,12 @@ class InventoryWarehouseOutcome extends Model
 
     public function transferItemsAsIncomesToWarehouse(InventoryWarehouse $warehouse)
     {
-        $incomes = $this->items->groupBy(function($item){
+        $outcomeInstance = $this;
+        $incomesCountable = $this->items->groupBy(function($item){
             return $item->inventory_warehouse_income_id;
         });
 
-        foreach ($incomes as $incomeId => $items){
+        foreach ($incomesCountable as $incomeId => $items){
             $income = InventoryWarehouseIncome::find($incomeId);
 
             $newIncome = InventoryWarehouseIncome::create([
@@ -151,12 +185,62 @@ class InventoryWarehouseOutcome extends Model
             });
         }
 
+        $incomesUncountable = $this->uncountableItems->groupBy(function($item){
+            return $item->inventory_warehouse_income_id;
+        });
+
+        foreach ($incomesUncountable as $incomeId => $items){
+            $income = InventoryWarehouseIncome::find($incomeId);
+
+            $newIncome = InventoryWarehouseIncome::create([
+                'description' => $income->description,
+                'date' => $income->date,
+                'ticket_type' => $income->ticket_type,
+                'ticket_number' => $income->ticket_number,
+                'commerce_number' => $income->commerce_number,
+                'qrcode_data' => $income->qrcode_data,
+                'image' => $income->image,
+                'currency' => $income->currency,
+                'job_code' => $income->job_code,
+                'expense_code' => $income->expense_code,
+                'inventory_warehouse_id' => $warehouse->id,
+                'origin_inventory_warehouse_income_id' => $income->id,
+            ]);
+
+            $items->each(function($item) use ($income, $newIncome, $warehouse, $outcomeInstance){
+                if (!isset($item->outcomes_details[$outcomeInstance->id])){
+                    return;
+                }
+
+                $outcomeItem = (object) $item->outcomes_details[$outcomeInstance->id];
+                $newItem = InventoryProductItemUncountable::create([
+                    'quantity_inserted' => $outcomeItem->quantity,
+                    'quantity_used' => 0,
+                    'quantity_remaining' => $outcomeItem->quantity,
+                    'buy_amount' => $outcomeItem->sell_amount,
+                    'buy_currency' => $outcomeItem->sell_currency,
+                    'inventory_product_id' => $item->inventory_product_id,
+                    'inventory_warehouse_id' => $warehouse->id,
+                    'inventory_warehouse_income_id' => $newIncome->id,
+                    'origin_inventory_product_item_uncountable_id' => $item->id,
+                ]);
+            });
+        }
+
         DataCache::clearRecord('warehouseStockList', [$this->inventory_warehouse_id]);
     }
 
     public function delete()
     {
+        $outcome = $this;
         $this->markProductsItemsAsInStock();
+        $this->uncountableItems()->each(function($item) use ($outcome){
+            $item->removeOutcome($outcome);
+        });
+        if ($this->request){
+            $this->request->inventory_warehouse_outcome_id = null;
+            $this->request->save();
+        }
         return parent::delete();
     }
 }

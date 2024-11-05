@@ -5,6 +5,7 @@ namespace App\Support\Generators\Records\Inventory;
 use Illuminate\Support\Collection;
 use App\Helpers\Enums\InventoryProductItemStatus;
 use App\Models\InventoryProductItem;
+use App\Models\InventoryProductItemUncountable;
 use App\Models\InventoryProduct;
 use App\Helpers\Toolbox;
 
@@ -72,7 +73,7 @@ class RecordInventoryProductsStock
         }
 
 
-        $products = $query->get()->map(function($product) use ($options){
+        $countableProducts = $query->get()->map(function($product) use ($options){
             $productsItemsQuery = InventoryProductItem::query()
                 ->where('inventory_product_id', $product->id);
 
@@ -84,13 +85,11 @@ class RecordInventoryProductsStock
                 return null;
             }
 
-            $allInStockProductsCount = $productsItemsQuery->where('status', InventoryProductItemStatus::InStock)->count();
-            $allLoanedProductsCount = $productsItemsQuery->where('status', InventoryProductItemStatus::Loaned)->count();
-            $allInRepairProductsCount = $productsItemsQuery->where('status', InventoryProductItemStatus::InRepair)->count();
-            $allWriteOffProductsCount = $productsItemsQuery->where('status', InventoryProductItemStatus::WriteOff)->count();
-            $allSoldProductsCount = $productsItemsQuery->where('status', InventoryProductItemStatus::Sold)->count();
-
-
+            $allInStockProductsCount = (clone $productsItemsQuery)->where('status', InventoryProductItemStatus::InStock)->count();
+            $allLoanedProductsCount = (clone $productsItemsQuery)->where('status', InventoryProductItemStatus::Loaned)->count();
+            $allInRepairProductsCount = (clone $productsItemsQuery)->where('status', InventoryProductItemStatus::InRepair)->count();
+            $allWriteOffProductsCount = (clone $productsItemsQuery)->where('status', InventoryProductItemStatus::WriteOff)->count();
+            $allSoldProductsCount = (clone $productsItemsQuery)->where('status', InventoryProductItemStatus::Sold)->count();
 
 
             $productItemData = [
@@ -111,7 +110,39 @@ class RecordInventoryProductsStock
             return $product !== null;
         });
 
-        return collect($products);
+        $uncountableProducts = $query->get()->map(function($product) use ($options){
+            $productsItemsQuery = InventoryProductItemUncountable::query()
+                ->where('inventory_product_id', $product->id);
+
+            if ($options['warehouseIds'] !== null){
+                $productsItemsQuery = $productsItemsQuery->whereIn('inventory_warehouse_id', $options['warehouseIds']);
+            }
+
+            if ($productsItemsQuery->count() === 0){
+                return null;
+            }
+
+
+
+            $productItemData = [
+                'id' => $product->id,
+                'name' => $product->name,
+                'category' => $product->category,
+                'sub_category' => $product->sub_category,
+                'brand' => $product->brand,
+                'quantity_total' => $productsItemsQuery->sum('quantity_inserted'),
+                'quantity_in_stock' => $productsItemsQuery->sum('quantity_remaining'),
+                'quantity_loaned' => 0,
+                'quantity_in_repair' => 0,
+                'quantity_write_off' => 0,
+                'quantity_sold' => $productsItemsQuery->sum('quantity_used'),
+            ];
+            return $productItemData;
+        })->filter(function($product){
+            return $product !== null;
+        });
+
+        return collect($countableProducts)->merge(collect($uncountableProducts));
     }
 
     private function createTable():array{

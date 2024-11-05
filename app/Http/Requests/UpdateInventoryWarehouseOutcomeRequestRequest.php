@@ -31,10 +31,10 @@ class UpdateInventoryWarehouseOutcomeRequestRequest extends FormRequest
             'inventory_warehouse_id' => ['integer', 'exists:inventory_warehouses,id'],
             'received_products' => ['nullable', 'array'],
             'received_products.*.product_id' => ['required', 'integer', 'exists:inventory_products,id'],
-            'received_products.*.quantity' => ['required', 'integer', 'min:0'],
+            'received_products.*.quantity' => ['required', 'numeric', 'min:0'],
             'requested_products' => ['array'],
             'requested_products.*.product_id' => ['required', 'integer', 'exists:inventory_products,id'],
-            'requested_products.*.quantity' => ['required', 'integer', 'min:1'],
+            'requested_products.*.quantity' => ['required', 'numeric', 'min:1'],
         ];
     }
 }

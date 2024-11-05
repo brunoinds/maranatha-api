@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use App\Models\InventoryProductItem;
+use App\Models\InventoryProductItemUncountable;
 use App\Models\InventoryWarehouseIncome;
 use App\Models\InventoryWarehouseOutcome;
 use App\Support\Assistants\InventoryAssistant;
@@ -34,6 +35,11 @@ class InventoryWarehouse extends Model
         return $this->hasMany(InventoryProductItem::class);
     }
 
+    public function uncountableProducts()
+    {
+        return $this->hasMany(InventoryProductItemUncountable::class);
+    }
+
     public function incomes()
     {
         return $this->hasMany(InventoryWarehouseIncome::class);
@@ -52,6 +58,11 @@ class InventoryWarehouse extends Model
     public function items()
     {
         return $this->hasMany(InventoryProductItem::class);
+    }
+
+    public function uncountableItems()
+    {
+        return $this->hasMany(InventoryProductItemUncountable::class);
     }
 
 

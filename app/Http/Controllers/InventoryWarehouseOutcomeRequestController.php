@@ -39,7 +39,7 @@ class InventoryWarehouseOutcomeRequestController extends Controller
         $loans = $warehouseOutcomeRequest->loans;
         $loans->each(function ($loan) {
             $loan->productItem;
-            $loan->productItem->product;
+            $loan->productItem?->product;
             $loan->loanedBy;
             $loan->loanedTo;
         });
@@ -313,14 +313,14 @@ class InventoryWarehouseOutcomeRequestController extends Controller
 
         if (isset($validated['requested_products']) && !is_null($validated['requested_products'])){
             foreach ($validated['requested_products'] as &$requestedProduct) {
-                $requestedProduct['quantity'] = (int) $requestedProduct['quantity'];
+                $requestedProduct['quantity'] = (float) $requestedProduct['quantity'];
                 $requestedProduct['product_id'] = (int) $requestedProduct['product_id'];
             }
         }
 
         if (isset($validated['received_products']) && !is_null($validated['received_products'])){
             foreach ($validated['received_products'] as &$receivedProduct) {
-                $receivedProduct['quantity'] = (int) $receivedProduct['quantity'];
+                $receivedProduct['quantity'] = (float) $receivedProduct['quantity'];
                 $receivedProduct['product_id'] = (int) $receivedProduct['product_id'];
             }
         }

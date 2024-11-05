@@ -28,7 +28,7 @@ class StoreInventoryWarehouseOutcomeRequestRequest extends FormRequest
             'inventory_warehouse_id' => ['required', 'integer', 'exists:inventory_warehouses,id'],
             'requested_products' => ['required', 'array'],
             'requested_products.*.product_id' => ['required', 'integer', 'exists:inventory_products,id'],
-            'requested_products.*.quantity' => ['required', 'integer', 'min:1'],
+            'requested_products.*.quantity' => ['required', 'numeric', 'min:1'],
         ];
     }
 }

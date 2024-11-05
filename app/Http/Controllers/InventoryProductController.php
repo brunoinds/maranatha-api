@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\StoreInventoryProductRequest;
 use App\Http\Requests\UpdateInventoryProductRequest;
 use App\Models\InventoryProduct;
+use App\Helpers\Enums\InventoryProductUnit;
 use Illuminate\Http\Request;
 use  App\Support\Search\GoogleImages\GoogleImageSearch;
 use App\Support\Cache\DataCache;
@@ -45,8 +46,17 @@ class InventoryProductController extends Controller
 
     public function update(UpdateInventoryProductRequest $request, InventoryProduct $product)
     {
+        $previousProductUnit = $product->unit;
+
         $validated = $request->validated();
+
+        if ($previousProductUnit !== $validated['unit']) {
+            $product->convertItemsUnitNature(InventoryProductUnit::getNature(InventoryProductUnit::from($validated['unit'])));
+        }
+
         $product->update($validated);
+
+
         $product->clearStockCaches();
         return response()->json(['message' => 'Product updated', 'product' => $product->toArray()]);
     }

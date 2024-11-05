@@ -318,7 +318,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
 
         Route::get('inventory/warehouse-outcome-requests/{warehouseOutcomeRequest}/loans', InventoryWarehouseOutcomeRequestController::class . '@listLoans');
 
-        Route::get('inventory/warehouse-incomes/{inventoryWarehouseIncome}/products', InventoryWarehouseIncomeController::class . '@listProductsItems');
+        //Route::get('inventory/warehouse-incomes/{inventoryWarehouseIncome}/products', InventoryWarehouseIncomeController::class . '@listProductsItems');
         Route::get('inventory/warehouse-incomes/{inventoryWarehouseIncome}/products-state', InventoryWarehouseIncomeController::class . '@listProductsState');
 
         Route::get('inventory/warehouse-incomes/{inventoryWarehouseIncome}/image', InventoryWarehouseIncomeController::class . '@showImage');

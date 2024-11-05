@@ -25,4 +25,32 @@ enum InventoryProductUnit: string
 
         return $items;
     }
+
+    public static function natures(): array{
+        return [
+            'Integer' => [InventoryProductUnit::Bags, InventoryProductUnit::Units, InventoryProductUnit::Boxes, InventoryProductUnit::Buckets, InventoryProductUnit::Bags, InventoryProductUnit::Packs],
+            'Float' => [InventoryProductUnit::Liters, InventoryProductUnit::Kilograms, InventoryProductUnit::Meters, InventoryProductUnit::Gallons]
+        ];
+    }
+
+    public static function naturesValues(): array{
+        $natures = self::natures();
+        return [
+            'Integer' => array_map(function($item){
+                return $item->value;
+            }, $natures['Integer']),
+            'Float' => array_map(function($item){
+                return $item->value;
+            }, $natures['Float']),
+        ];
+    }
+
+    public static function getNature(InventoryProductUnit $enum): string|null{
+        foreach (self::natures() as $nature => $units){
+            if(in_array($enum, $units)){
+                return $nature;
+            }
+        }
+        return null;
+    }
 }

@@ -6,6 +6,7 @@ use App\Http\Requests\StoreInventoryWarehouseOutcomeRequest;
 use App\Http\Requests\UpdateInventoryWarehouseOutcomeRequest;
 use App\Models\InventoryWarehouseOutcome;
 use App\Models\InventoryProductItem;
+use App\Models\InventoryProductItemUncountable;
 use App\Helpers\Enums\InventoryProductItemStatus;
 use App\Models\InventoryWarehouseOutcomeRequest;
 use App\Helpers\Enums\InventoryWarehouseOutcomeRequestStatus;
@@ -24,59 +25,114 @@ class InventoryWarehouseOutcomeController extends Controller
         //
     }
 
-    public function create()
-    {
-        //
-    }
 
     public function resumeAnalisys(InventoryWarehouseOutcome $inventoryWarehouseOutcome)
     {
-        $productsIds = $inventoryWarehouseOutcome->items()->groupBy('inventory_product_id')->select('inventory_product_id')->pluck('inventory_product_id')->toArray();
 
-        $productsResume = [];
-        foreach ($productsIds as $productId) {
-            $itemsChosenToSellBuyCurrenciesFounds = $inventoryWarehouseOutcome->items()->where('inventory_product_id', $productId)
-                ->groupBy('buy_currency')
-                ->pluck('buy_currency')
-                ->flatten()
-                ->unique()
-                ->toArray();
+        $productsResumeCountableItems = (function() use ($inventoryWarehouseOutcome){
+            $productsIds = $inventoryWarehouseOutcome->items()->groupBy('inventory_product_id')->select('inventory_product_id')->pluck('inventory_product_id')->toArray();
+            $productsResume = [];
+            foreach ($productsIds as $productId) {
+                $itemsChosenToSellBuyCurrenciesFounds = $inventoryWarehouseOutcome->items()->where('inventory_product_id', $productId)
+                    ->groupBy('buy_currency')
+                    ->pluck('buy_currency')
+                    ->flatten()
+                    ->unique()
+                    ->toArray();
 
 
-            $prices = [];
-            foreach ($itemsChosenToSellBuyCurrenciesFounds as $buyCurrency) {
-                $itemsChosenToSellBuyAmount = $inventoryWarehouseOutcome->items()->where('inventory_product_id', $productId)->where('buy_currency', $buyCurrency)->sum('buy_amount');
-                $itemsChosenToSellBuyCount = $inventoryWarehouseOutcome->items()->where('inventory_product_id', $productId)->where('buy_currency', $buyCurrency)->count();
+                $prices = [];
+                foreach ($itemsChosenToSellBuyCurrenciesFounds as $buyCurrency) {
+                    $itemsChosenToSellBuyAmount = $inventoryWarehouseOutcome->items()->where('inventory_product_id', $productId)->where('buy_currency', $buyCurrency)->sum('buy_amount');
+                    $itemsChosenToSellBuyCount = $inventoryWarehouseOutcome->items()->where('inventory_product_id', $productId)->where('buy_currency', $buyCurrency)->count();
 
-                $prices[] = [
-                    'currency' => $buyCurrency,
-                    'amount' => $itemsChosenToSellBuyAmount,
-                    'count' => $itemsChosenToSellBuyCount,
+                    $prices[] = [
+                        'currency' => $buyCurrency,
+                        'amount' => $itemsChosenToSellBuyAmount,
+                        'count' => $itemsChosenToSellBuyCount,
+                    ];
+                }
+
+                $itemsChosenToSellAggregation = $inventoryWarehouseOutcome->items()->where('inventory_product_id', $productId)
+                    ->groupBy(['buy_currency', 'buy_amount'])
+                    ->select('buy_currency', 'buy_amount', DB::raw('COUNT(*) as count'), DB::raw('SUM(buy_amount) as total_buy_amount'))
+                    ->get()->toArray();
+
+                $productsResume[] = [
+                    'product_id' => $productId,
+                    'quantity' => $inventoryWarehouseOutcome->items()->where('inventory_product_id', $productId)->count(),
+                    'do_loan' => false,
+                    'items_aggregated' => collect($itemsChosenToSellAggregation)->map(function ($item) {
+                        $return = [
+                            'currency' => $item['buy_currency'],
+                            'unit_amount' => $item['buy_amount'],
+                            'count' => $item['count'],
+                            'total_amount' => $item['total_buy_amount'],
+                        ];
+                        return $return;
+                    })->toArray(),
+                    'prices' => $prices,
                 ];
             }
 
-            $itemsChosenToSellAggregation = $inventoryWarehouseOutcome->items()->where('inventory_product_id', $productId)
-                ->groupBy(['buy_currency', 'buy_amount'])
-                ->select('buy_currency', 'buy_amount', DB::raw('COUNT(*) as count'), DB::raw('SUM(buy_amount) as total_buy_amount'))
-                ->get()->toArray();
+            return $productsResume;
+        })();
 
-            $productsResume[] = [
-                'product_id' => $productId,
-                'quantity' => $inventoryWarehouseOutcome->items()->where('inventory_product_id', $productId)->count(),
-                'do_loan' => false,
-                'items_aggregated' => collect($itemsChosenToSellAggregation)->map(function ($item) {
-                    $return = [
-                        'currency' => $item['buy_currency'],
-                        'unit_amount' => $item['buy_amount'],
-                        'count' => $item['count'],
-                        'total_amount' => $item['total_buy_amount'],
+        $productsResumeUncountableItems = (function() use ($inventoryWarehouseOutcome){
+            $productsIds = $inventoryWarehouseOutcome->uncountableItems()->groupBy('inventory_product_id')->select('inventory_product_id')->pluck('inventory_product_id')->toArray();
+            $productsResume = [];
+            foreach ($productsIds as $productId) {
+
+                $itemsChosenToSellBuyCurrenciesFounds = [];
+                $outcomes = [];
+                $inventoryWarehouseOutcome->uncountableItems()->where('inventory_product_id', $productId)->each(function(InventoryProductItemUncountable $inventoryProductItemUncountable) use ($inventoryWarehouseOutcome, &$itemsChosenToSellBuyCurrenciesFounds, &$outcomes){
+                    $itemsChosenToSellBuyCurrenciesFounds[] = $inventoryProductItemUncountable->outcomes_details[$inventoryWarehouseOutcome->id]['sell_currency'];
+                    $outcomes[] = [
+                        'id' => $inventoryProductItemUncountable->id,
+                        'instance' => $inventoryProductItemUncountable,
+                        'sell_currency' => $inventoryProductItemUncountable->outcomes_details[$inventoryWarehouseOutcome->id]['sell_currency'],
+                        'sell_amount' => $inventoryProductItemUncountable->outcomes_details[$inventoryWarehouseOutcome->id]['sell_amount'],
+                        'quantity' => $inventoryProductItemUncountable->outcomes_details[$inventoryWarehouseOutcome->id]['quantity'],
                     ];
-                    return $return;
-                })->toArray(),
-                'prices' => $prices,
-            ];
-        }
+                });
 
+                $itemsChosenToSellBuyCurrenciesFounds = collect($itemsChosenToSellBuyCurrenciesFounds)->unique()->toArray();
+
+                $outcomes = collect($outcomes);
+
+                $prices = [];
+                foreach ($itemsChosenToSellBuyCurrenciesFounds as $sellCurrency) {
+                    $itemsChosenToSellBuyAmount = $outcomes->where('sell_currency', $sellCurrency)->sum('sell_amount');
+                    $itemsChosenToSellBuyCount = $outcomes->where('sell_currency', $sellCurrency)->sum('quantity');
+
+                    $prices[] = [
+                        'currency' => $sellCurrency,
+                        'amount' => $itemsChosenToSellBuyAmount,
+                        'count' => $itemsChosenToSellBuyCount,
+                    ];
+                }
+
+                $productsResume[] = [
+                    'product_id' => $productId,
+                    'quantity' => $inventoryWarehouseOutcome->items()->where('inventory_product_id', $productId)->count(),
+                    'do_loan' => false,
+                    'items_aggregated' => collect($outcomes)->map(function ($item) {
+                        $inventoryProductItemUncountable = $item['instance'];
+                        return [
+                            'currency' => $item['sell_currency'],
+                            'unit_amount' => $inventoryProductItemUncountable->calculateSellPriceFromBuyPrice(1),
+                            'count' => $item['quantity'],
+                            'total_amount' => $item['sell_amount'],
+                        ];
+                    })->toArray(),
+                    'prices' => $prices,
+                ];
+            }
+
+            return $productsResume;
+        })();
+
+        $productsResume = collect([])->merge($productsResumeCountableItems)->merge($productsResumeUncountableItems)->toArray();
 
         $outcomeResume = [
             'products' => $productsResume,
@@ -110,13 +166,23 @@ class InventoryWarehouseOutcomeController extends Controller
 
     public function listProductsItems(InventoryWarehouseOutcome $inventoryWarehouseOutcome)
     {
-        return response()->json($inventoryWarehouseOutcome->items, 200);
+        return response()->json([
+            'countable_items' => $inventoryWarehouseOutcome->items,
+            'uncountable_items' => $inventoryWarehouseOutcome->uncountableItems->map(function($item) use ($inventoryWarehouseOutcome){
+                return [
+                    'id' => $item->id,
+                    'inventory_product_id' => $item->inventory_product_id,
+                    'quantity' => $item->outcomes_details[$inventoryWarehouseOutcome->id]['quantity'],
+                    'sell_amount' => $item->outcomes_details[$inventoryWarehouseOutcome->id]['sell_amount'],
+                    'sell_currency' => $item->outcomes_details[$inventoryWarehouseOutcome->id]['sell_currency'],
+                ];
+            }),
+        ], 200);
     }
 
     public function store(StoreInventoryWarehouseOutcomeRequest $request)
     {
         $validated = $request->validated();
-
 
         //Check if every product_item listed exists and it's status is 'InStock':
         foreach ($validated['products_items'] as $productItem){
@@ -148,6 +214,11 @@ class InventoryWarehouseOutcomeController extends Controller
 
             $productItem->inventory_warehouse_outcome_id = $inventoryWarehouseOutcome->id;
             $productItem->save();
+        }
+
+        foreach ($validated['products_items_uncountable'] as $productItemUncountable) {
+            $productItemUncountableInstance = InventoryProductItemUncountable::find($productItemUncountable['id']);
+            $productItemUncountableInstance->addOutcome($inventoryWarehouseOutcome, $productItemUncountable['quantity']);
         }
 
 

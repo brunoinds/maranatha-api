@@ -124,6 +124,12 @@ class WarehouseOutcomeProductsPdfCreator
             $productsIds[] = $groupedItems->first()->product->id;
         });
 
+        $this->outcome->uncountableItems->groupBy(function($item){
+            return $item->inventory_product_id ;
+        })->each(function($groupedItems) use (&$productsIds){
+            $productsIds[] = $groupedItems->first()->product->id;
+        });
+
         $productsImages = [];
 
         collect($productsIds)->each(function($productId) use (&$productsImages, &$options){
@@ -148,6 +154,7 @@ class WarehouseOutcomeProductsPdfCreator
         });
 
 
+        $outcomeInstance = $this->outcome;
 
         $items = [];
         $iteration = 0;
@@ -165,6 +172,45 @@ class WarehouseOutcomeProductsPdfCreator
             $productUnitAmount = $groupedItems->first()->sell_amount;
             $productCurrency = $groupedItems->first()->sell_currency;
             $productQuantity = $groupedItems->count();
+
+            $unitPrice = Toolbox::moneyPrefix($productCurrency) . ' ' . number_format($productUnitAmount, 2);
+            $totalPrice = Toolbox::moneyPrefix($productCurrency) . ' ' . number_format($productTotalAmount, 2);
+
+
+            if (isset($productsImages[$product->id]) && $productsImages[$product->id] !== null){
+                $productImage = $productsImages[$product->id];
+            }else{
+                $productImage = null;
+            }
+
+            $items[] = [
+                'index' => $i,
+                'image' => $productImage,
+                'name' => $productName,
+                'description' => $productDescription,
+                'brand' => $productBrand,
+                'quantity' => $productQuantity,
+                'unit_price' => $unitPrice,
+                'total_price' => $totalPrice
+            ];
+        });
+
+        $this->outcome->uncountableItems->groupBy(function($item) use ($outcomeInstance){
+            return $item->inventory_product_id . $item->outcomes_details[$outcomeInstance->id]['sell_currency'] . $item->outcomes_details[$outcomeInstance->id]['sell_amount'];
+        })->each(function($groupedItems) use (&$items, &$iteration, &$productsImages, $outcomeInstance){
+            $i = ++$iteration;
+
+            $product = $groupedItems->first()->product;
+            $productName = $product->name;
+            $productImage = $product->image;
+            $productDescription = $product->description;
+            $productBrand = $product->brand;
+
+
+            $productTotalAmount = $groupedItems->first()->outcomes_details[$outcomeInstance->id]['sell_amount'];
+            $productUnitAmount = $groupedItems->first()->calculateSellPriceFromBuyPrice(1);
+            $productCurrency = $groupedItems->first()->outcomes_details[$outcomeInstance->id]['sell_currency'];
+            $productQuantity = $groupedItems->first()->outcomes_details[$outcomeInstance->id]['quantity'];
 
             $unitPrice = Toolbox::moneyPrefix($productCurrency) . ' ' . number_format($productUnitAmount, 2);
             $totalPrice = Toolbox::moneyPrefix($productCurrency) . ' ' . number_format($productTotalAmount, 2);
