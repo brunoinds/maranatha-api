@@ -46,7 +46,7 @@ class InventoryWarehouseOutcome extends Model
     public function uncountableItems()
     {
         // Get the IDs of the related items using whereJsonContains
-        $uncountableItemsIds = InventoryProductItemUncountable::whereJsonContains('inventory_warehouse_outcome_ids', $this->id)
+        $uncountableItemsIds = InventoryProductItemUncountable::where('inventory_warehouse_outcome_ids', 'LIKE', '%' . $this->id . '%')
             ->pluck('id');
 
         return collect(InventoryProductItemUncountable::whereIn('id', $uncountableItemsIds)->get());
