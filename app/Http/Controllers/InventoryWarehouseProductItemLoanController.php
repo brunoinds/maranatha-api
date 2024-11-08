@@ -100,7 +100,7 @@ class InventoryWarehouseProductItemLoanController extends Controller
         $loans = InventoryWarehouseProductItemLoan::where('loaned_to_user_id', auth()->id())->get();
         $loans->each(function ($loan) {
             $loan->productItem;
-            $loan->productItem->product;
+            $loan->productItem?->product;
             $loan->loanedBy;
             $loan->loanedTo;
         });
