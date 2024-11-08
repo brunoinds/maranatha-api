@@ -45,8 +45,13 @@ class InventoryWarehouseOutcome extends Model
 
     public function uncountableItems()
     {
-        return $this->hasManyJson(InventoryProductItemUncountable::class, 'inventory_warehouse_outcome_ids');
+        // Get the IDs of the related items using whereJsonContains
+        $uncountableItemsIds = InventoryProductItemUncountable::whereJsonContains('inventory_warehouse_outcome_ids', $this->id)
+            ->pluck('id');
 
+        return collect(InventoryProductItemUncountable::whereIn('id', $uncountableItemsIds)->get());
+
+        //return $this->hasManyJson(InventoryProductItemUncountable::class, 'inventory_warehouse_outcome_ids');
     }
 
     public function products()
@@ -185,7 +190,7 @@ class InventoryWarehouseOutcome extends Model
             });
         }
 
-        $incomesUncountable = $this->uncountableItems->groupBy(function($item){
+        $incomesUncountable = $this->uncountableItems()->groupBy(function($item){
             return $item->inventory_warehouse_income_id;
         });
 

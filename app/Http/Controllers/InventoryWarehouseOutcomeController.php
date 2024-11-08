@@ -79,7 +79,7 @@ class InventoryWarehouseOutcomeController extends Controller
         })();
 
         $productsResumeUncountableItems = (function() use ($inventoryWarehouseOutcome){
-            $productsIds = $inventoryWarehouseOutcome->uncountableItems()->groupBy('inventory_product_id')->select('inventory_product_id')->pluck('inventory_product_id')->toArray();
+            $productsIds = $inventoryWarehouseOutcome->uncountableItems()->pluck('inventory_product_id')->toArray();
             $productsResume = [];
             foreach ($productsIds as $productId) {
 
@@ -114,7 +114,7 @@ class InventoryWarehouseOutcomeController extends Controller
 
                 $productsResume[] = [
                     'product_id' => $productId,
-                    'quantity' => $inventoryWarehouseOutcome->items()->where('inventory_product_id', $productId)->count(),
+                    'quantity' => $inventoryWarehouseOutcome->uncountableItems()->where('inventory_product_id', $productId)->count(),
                     'do_loan' => false,
                     'items_aggregated' => collect($outcomes)->map(function ($item) {
                         $inventoryProductItemUncountable = $item['instance'];
@@ -168,7 +168,7 @@ class InventoryWarehouseOutcomeController extends Controller
     {
         return response()->json([
             'countable_items' => $inventoryWarehouseOutcome->items,
-            'uncountable_items' => $inventoryWarehouseOutcome->uncountableItems->map(function($item) use ($inventoryWarehouseOutcome){
+            'uncountable_items' => $inventoryWarehouseOutcome->uncountableItems()->map(function($item) use ($inventoryWarehouseOutcome){
                 return [
                     'id' => $item->id,
                     'inventory_product_id' => $item->inventory_product_id,
