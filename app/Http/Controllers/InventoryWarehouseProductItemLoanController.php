@@ -78,7 +78,7 @@ class InventoryWarehouseProductItemLoanController extends Controller
     public function show(InventoryWarehouseProductItemLoan $warehouseLoan)
     {
         $warehouseLoan->productItem;
-        $warehouseLoan->productItem->product;
+        $warehouseLoan->productItem?->product;
         $warehouseLoan->loanedBy;
         $warehouseLoan->loanedTo;
 

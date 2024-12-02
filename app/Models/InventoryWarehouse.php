@@ -84,10 +84,18 @@ class InventoryWarehouse extends Model
 
     public function delete()
     {
-        $this->products()->delete();
-        $this->outcomes()->delete();
-        $this->incomes()->delete();
-        $this->outcomeRequests()->delete();
+        $this->products()->each(function($product){
+            $product->delete();
+        });
+        $this->outcomes()->each(function($outcome){
+            $outcome->delete();
+        });
+        $this->incomes()->each(function($income){
+            $income->delete();
+        });
+        $this->outcomeRequests()->each(function($outcomeRequest){
+            $outcomeRequest->delete();
+        });
         return parent::delete();
     }
 }

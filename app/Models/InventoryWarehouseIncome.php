@@ -107,8 +107,12 @@ class InventoryWarehouseIncome extends Model
 
     public function delete()
     {
-        $this->items()->delete();
-        $this->uncountableItems()->delete();
+        $this->items()->each(function($item){
+            $item->delete();
+        });
+        $this->uncountableItems()->each(function($item){
+            $item->delete();
+        });
         DataCache::clearRecord('warehouseStockList', [$this->inventory_warehouse_id]);
         return parent::delete();
     }

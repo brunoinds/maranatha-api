@@ -22,10 +22,10 @@ class FixOrfanateProductItems extends Command
         }
         $this->info('Found ' . $orfanateItems->count() . ' orfanate items.');
 
-        $orfanateItems->each(function ($item) {
+        /* $orfanateItems->each(function ($item) {
             $this->warn('Deleting orfanate item with id: "' . $item->id . '"');
             InventoryProductItem::find($item->id)->delete();
-        });
+        }); */
     }
 
     private function getOrfanateItems()
