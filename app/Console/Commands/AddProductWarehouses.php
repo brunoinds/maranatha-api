@@ -7,7 +7,7 @@ use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
 use App\Models\InventoryProductItem;
 
-class FixOrfanateProductItems extends Command
+class AddProductWarehouses extends Command
 {
     protected $signature = 'inventory:add-product-warehouses';
 
