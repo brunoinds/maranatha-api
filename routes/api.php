@@ -300,6 +300,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::get('inventory/warehouses/{warehouse}/outcomes', InventoryWarehouseController::class . '@listOutcomes');
         Route::get('inventory/warehouses/{warehouse}/outcome-requests', InventoryWarehouseController::class . '@listOutcomeRequests');
         Route::get('inventory/warehouses/{warehouse}/loans', InventoryWarehouseController::class . '@listLoans');
+        Route::get('inventory/warehouses/{warehouse}/loans-by-users', InventoryWarehouseController::class . '@listLoansByUsers');
 
         Route::get('inventory/warehouses/{warehouse}/products', InventoryWarehouseController::class . '@listProducts');
         Route::get('inventory/warehouses/{warehouse}/stock', InventoryWarehouseController::class . '@listStock');

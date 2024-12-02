@@ -11,6 +11,12 @@ use App\Models\InventoryProduct;
 use Illuminate\Support\Facades\DB;
 use App\Support\Cache\DataCache;
 use App\Helpers\Enums\MoneyType;
+use App\Models\User;
+use Carbon\Carbon;
+use App\Models\InventoryWarehouseOutcomeRequest;
+use App\Models\Job;
+use App\Models\Expense;
+
 
 class InventoryWarehouseController extends Controller
 {
@@ -174,9 +180,67 @@ class InventoryWarehouseController extends Controller
         return response()->json($loans->toArray());
     }
 
+    public function listLoansByUsers(InventoryWarehouse $warehouse)
+    {
+        $loans = $warehouse->loans->groupBy('loaned_to_user_id')->map(function ($userLoans) {
+            $userLoans = $userLoans->map(function ($loan) {
+                $loan->productItem;
+                $loan->productItem?->product;
+                $loan->loanedBy;
+                $loan->loanedTo;
+                return $loan;
+            });
+
+            return [
+                'user' => User::find($userLoans[0]->loaned_to_user_id),
+                'loans' => $userLoans->map(function($loan){
+                    $loan->tagging = (function() use ($loan){
+                        if (count($loan->movements) === 0){
+                            return [
+                                'job' => [
+                                    'code' => '',
+                                    'name' => ''
+                                ],
+                                'expense' => [
+                                    'code' => '',
+                                    'name' => ''
+                                ]
+                            ];
+                        }
+
+                        $lastMovement = $loan->movements[count($loan->movements) - 1];
+
+                        return [
+                            'job' => [
+                                'code' => $lastMovement['job_code'],
+                                'name' => Job::where('code', $lastMovement['job_code'])->first()->name
+                            ],
+                            'expense' => [
+                                'code' => $lastMovement['expense_code'],
+                                'name' => Expense::where('code', $lastMovement['expense_code'])->first()->name
+                            ]
+                        ];
+                    })();
+                    return $loan;
+                })->toArray()
+            ];
+        });
+
+
+        return response()->json($loans->values()->toArray());
+    }
+
     public function listOutcomeRequests(InventoryWarehouse $warehouse)
     {
-        $outcomes = $warehouse->outcomeRequests;
+
+        //Do not include ->chat property from eager loading:
+        $outcomes = $warehouse->outcomeRequests()->get()
+            ->makeHidden('messages')
+            ->map(function ($outcome) {
+                $outcome->request_type = $outcome->requestType();
+                return $outcome;
+            });
+
         return response()->json($outcomes->toArray());
     }
 

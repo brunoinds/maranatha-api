@@ -5,8 +5,10 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use App\Models\InventoryProductItem;
+use App\Models\InventoryProduct;
 use App\Models\InventoryWarehouseOutcome;
 use App\Helpers\Enums\InventoryWarehouseOutcomeRequestStatus;
+use App\Helpers\Enums\InventoryWarehouseOutcomeRequestType;
 use OneSignal;
 use App\Helpers\Toolbox;
 
@@ -53,6 +55,27 @@ class InventoryWarehouseOutcomeRequest extends Model
         return array_reduce($this->requested_products, function ($carry, $requestedProduct) {
             return $carry + $requestedProduct['quantity'];
         }, 0);
+    }
+
+    public function requestType(): InventoryWarehouseOutcomeRequestType
+    {
+
+        $first = collect($this->requested_products)->first();
+
+
+        if (!$first){
+            return InventoryWarehouseOutcomeRequestType::Outcomes;
+        }
+
+
+        $product = InventoryProduct::find($this->requested_products[0]['product_id']);
+
+
+        if (!$product) {
+            return InventoryWarehouseOutcomeRequestType::Outcomes;
+        }
+
+        return $product->is_loanable ? InventoryWarehouseOutcomeRequestType::Loans : InventoryWarehouseOutcomeRequestType::Outcomes;
     }
 
     public function changeStatus(InventoryWarehouseOutcomeRequestStatus $status)
@@ -247,7 +270,9 @@ class InventoryWarehouseOutcomeRequest extends Model
 
     public function requestedProducts()
     {
-        return $this->hasMany(InventoryProductItem::class, 'inventory_warehouse_outcome_request_id');
+        return collect($this->requested_products)->map(function ($requestedProduct) {
+            return InventoryProductItem::find($requestedProduct['product_id']);
+        });
     }
 
 
