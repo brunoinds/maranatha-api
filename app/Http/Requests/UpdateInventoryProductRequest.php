@@ -37,6 +37,8 @@ class UpdateInventoryProductRequest extends FormRequest
             'status' => ['string', Rule::in(InventoryProductStatus::toArray())],
             'image' => ['nullable', 'url:http,https'],
             'is_loanable' => ['boolean'],
+            'inventory_warehouses_ids' => 'present|array',
+            'inventory_warehouses_ids.*' => 'integer|exists:inventory_warehouses,id'
         ];
     }
 }

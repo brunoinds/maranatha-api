@@ -22,6 +22,8 @@ use App\Support\Toolbox\TString;
 class InventoryProduct extends Model
 {
     use HasFactory;
+    use \Staudenmeir\EloquentJsonRelations\HasJsonRelationships;
+
 
     protected $fillable = [
         'name',
@@ -34,13 +36,20 @@ class InventoryProduct extends Model
         'code',
         'status',
         'image',
-        'is_loanable'
+        'is_loanable',
+        'inventory_warehouses_ids'
     ];
 
     protected $casts = [
         'unit' => InventoryProductUnit::class,
-        'status' => InventoryProductStatus::class
+        'status' => InventoryProductStatus::class,
+        'inventory_warehouses_ids' => 'array'
     ];
+
+    public function warehouses()
+    {
+        return $this->hasMany(InventoryWarehouse::class, 'id', 'inventory_warehouses_ids');
+    }
 
     public function items()
     {
