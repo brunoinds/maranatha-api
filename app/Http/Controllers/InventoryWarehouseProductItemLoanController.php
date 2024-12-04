@@ -44,6 +44,7 @@ class InventoryWarehouseProductItemLoanController extends Controller
                     [
                         'id' => Str::uuid(),
                         'user_id' => auth()->id(),
+                        'to_user_id' => auth()->id(),
                         'job_code' => $validated['job_code'],
                         'expense_code' => $validated['expense_code'],
                         'date' => now(),
@@ -53,6 +54,8 @@ class InventoryWarehouseProductItemLoanController extends Controller
                 'intercurrences' => [],
                 'inventory_product_item_id' => $productItemId,
                 'inventory_warehouse_id' => $validated['inventory_warehouse_id'],
+                'job_code' => $validated['job_code'],
+                'expense_code' => $validated['expense_code'],
                 'inventory_warehouse_outcome_request_id' => isset($validated['inventory_warehouse_outcome_request_id']) ? $validated['inventory_warehouse_outcome_request_id'] : null,
             ]);
 
@@ -89,6 +92,7 @@ class InventoryWarehouseProductItemLoanController extends Controller
 
         $warehouseLoan->movements = collect($warehouseLoan->movements)->map(function ($movement){
             $movement['user'] = User::where('id', $movement['user_id'])->first();
+            $movement['to_user'] = User::where('id', $movement['to_user_id'])->first();
             return $movement;
         });
 
@@ -167,6 +171,12 @@ class InventoryWarehouseProductItemLoanController extends Controller
         if (count($validated['movements']) > count($warehouseLoan->movements)){
             $newMovements = array_slice($validated['movements'], count($warehouseLoan->movements));
             foreach ($newMovements as $newMovement){
+
+                $validated['loaned_to_user_id'] = $newMovement['to_user_id'];
+                $validated['job_code'] = $newMovement['job_code'];
+                $validated['expense_code'] = $newMovement['expense_code'];
+
+
                 $notifications[] = [
                     'headings' => '↔️ Movimiento de producto prestado',
                     'message' => $warehouseLoan->loanedTo->name . ' ha realizado un movimiento con "' . $warehouseLoan->productItem->product->name . '".',

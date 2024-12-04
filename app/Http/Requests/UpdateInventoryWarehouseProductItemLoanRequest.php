@@ -35,6 +35,7 @@ class UpdateInventoryWarehouseProductItemLoanRequest extends FormRequest
             'movement.*.id' => ['required', 'string'],
             'movement.*.user_id' => ['required', 'exists:users,id'],
             'movement.*.job_code' => ['required', 'string'],
+            'movement.*.to_user_id' => ['required', 'exists:users,id'],
             'movement.*.expense_code' => ['required', 'string'],
             'movement.*.date' => ['required', 'date'],
             'movement.*.description' => ['required', 'string'],
@@ -45,6 +46,8 @@ class UpdateInventoryWarehouseProductItemLoanRequest extends FormRequest
             'intercurrences.*.description' => ['required', 'string'],
             'inventory_warehouse_id' => ['required', 'integer'],
             'inventory_warehouse_outcome_request_id' => ['nullable', 'integer', 'exists:inventory_warehouse_outcome_requests,id'],
+            'job_code' => ['nullable', 'string', 'max:255'],
+            'expense_code' => ['nullable', 'string', 'max:255'],
         ];
     }
 }

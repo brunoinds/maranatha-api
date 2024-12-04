@@ -22,6 +22,8 @@ class InventoryWarehouseProductItemLoan extends Model
     protected $fillable = [
         'loaned_to_user_id',
         'loaned_by_user_id',
+        'job_code',
+        'expense_code',
         'loaned_at',
         'received_at',
         'returned_at',

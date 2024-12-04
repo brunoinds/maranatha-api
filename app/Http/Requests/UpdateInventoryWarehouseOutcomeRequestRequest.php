@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use App\Helpers\Enums\InventoryWarehouseOutcomeRequestStatus;
+use App\Helpers\Enums\InventoryWarehouseOutcomeRequestType;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
@@ -27,6 +28,7 @@ class UpdateInventoryWarehouseOutcomeRequestRequest extends FormRequest
             'description' => ['nullable', 'string', 'max:1000'],
             'job_code' => ['nullable', 'string', 'max:255'],
             'expense_code' => ['nullable', 'string', 'max:255'],
+            'type' => ['nullable', Rule::in(InventoryWarehouseOutcomeRequestType::toArray())],
             'status' => ['string', Rule::in(InventoryWarehouseOutcomeRequestStatus::toArray())],
             'inventory_warehouse_id' => ['integer', 'exists:inventory_warehouses,id'],
             'received_products' => ['nullable', 'array'],

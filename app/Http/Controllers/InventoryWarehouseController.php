@@ -193,36 +193,7 @@ class InventoryWarehouseController extends Controller
 
             return [
                 'user' => User::find($userLoans[0]->loaned_to_user_id),
-                'loans' => $userLoans->map(function($loan){
-                    $loan->tagging = (function() use ($loan){
-                        if (count($loan->movements) === 0){
-                            return [
-                                'job' => [
-                                    'code' => '',
-                                    'name' => ''
-                                ],
-                                'expense' => [
-                                    'code' => '',
-                                    'name' => ''
-                                ]
-                            ];
-                        }
-
-                        $lastMovement = $loan->movements[count($loan->movements) - 1];
-
-                        return [
-                            'job' => [
-                                'code' => $lastMovement['job_code'],
-                                'name' => Job::where('code', $lastMovement['job_code'])->first()->name
-                            ],
-                            'expense' => [
-                                'code' => $lastMovement['expense_code'],
-                                'name' => Expense::where('code', $lastMovement['expense_code'])->first()->name
-                            ]
-                        ];
-                    })();
-                    return $loan;
-                })->toArray()
+                'loans' => $userLoans->toArray()
             ];
         });
 
@@ -235,11 +206,7 @@ class InventoryWarehouseController extends Controller
 
         //Do not include ->chat property from eager loading:
         $outcomes = $warehouse->outcomeRequests()->get()
-            ->makeHidden('messages')
-            ->map(function ($outcome) {
-                $outcome->request_type = $outcome->requestType();
-                return $outcome;
-            });
+            ->makeHidden('messages');
 
         return response()->json($outcomes->toArray());
     }

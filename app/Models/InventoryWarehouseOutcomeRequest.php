@@ -34,14 +34,16 @@ class InventoryWarehouseOutcomeRequest extends Model
         'on_the_way_at',
         'job_code',
         'expense_code',
-        'status'
+        'status',
+        'type'
     ];
 
     protected $casts = [
         'requested_products' => 'array',
         'received_products' => 'array',
         'messages' => 'array',
-        'status' => InventoryWarehouseOutcomeRequestStatus::class
+        'status' => InventoryWarehouseOutcomeRequestStatus::class,
+        'type' => InventoryWarehouseOutcomeRequestType::class
     ];
 
     public function addRequestedProduct(int $product_id, float $quantity)
@@ -55,27 +57,6 @@ class InventoryWarehouseOutcomeRequest extends Model
         return array_reduce($this->requested_products, function ($carry, $requestedProduct) {
             return $carry + $requestedProduct['quantity'];
         }, 0);
-    }
-
-    public function requestType(): InventoryWarehouseOutcomeRequestType
-    {
-
-        $first = collect($this->requested_products)->first();
-
-
-        if (!$first){
-            return InventoryWarehouseOutcomeRequestType::Outcomes;
-        }
-
-
-        $product = InventoryProduct::find($this->requested_products[0]['product_id']);
-
-
-        if (!$product) {
-            return InventoryWarehouseOutcomeRequestType::Outcomes;
-        }
-
-        return $product->is_loanable ? InventoryWarehouseOutcomeRequestType::Loans : InventoryWarehouseOutcomeRequestType::Outcomes;
     }
 
     public function changeStatus(InventoryWarehouseOutcomeRequestStatus $status)
