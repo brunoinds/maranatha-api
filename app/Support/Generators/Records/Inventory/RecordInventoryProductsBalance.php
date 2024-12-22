@@ -102,7 +102,7 @@ class RecordInventoryProductsBalance
                             'warehouse' => (clone $productItems)->first()->warehouse->name,
                             'income_quantity' => (clone $productItems)->count(),
                             'outcome_quantity' => (clone $productItems)->where('status', InventoryProductItemStatus::Sold)->count(),
-                            'outcome_amount' => (clone $productItems)->where('status', InventoryProductItemStatus::Sold)->first()?->buy_amount ?? 0,
+                            'outcome_amount' => (clone $productItems)->first()?->buy_amount ?? 0,
                             'balance_quantity' => (clone $productItems)->count() - (clone $productItems)->where('status', InventoryProductItemStatus::Sold)->count(),
                             'balance_total_amount' => ((clone $productItems)->count() - (clone $productItems)->where('status', InventoryProductItemStatus::Sold)->count()) * ((clone $productItems)->first()?->buy_amount ?? 0)
                         ];
