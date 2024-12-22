@@ -132,7 +132,7 @@ class WarehouseOutcomeRequestReceivedProductsPdfCreator
         $receivedImage = file_get_contents(base_path('app/Support/Creators/Inventory/WarehouseOutcomeRequestReceivedProducts/Assets/Received.jpg'));
         $receivedImageBase64 = base64_encode($receivedImage);
 
-        $receivedImage = '<img src="data:image/jpg;base64,' . $receivedImageBase64 . '">';
+        $receivedImage = 'data:image/jpg;base64,' . $receivedImageBase64 . '';
         $this->html = str_replace('{{$receivedImage}}', $receivedImage, $this->html);
     }
 
