@@ -167,7 +167,7 @@ class RecordInventoryProductsBalance
                             'outcome_quantity' => (clone $productItems)->sum('quantity_used'),
                             'outcome_amount' => (clone $productItems)->first()->calculateSellPriceFromBuyPrice(1),
                             'balance_quantity' => (clone $productItems)->sum('quantity_used'),
-                            'balance_total_amount' => (clone $productItems)->first()->calculateSellPriceFromBuyPrice((clone $productItems)->sum('quantity_used'))
+                            'balance_total_amount' => (((clone $productItems)->first()->calculateSellPriceFromBuyPrice(1) * (clone $productItems)->sum('quantity_inserted')) - ((clone $productItems)->sum('quantity_used') * (clone $productItems)->first()->calculateSellPriceFromBuyPrice(1)))
                         ];
                     });
 
