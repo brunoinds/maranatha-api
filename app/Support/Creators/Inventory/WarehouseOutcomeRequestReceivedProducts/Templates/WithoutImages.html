@@ -130,6 +130,13 @@ table.items-resume tr[documentname]{
             </tbody>
 
             <tfoot>
+                <tr qrcode>
+                    <td>
+                        <img width="100"
+                        src="{{$receivedImage}}"
+                        />
+                    </td>
+                </tr>
                 <tr info>
                     <td colspan="6">
                         <br>
@@ -151,13 +158,7 @@ table.items-resume tr[documentname]{
                     </td>
 
                 </tr>
-                <tr qrcode>
-                    <td>
-                        <img width="100"
-                        src="{{$receivedImage}}"
-                        />
-                    </td>
-                </tr>
+
             </tfoot>
         </table>
     </main>
