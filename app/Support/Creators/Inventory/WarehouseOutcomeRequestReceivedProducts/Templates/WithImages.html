@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+
+<style>
+*{
+    font-family: helvetica;
+
+}
+h1, h2, p, h3{
+    margin: 0;
+    padding: 0;
+}
+table.heading{
+    border-collapse: collapse;
+    font-size: 9px;
+    font-family: helvetica;
+    width: 100%;
+}
+
+table.heading tr > td{
+    border-width: 0.5px;
+}
+
+
+table.heading tr > td:nth-child(1){
+    text-align: right;
+    min-width: 160px;
+    padding-right: 8px;
+}
+table.heading tr > td:nth-child(2){
+    text-align: left;
+}
+
+table.heading tr[center] > td{
+    text-align: center;
+}
+
+table.heading tr[center]:nth-child(1){
+    font-weight: bold;
+    font-size: 14px;
+}
+table.heading tr[center]:nth-child(2){
+    font-weight: bold;
+    font-size: 10px;
+}
+
+table.heading tr[center]:nth-child(3){
+    font-size: 9px;
+}
+
+table.items{
+    border-collapse: collapse;
+    font-size: 10px;
+    font-family: helvetica;
+    width: 100%;
+    border: 2px solid black;
+}
+table.items td, table.items th {
+    border-width: 0.5px;
+    border-color: gray;
+    border-style: solid;
+    padding: 4px 4px;
+    text-align: center;
+}
+table.items th {
+    background-color: #ebebeb;
+    white-space: nowrap;
+    text-align: center;
+    padding: 6px 6px;
+}
+
+table.items tr > td:nth-child(3){
+    width: 100%;
+    text-align: left;
+}
+table.items tr > td:nth-child(7){
+    width: 100%;
+    text-align: right;
+}
+table.items tr[totals] td{
+    padding: 6px 6px;
+    font-weight: bold;
+    font-size: 10px;
+}
+table.items tr[totals] > td:nth-child(1){
+    text-align: right;
+    font-size: 14px;
+}
+table.items tr[totals] > td:nth-child(2){
+    font-weight: bold;
+    font-size: 14px;
+    white-space: nowrap;
+    text-align: right;
+}
+table.items tr[totals] > td:nth-child(3){
+    width: 100%;
+    text-align: left;
+}
+
+table.items tr > td:nth-child(2) > img{
+    width: 50px;
+    height: 50px;
+    object-fit: cover;
+    border-radius: 50%;
+}
+
+.title{
+    text-align: center;
+    margin: 20px 0;
+    font-size: 14px;
+    border-bottom: 2px solid black;
+    border-top: 2px solid black;
+
+    padding: 20px;
+}
+
+.table-header{
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 20px;
+}
+.table-header td{
+    padding: 10px;
+    border: 1px solid black;
+}
+.table-header img{
+    width: 100px;
+}
+.table-header .th-first{
+    width: 100px;
+}
+.table-header .th-second{
+    width: 100%;
+}
+.table-header .th-second > h1{
+    font-size: 22px;
+}
+.table-header .th-second > h2{
+    font-size: 14px;
+}
+.table-header .th-second > h3{
+    font-size: 12px;
+    margin-bottom: 6px;
+}
+
+.table-header .th-third{
+    width: 100px;
+}
+
+.details{
+    font-size: 8px;
+    border-bottom: 2px solid black;
+    padding-bottom: 20px;
+}
+
+.details table{
+    width: 100%;
+    font-size: 8px;
+    border-collapse: collapse;
+}
+.details table tr > td{
+    padding: 4px;
+}
+.details table tr > td:nth-child(1){
+    width: 100px;
+    text-align: right;
+}
+.details table tr > td:nth-child(2){
+    width: 100%;
+    text-align: left;
+    font-weight: normal;
+    color: gray;
+}
+
+</style>
+</head>
+<body>
+    <table class="table-header">
+        <tr>
+            <td class="th-first">
+                <img src="{{$maranathaLogo}}">
+            </td>
+            <td class="th-second">
+                <h3>Maranatha Invoices - Inventário</h3>
+                <h1>{{$warehouseName}}</h1>
+                <h2>{{$warehouseZone}} - {{$warehouseCountry}}</h2>
+            </td>
+            <td class="th-third">
+                <img
+                    src="{{$receivedImage}}"
+                    />
+            </td>
+            <td class="th-third">
+                <img
+                    src="{{$qrCode}}"
+                    />
+            </td>
+        </tr>
+    </table>
+    <main>
+
+        <section class="title">
+            <h1>Orden de Despacho #00{{$outcomeRequestId}}</h1>
+        </section>
+
+        <section class="details">
+            <table>
+                <tr>
+                    <td>
+                        <h2>FECHA:</h2>
+                    </td>
+                    <td>
+                        <h2>{{$date}}</h2>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <h2>DESPACHADO POR:</h2>
+                    </td>
+                    <td>
+                        <h2>{{$dispatchedBy}}</h2>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <h2>JOB:</h2>
+                    </td>
+                    <td>
+                        <h2>{{$job}}</h2>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <h2>EXPENSE:</h2>
+                    </td>
+                    <td>
+                        <h2>{{$expense}}</h2>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <h2>PEDIDO:</h2>
+                    </td>
+                    <td>
+                        <h2>#00{{$outcomeRequestId}}</h2>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <h2>SOLICITADO POR:</h2>
+                    </td>
+                    <td>
+                        <h2>{{$requestedBy}}</h2>
+                    </td>
+                </tr>
+            </table>
+        </section>
+
+        <br><br><br>
+
+
+        <h3>Productos despachados:</h3>
+        <br>
+        <table class="items">
+            <thead>
+                <th>#</th>
+                <th>FOTO</th>
+                <th>DESCRIPCIÓN</th>
+                <th>DETALLE</th>
+                <th>MARCA</th>
+                <th>CANTIDAD</th>
+                <th>PRECIO</th>
+                <th>TOTAL</th>
+            </thead>
+            <tbody>
+                {{$tableRows}}
+                <tr totals>
+                    <td colspan="7">Total</td><td>{{$tableTotals}}</td>
+                </tr>
+            </tbody>
+        </table>
+    </main>
+</body>
+</html>

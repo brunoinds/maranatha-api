@@ -16,7 +16,7 @@ use App\Models\InventoryWarehouse;
 
 use App\Support\Creators\Inventory\WarehouseOutcomeRequestRequestedProducts\WarehouseOutcomeRequestRequestedProductsPdfCreator;
 use App\Support\Creators\Inventory\WarehouseOutcomeRequestDispatchedProducts\WarehouseOutcomeRequestDispatchedProductsPdfCreator;
-
+use App\Support\Creators\Inventory\WarehouseOutcomeRequestReceivedProducts\WarehouseOutcomeRequestReceivedProductsPdfCreator;
 
 
 
@@ -374,6 +374,28 @@ class InventoryWarehouseOutcomeRequestController extends Controller
     public function downloadDispatchedPDF(InventoryWarehouseOutcomeRequest $warehouseOutcomeRequest)
     {
         $pdf = WarehouseOutcomeRequestDispatchedProductsPdfCreator::new($warehouseOutcomeRequest);
+
+        $withImages = request()->query('withImages') === 'true' ? true : false;
+
+        $content = $pdf->create(['withImages' => $withImages])->output();
+
+        $documentName = Str::slug($warehouseOutcomeRequest->id, '-') . '.pdf';
+
+        $temporaryDirectory = (new TemporaryDirectory())->create();
+        $tempPath = $temporaryDirectory->path($documentName);
+
+        file_put_contents($tempPath, $content);
+
+        return response()
+            ->download($tempPath, $documentName, [
+                'Content-Encoding' => 'base64',
+                'Content-Length' => filesize($tempPath),
+            ])->deleteFileAfterSend(true);
+    }
+
+    public function downloadReceivedPDF(InventoryWarehouseOutcomeRequest $warehouseOutcomeRequest)
+    {
+        $pdf = WarehouseOutcomeRequestReceivedProductsPdfCreator::new($warehouseOutcomeRequest);
 
         $withImages = request()->query('withImages') === 'true' ? true : false;
 
