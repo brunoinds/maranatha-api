@@ -27,6 +27,7 @@ class StoreInvoiceRequest extends FormRequest
             'description' => ['required', 'string', 'max:1000'],
             'ticket_number' => ['required', 'string', 'max:100'],
             'commerce_number' => ['required', 'string', 'max:100'],
+            'provider' => ['nullable', 'string', 'max:100'],
             'date' => ['required', 'date'],
             'job_code' => ['required', 'string', 'max:100'],
             'expense_code' => ['required', 'string', 'max:100'],

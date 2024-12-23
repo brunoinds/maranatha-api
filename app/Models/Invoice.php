@@ -19,7 +19,23 @@ class Invoice extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['type', 'description', 'report_id', 'ticket_number', 'commerce_number', 'date', 'job_code', 'expense_code', 'amount', 'qrcode_data', 'image', 'image_size', 'pdf', 'pdf_size'];
+    protected $fillable = [
+        'type',
+        'description',
+        'report_id',
+        'ticket_number',
+        'commerce_number',
+        'provider',
+        'date',
+        'job_code',
+        'expense_code',
+        'amount',
+        'qrcode_data',
+        'image',
+        'image_size',
+        'pdf',
+        'pdf_size'
+    ];
 
     public function amountIn(MoneyType $currency)
     {

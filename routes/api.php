@@ -297,7 +297,6 @@ Route::middleware(['auth:sanctum'])->group(function () {
 
         Route::get('inventory/products/items/{inventoryProductItem}/loans', InventoryProductItemController::class . '@loans');
 
-
         Route::post('inventory/warehouses/{warehouse}/outcome-resume-analisys', InventoryWarehouseController::class . '@listOutcomeResumeAnalisys');
 
         Route::get('inventory/warehouses/{warehouse}/incomes', InventoryWarehouseController::class . '@listIncomes');

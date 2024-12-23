@@ -201,6 +201,12 @@ class ReportPDFCreator
                 $invoiceDescription = str_replace($matches[0], "($amount)", $invoiceDescription);
             }
 
+            //Check if invoice has provider and append in parenthesis:
+            if ($invoice->provider){
+                $invoiceDescription .= ' (' . $invoice->provider . ')';
+            }
+
+
             $jobCode = ReportAssistant::jobCodeOverride(Job::sanitizeCode($invoice->job_code));
 
             $invoicesItemsHtml .= "<tr>

@@ -16,7 +16,22 @@ class Report extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['user_id', 'title', 'type', 'money_type', 'from_date', 'to_date', 'status', 'exported_pdf', 'rejection_reason', 'approved_at', 'rejected_at', 'submitted_at', 'metadata', 'country'];
+    protected $fillable = [
+        'user_id',
+        'title',
+        'type',
+        'money_type',
+        'from_date',
+        'to_date',
+        'status',
+        'exported_pdf',
+        'rejection_reason',
+        'approved_at',
+        'rejected_at',
+        'submitted_at',
+        'metadata',
+        'country'
+    ];
 
     protected $casts = [
         'money_type' => MoneyType::class,
@@ -51,7 +66,7 @@ class Report extends Model
     public function amountInDollars(){
         return $this->amountIn(MoneyType::USD);
     }
-    
+
     public function invoices(){
         return $this->hasMany(Invoice::class);
     }
