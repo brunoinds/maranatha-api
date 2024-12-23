@@ -203,7 +203,7 @@ class ReportPDFCreator
 
             //Check if invoice has provider and append in parenthesis:
             if ($invoice->provider){
-                $invoiceDescription .= ' (' . $invoice->provider . ')';
+                $invoiceDescription .= ' - ' . $invoice->provider;
             }
 
 
