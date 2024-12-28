@@ -367,8 +367,23 @@ class ReportPDFCreator
                         $w = $templateSize['width'];
                         $h = $templateSize['height'];
 
+
+
                         $x = ($newPdf->GetPageWidth() - $w) / 2;
                         $y = ($newPdf->GetPageHeight() - $h) / 2;
+
+                        if ($newPdf->GetPageHeight() < $h){
+                            //If the old page height is bigger than the default new pdf page, we should adjust the height of the new pdf page to maximum height of the old page:
+                            $y = 0;
+                            $newPdf->setPageFormat([
+                                'width' => $newPdf->GetPageWidth(),
+                                'height' => $h,
+                                0 => $newPdf->GetPageWidth(),
+                                1 => $h,
+                                'orientation' => 'P'
+                            ], 'P');
+                        }
+
                         $newPdf->useTemplate(tpl: $tplIdx, x: $x, y: $y, width: $w, height: $h);
                     }
 
