@@ -36,6 +36,17 @@ class ChangeUserPassword extends Command
         // Interrogate to enter new password:
         $password = $this->secret('💬 Enter new password for ' . $user->name);
 
+        if (strlen($password) < 8) {
+            $this->error('❌ Password must be at least 8 characters long');
+
+            $password = $this->secret('💬 Enter new password for ' . $user->name);
+
+            if (strlen($password) < 8) {
+                $this->error('❌ Password must be at least 8 characters long');
+                return;
+            }
+        }
+
 
         // Update user password:
         User::where('id', $userId)->update([
