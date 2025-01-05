@@ -65,7 +65,7 @@ class RecordInventoryProductsBalance
 
 
             $items = [];
-            $query->groupBy(['inventory_product_id','buy_currency', 'buy_amount'])
+            $query->groupBy(['inventory_product_id','buy_currency', 'buy_amount', 'inventory_warehouse_id'])
                     ->select()->each(function($item) use (&$options, &$items){
                         $query = InventoryProductItem::query();
                         if ($options['moneyType'] !== null && $item->buy_currency !== $options['moneyType']){
