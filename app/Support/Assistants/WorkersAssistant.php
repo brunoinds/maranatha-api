@@ -74,14 +74,14 @@ class WorkersAssistant{
                 ];
             });
 
-            //Complete the payments with the missing months of 2024:
+            //Complete the payments with the missing months of the years (2024, 2025):
             $paymentsMonths = collect($payments)->map(function($payment){
                 return $payment['month_year'];
             });
             $months = collect(range(1, 12))->map(function($month){
                 return str_pad($month, 2, '0', STR_PAD_LEFT);
             });
-            $years = collect(range(2024, 2024));
+            $years = collect(range(2024, Carbon::now()->year)); //Increment the range of years to 2025
             $monthsYears = $years->map(function($year) use ($months){
                 return $months->map(function($month) use ($year){
                     return $month . '/' . $year;

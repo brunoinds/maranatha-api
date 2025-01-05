@@ -65,21 +65,22 @@ class RecordInventoryProductsBalance
 
 
             $items = [];
-            $query->groupBy(['buy_currency', 'buy_amount'])
+            $query->groupBy(['inventory_product_id','buy_currency', 'buy_amount'])
                     ->select()->each(function($item) use (&$options, &$items){
                         $query = InventoryProductItem::query();
-                        if ($options['moneyType'] !== null){
-                            $query = $query->where('buy_currency', $options['moneyType']);
+                        if ($options['moneyType'] !== null && $item->buy_currency !== $options['moneyType']){
+                            return;
                         }
-                        if ($options['warehouseIds'] !== null){
-                            $query = $query->whereIn('inventory_warehouse_id', $options['warehouseIds']);
+                        if ($options['warehouseIds'] !== null && !in_array($item->inventory_warehouse_id, $options['warehouseIds'])){
+                            return;
                         }
-                        if ($options['productId'] !== null){
-                            $query = $query->where('inventory_product_id', $options['productId']);
+                        if ($options['productId'] !== null && $item->inventory_product_id !== $options['productId']){
+                            return;
                         }
 
                         $productItems = $query->where('buy_currency', $item->buy_currency)
-                            ->where('buy_amount', $item->buy_amount);
+                            ->where('buy_amount', $item->buy_amount)
+                            ->where('inventory_product_id', $item->inventory_product_id);
 
                         if ($options['categories'] !== null){
                             if (!in_array((clone $productItems)->first()->product->category, $options['categories'])){
@@ -100,11 +101,20 @@ class RecordInventoryProductsBalance
                             'sub_category' => (clone $productItems)->first()->product->sub_category,
                             'currency' => (clone $productItems)->first()->buy_currency,
                             'warehouse' => (clone $productItems)->first()->warehouse->name,
+
+
+                            /* 'q' => (clone $productItems)->toRawSql(), */
                             'income_quantity' => (clone $productItems)->count(),
                             'outcome_quantity' => (clone $productItems)->where('status', InventoryProductItemStatus::Sold)->count(),
+
+                            'stock_quantity' => (clone $productItems)->where('status', InventoryProductItemStatus::InStock)->count(),
+                            'stock_amount' => (clone $productItems)->where('status', InventoryProductItemStatus::InStock)->sum('buy_amount'),
+                            'unit_price' => (clone $productItems)->first()->buy_amount,
+                            /*
                             'outcome_amount' => (clone $productItems)->first()?->buy_amount ?? 0,
                             'balance_quantity' => (clone $productItems)->count() - (clone $productItems)->where('status', InventoryProductItemStatus::Sold)->count(),
                             'balance_total_amount' => ((clone $productItems)->count() - (clone $productItems)->where('status', InventoryProductItemStatus::Sold)->count()) * ((clone $productItems)->first()?->buy_amount ?? 0)
+                            */
                         ];
                     });
 
@@ -128,21 +138,22 @@ class RecordInventoryProductsBalance
 
 
             $items = [];
-            $query->groupBy(['buy_currency', 'buy_amount'])
+            $query->groupBy(['inventory_product_id','buy_currency', 'buy_amount'])
                     ->select()->each(function($item) use (&$options, &$items){
                         $query = InventoryProductItemUncountable::query();
-                        if ($options['moneyType'] !== null){
-                            $query = $query->where('buy_currency', $options['moneyType']);
+                        if ($options['moneyType'] !== null && $item->buy_currency !== $options['moneyType']){
+                            return;
                         }
-                        if ($options['warehouseIds'] !== null){
-                            $query = $query->whereIn('inventory_warehouse_id', $options['warehouseIds']);
+                        if ($options['warehouseIds'] !== null && !in_array($item->inventory_warehouse_id, $options['warehouseIds'])){
+                            return;
                         }
-                        if ($options['productId'] !== null){
-                            $query = $query->where('inventory_product_id', $options['productId']);
+                        if ($options['productId'] !== null && $item->inventory_product_id !== $options['productId']){
+                            return;
                         }
 
                         $productItems = $query->where('buy_currency', $item->buy_currency)
-                            ->where('buy_amount', $item->buy_amount);
+                            ->where('buy_amount', $item->buy_amount)
+                            ->where('inventory_product_id', $item->inventory_product_id);
 
                         if ($options['categories'] !== null){
                             if (!in_array((clone $productItems)->first()->product->category, $options['categories'])){
@@ -163,11 +174,18 @@ class RecordInventoryProductsBalance
                             'sub_category' => (clone $productItems)->first()->product->sub_category,
                             'currency' => (clone $productItems)->first()->buy_currency->value,
                             'warehouse' => (clone $productItems)->first()->warehouse->name,
+
+                            /* 'q' => (clone $productItems)->toRawSql(), */
                             'income_quantity' => (clone $productItems)->sum('quantity_inserted'),
                             'outcome_quantity' => (clone $productItems)->sum('quantity_used'),
+                            'stock_quantity' => (clone $productItems)->sum('quantity_remaining'),
+                            'stock_amount' => (clone $productItems)->sum('quantity_remaining') * (clone $productItems)->first()->calculateSellPriceFromBuyPrice(1),
+                            'unit_price' => (clone $productItems)->first()->calculateSellPriceFromBuyPrice(1),
+                            /*
                             'outcome_amount' => (clone $productItems)->first()->calculateSellPriceFromBuyPrice(1),
                             'balance_quantity' => (clone $productItems)->sum('quantity_used'),
                             'balance_total_amount' => (((clone $productItems)->first()->calculateSellPriceFromBuyPrice(1) * (clone $productItems)->sum('quantity_inserted')) - ((clone $productItems)->sum('quantity_used') * (clone $productItems)->first()->calculateSellPriceFromBuyPrice(1)))
+                            */
                         ];
                     });
 
@@ -192,9 +210,13 @@ class RecordInventoryProductsBalance
                 'warehouse' => $item['warehouse'],
                 'income_quantity' => $item['income_quantity'],
                 'outcome_quantity' => $item['outcome_quantity'],
-                'outcome_amount' => Toolbox::moneyFormat($item['outcome_amount'], $item['currency']),
+                'stock_quantity' => $item['stock_quantity'],
+                'stock_amount' => $item['stock_amount'],
+                'unit_price' => $item['unit_price'],
+                /* 'q' => $item['q'], */
+                /* 'outcome_amount' => Toolbox::moneyFormat($item['outcome_amount'], $item['currency']),
                 'balance_quantity' => $item['balance_quantity'],
-                'balance_total_amount' => Toolbox::moneyFormat($item['balance_total_amount'], $item['currency'])
+                'balance_total_amount' => Toolbox::moneyFormat($item['balance_total_amount'], $item['currency']) */
             ];
         });
 
@@ -232,11 +254,11 @@ class RecordInventoryProductsBalance
                 ],
                 [
                     'title' => 'Actual',
-                    'key' => 'balance_quantity'
+                    'key' => 'stock_quantity'
                 ],
                 [
-                    'title' => 'Precio',
-                    'key' => 'outcome_amount'
+                    'title' => 'Precio Unitario',
+                    'key' => 'unit_price'
                 ],
                 [
                     'title' => 'Moneda',
@@ -244,10 +266,43 @@ class RecordInventoryProductsBalance
                 ],
                 [
                     'title' => 'Total',
-                    'key' => 'balance_total_amount'
+                    'key' => 'stock_amount'
+                ],
+                [
+                    'title' => 'q',
+                    'key' => 'q'
                 ]
             ],
-            'body' => $body,
+            'body' => collect($body)->map(function($item){
+                return [
+                    ...$item,
+                    'stock_amount' => Toolbox::moneyFormat($item['stock_amount'], $item['currency']),
+                    'unit_price' => Toolbox::moneyFormat($item['unit_price'], $item['currency']),
+                ];
+            }),
+            'footer' => [
+                'totals' => [
+                    'title' => 'Totales',
+                    'items' => [
+                        [
+                            'key' => 'income_quantity',
+                            'value' => round(array_sum(array_column($body, 'income_quantity')), 2),
+                        ],
+                        [
+                            'key' => 'outcome_quantity',
+                            'value' => round(array_sum(array_column($body, 'outcome_quantity')),2),
+                        ],
+                        [
+                            'key' => 'stock_quantity',
+                            'value' => round(array_sum(array_column($body, 'stock_quantity')),2),
+                        ],
+                        [
+                            'key' => 'stock_amount',
+                            'value' => Toolbox::moneyFormat(array_sum(array_column($body, 'stock_amount')), $this->moneyType),
+                        ]
+                    ]
+                ]
+            ],
         ];
     }
 
