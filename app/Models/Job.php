@@ -33,6 +33,10 @@ class Job extends Model
         if (is_null($code)) {
             return null;
         }
+
+        //First remove anyng inside [], including []:
+        $code = preg_replace('/\[[^\]]*\]/', '', $code);
+
         if (str_contains($code, '-')) {
             $code = explode('-', $code)[0];
             $code = trim($code);
