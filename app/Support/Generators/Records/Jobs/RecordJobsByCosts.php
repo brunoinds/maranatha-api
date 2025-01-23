@@ -25,6 +25,7 @@ class RecordJobsByCosts
     private DateTime $startDate;
     private DateTime $endDate;
     private string|null $jobRegion = null;
+    private string|null $country = null;
     private string|null $expenseCode = null;
 
     /**
@@ -33,6 +34,7 @@ class RecordJobsByCosts
      * @param DateTime $options['endDate']
      * @param null|string $options['jobRegion']
      * @param null|string $options['expenseCode']
+     * @param null|string $options['country']
      */
 
     public function __construct(array $options){
@@ -40,6 +42,7 @@ class RecordJobsByCosts
         $this->endDate = $options['endDate'];
         $this->jobRegion = $options['jobRegion'];
         $this->expenseCode = $options['expenseCode'];
+        $this->country = $options['country'];
     }
 
     private function getInvoicesData():array
@@ -54,6 +57,7 @@ class RecordJobsByCosts
                     ->with('report')
                     ->join('reports', 'invoices.report_id', '=', 'reports.id')
                     ->join('jobs', 'invoices.job_code', '=', 'jobs.code')
+                    ->select('invoices.*', 'reports.zone as report_zone', 'jobs.zone as job_zone', 'jobs.country as job_country')
                     ->whereDate('invoices.date', '>=', $this->startDate->format('Y-m-d'))
                     ->whereDate('invoices.date', '<=', $this->endDate->format('Y-m-d'))
                     ->where(function($query){
@@ -62,8 +66,13 @@ class RecordJobsByCosts
                     });
 
 
+
         if ($this->jobRegion !== null){
-            $invoicesInSpan = $invoicesInSpan->where('zone', '=', $this->jobRegion);
+            $invoicesInSpan = $invoicesInSpan->where('job_zone', '=', $this->jobRegion);
+        }
+
+        if ($this->country !== null){
+            $invoicesInSpan = $invoicesInSpan->where('job_country', '=', $this->country);
         }
 
         if ($this->expenseCode !== null){
@@ -101,6 +110,10 @@ class RecordJobsByCosts
 
         if ($this->jobRegion !== null){
             $spendingsInSpan = $spendingsInSpan->where('job.zone', '=', $this->jobRegion);
+        }
+
+        if ($this->country !== null){
+            $spendingsInSpan = $spendingsInSpan->where('job.country', '=', $this->country);
         }
 
         if ($this->expenseCode !== null){
@@ -283,7 +296,8 @@ class RecordJobsByCosts
                 'startDate' => $this->startDate->format('c'),
                 'endDate' => $this->endDate->format('c'),
                 'jobRegion' => $this->jobRegion,
-                'expenseCode' => $this->expenseCode
+                'expenseCode' => $this->expenseCode,
+                'country' => $this->country,
             ],
         ];
     }

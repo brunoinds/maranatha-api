@@ -25,6 +25,9 @@ class RecordInventoryProductsKardex
     private string|null $productId = null;
     private array|null $categories = null;
     private array|null $subCategories = null;
+    /* private array|null $country = null;
+    private array|null $jobRegion = null; */
+
 
 
     /**
@@ -41,6 +44,7 @@ class RecordInventoryProductsKardex
         * @param string|null $options['categories']
         * @param string|null $options['subCategories']
 
+
      */
 
     public function __construct(array $options){
@@ -53,6 +57,8 @@ class RecordInventoryProductsKardex
         $this->productId = $options['productId'] ?? null;
         $this->categories = $options['categories'] ?? null;
         $this->subCategories = $options['subCategories'] ?? null;
+        /* $this->country = $options['country'] ?? null;
+        $this->jobRegion = $options['jobRegion'] ?? null; */
     }
 
     private function getKardex():Collection
@@ -66,7 +72,9 @@ class RecordInventoryProductsKardex
             'jobCode' => $this->jobCode,
             'productId' => $this->productId,
             'categories' => $this->categories,
-            'subCategories' => $this->subCategories
+            'subCategories' => $this->subCategories,
+            'country' => $this->country,
+            'jobRegion' => $this->jobRegion
         ];
 
         $list = [];

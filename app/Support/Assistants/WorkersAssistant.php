@@ -221,6 +221,7 @@ class WorkersAssistant{
                             'job' => [
                                 'code' => null,
                                 'zone' => null,
+                                'country' => null
                             ],
                             'expense' => [
                                 'code' => null
@@ -290,6 +291,7 @@ class WorkersAssistant{
                         $spending['attendance']['created_at'] = $attendance->created_at;
                         $spending['job']['code'] = $attendance->job->code;
                         $spending['job']['zone'] = $attendance->job->zone;
+                        $spending['job']['country'] = $attendance->job->country;
                         $spending['expense']['code'] = $attendance->expense->code;
                     }
                 }

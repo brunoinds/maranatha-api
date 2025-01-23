@@ -29,6 +29,7 @@ class RecordAttendancesByJobs
     private string|null $supervisor = null;
     private string|null $workerDni = null;
     private string|null $jobZone = null;
+    private string|null $country = null;
 
     /**
      * @param array $options
@@ -39,6 +40,7 @@ class RecordAttendancesByJobs
      * @param null|string $options['supervisor']
      * @param null|string $options['workerDni']
      * @param null|string $options['jobZone']
+     * @param null|string $options['country']
      */
 
     public function __construct(array $options){
@@ -49,6 +51,7 @@ class RecordAttendancesByJobs
         $this->supervisor = $options['supervisor'];
         $this->workerDni = $options['workerDni'];
         $this->jobZone = $options['jobZone'];
+        $this->country = $options['country'];
     }
 
     private function getWorkersData():array
@@ -65,6 +68,10 @@ class RecordAttendancesByJobs
 
         if ($this->jobCode !== null){
             $spendingsInSpan = $spendingsInSpan->where('job.code', '=', $this->jobCode);
+        }
+
+        if ($this->country !== null){
+            $spendingsInSpan = $spendingsInSpan->where('job.country', '=', $this->country);
         }
 
         if ($this->expenseCode !== null){

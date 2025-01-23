@@ -60,6 +60,7 @@ class RecordInvoicesByItems
                     ->with(['report', 'report.user'])
                     ->join('reports', 'invoices.report_id', '=', 'reports.id')
                     ->join('jobs', 'invoices.job_code', '=', 'jobs.code')
+                    ->select('invoices.*', 'reports.zone as report_zone', 'jobs.zone as job_zone', 'jobs.country as job_country')
                     ->where('invoices.date', '>=', $this->startDate)
                     ->where('invoices.date', '<=', $this->endDate)
                     ->where(function($query){
@@ -69,7 +70,7 @@ class RecordInvoicesByItems
 
 
         if ($this->jobRegion !== null){
-            $invoicesInSpan = $invoicesInSpan->where('zone', '=', $this->jobRegion);
+            $invoicesInSpan = $invoicesInSpan->where('job_zone', '=', $this->jobRegion);
         }
 
         if ($this->expenseCode !== null){
@@ -82,7 +83,7 @@ class RecordInvoicesByItems
 
 
         if ($this->country !== null){
-            $invoicesInSpan = $invoicesInSpan->where('country', '=', $this->country);
+            $invoicesInSpan = $invoicesInSpan->where('job_country', '=', $this->country);
         }
 
         if ($this->moneyType !== null){

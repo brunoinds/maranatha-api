@@ -30,6 +30,9 @@ class RecordUsersByCosts
     private string|null $expenseCode = null;
     private string|null $type = null;
     private string|null $userId = null;
+    private string|null $country = null;
+    private string|null $jobRegion = null;
+
 
     /**
      * @param array $options
@@ -37,6 +40,8 @@ class RecordUsersByCosts
      * @param DateTime $options['endDate']
      * @param null|string $options['jobCode']
      * @param null|string $options['expenseCode']
+     * @param null|string $options['country']
+     * @param null|string $options['jobRegion']
      * @param null|string $options['type']
      * @param null|string $options['userId']
      */
@@ -48,6 +53,8 @@ class RecordUsersByCosts
         $this->expenseCode = $options['expenseCode'];
         $this->type = $options['type'];
         $this->userId = $options['userId'];
+        $this->country = $options['country'];
+        $this->jobRegion = $options['jobRegion'];
     }
 
     private function getUserInvoicesCosts(): array
@@ -82,6 +89,8 @@ class RecordUsersByCosts
                     && ($this->endDate === null || Carbon::parse($invoice->date)->format('Y-m-d') <= $this->endDate->format('Y-m-d'))
                     && ($this->jobCode === null || $invoice->job_code === $this->jobCode)
                     && ($this->expenseCode === null || $invoice->expense_code === $this->expenseCode)
+                    && ($this->jobRegion === null || $invoice->job->zone === $this->jobRegion)
+                    && ($this->country === null || $invoice->job->country === $this->country)
                     && ($this->type === null || $this->type === 'Invoices' || $invoice->type === $this->type)) {
 
                     $invoiceData = [
@@ -96,6 +105,8 @@ class RecordUsersByCosts
                         ],
                         'user_name' => $report->user->name,
                         'job_code' => $invoice->job_code,
+                        'country' => $invoice->job->country,
+                        'job_region' => $invoice->job->zone,
                         'expense_code' => $invoice->expense_code,
                         'amount_in_soles' => $invoice->amountInSoles(),
                         'amount_in_dollars' => $invoice->amountInDollars(),
@@ -120,6 +131,14 @@ class RecordUsersByCosts
 
         if ($this->jobCode !== null){
             $spendingsInSpan = $spendingsInSpan->where('job.code', '=', $this->jobCode);
+        }
+
+        if ($this->jobRegion !== null){
+            $spendingsInSpan = $spendingsInSpan->where('job.zone', '=', $this->jobRegion);
+        }
+
+        if ($this->country !== null){
+            $spendingsInSpan = $spendingsInSpan->where('job.country', '=', $this->country);
         }
 
         if ($this->expenseCode !== null){
@@ -165,6 +184,8 @@ class RecordUsersByCosts
                 'expense_code' => $item->expense->code,
                 'amount_in_soles' => $item->amountInSoles,
                 'amount_in_dollars' => $item->amountInDollars,
+                'country' => $item->job->country,
+                'job_region' => $item->job->zone,
             ];
             return $itemData;
         });
@@ -198,6 +219,14 @@ class RecordUsersByCosts
                 [
                     'title' => 'Job',
                     'key' => 'job_code',
+                ],
+                [
+                    'title' => 'País',
+                    'key' => 'country',
+                ],
+                [
+                    'title' => 'Zona',
+                    'key' => 'job_region',
                 ],
                 [
                     'title' => 'Expense',

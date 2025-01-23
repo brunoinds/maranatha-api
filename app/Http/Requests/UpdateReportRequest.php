@@ -33,7 +33,8 @@ class UpdateReportRequest extends FormRequest
             'type' => [Rule::in(['Bill', 'Facture'])],
             'money_type' => [Rule::in(MoneyType::toArray())],
             'country' => ['string', 'max:2'],
-            'metadata' => ['array']
+            'metadata' => ['array'],
+            'zone' => ['string', 'max:100'],
         ];
     }
 }

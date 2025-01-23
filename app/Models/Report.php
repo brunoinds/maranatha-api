@@ -30,7 +30,8 @@ class Report extends Model
         'rejected_at',
         'submitted_at',
         'metadata',
-        'country'
+        'country',
+        'zone'
     ];
 
     protected $casts = [

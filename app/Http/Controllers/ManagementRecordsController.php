@@ -77,11 +77,13 @@ class ManagementRecordsController extends Controller
             'start_date' => 'required|date',
             'end_date' => 'required|date',
             'job_region' => 'nullable|string',
+            'country' => 'nullable|string',
             'expense_code' => 'nullable|string',
         ]);
 
         $defaults = [
             'job_region' => null,
+            'country' => null,
             'expense_code' => null,
         ];
 
@@ -99,6 +101,7 @@ class ManagementRecordsController extends Controller
             'endDate' => new DateTime($validatedData['end_date']),
             'jobRegion' => $validatedData['job_region'],
             'expenseCode' => $validatedData['expense_code'],
+            'country' => $validatedData['country'],
         ]);
 
         $document = $record->generate();
@@ -121,6 +124,7 @@ class ManagementRecordsController extends Controller
             'supervisor' => 'nullable|string',
             'worker_dni' => 'nullable|string',
             'job_zone' => 'nullable|string',
+            'country' => 'nullable|string',
         ]);
 
         $defaults = [
@@ -129,6 +133,7 @@ class ManagementRecordsController extends Controller
             'expense_code' => null,
             'supervisor' => null,
             'worker_dni' => null,
+            'country' => null
         ];
 
         $validatedData = array_merge($defaults, $validatedData);
@@ -148,6 +153,7 @@ class ManagementRecordsController extends Controller
             'supervisor' => $validatedData['supervisor'],
             'workerDni' => $validatedData['worker_dni'],
             'jobZone' => $validatedData['job_zone'],
+            'country' => $validatedData['country'],
         ]);
 
         $document = $record->generate();
@@ -170,6 +176,7 @@ class ManagementRecordsController extends Controller
             'supervisor' => 'nullable|string',
             'worker_dni' => 'nullable|string',
             'job_zone' => 'nullable|string',
+            'country' => 'nullable|string',
         ]);
 
         $defaults = [
@@ -177,7 +184,8 @@ class ManagementRecordsController extends Controller
             'expense_code' => null,
             'supervisor' => null,
             'worker_dni' => null,
-            'job_zone' => null
+            'job_zone' => null,
+            'country' => null
         ];
 
         $validatedData = array_merge($defaults, $validatedData);
@@ -197,6 +205,7 @@ class ManagementRecordsController extends Controller
             'supervisor' => $validatedData['supervisor'],
             'workerDni' => $validatedData['worker_dni'],
             'jobZone' => $validatedData['job_zone'],
+            'country' => $validatedData['country'],
         ]);
 
         $document = $record->generate();
@@ -219,6 +228,7 @@ class ManagementRecordsController extends Controller
             'supervisor' => 'nullable|string',
             'worker_dni' => 'nullable|string',
             'job_zone' => 'nullable|string',
+            'country' => 'nullable|string',
         ]);
 
         $defaults = [
@@ -226,17 +236,18 @@ class ManagementRecordsController extends Controller
             'expense_code' => null,
             'supervisor' => null,
             'worker_dni' => null,
-            'job_zone' => null
+            'job_zone' => null,
+            'country' => null
         ];
 
         $validatedData = array_merge($defaults, $validatedData);
 
-        /*if (RecordsCache::getRecord('attendancesByWorkersJobsExpenses', $validatedData)){
+        if (RecordsCache::getRecord('attendancesByWorkersJobsExpenses', $validatedData)){
             return response()->json([
                 ...RecordsCache::getRecord('attendancesByWorkersJobsExpenses', $validatedData),
                 'is_cached' => true
             ]);
-        }*/
+        }
 
         $record = new RecordAttendancesByWorkersJobsExpenses([
             'startDate' => new DateTime($validatedData['start_date']),
@@ -246,6 +257,7 @@ class ManagementRecordsController extends Controller
             'supervisor' => $validatedData['supervisor'],
             'workerDni' => $validatedData['worker_dni'],
             'jobZone' => $validatedData['job_zone'],
+            'country' => $validatedData['country'],
         ]);
 
         $document = $record->generate();
@@ -267,6 +279,8 @@ class ManagementRecordsController extends Controller
             'expense_code' => 'nullable|string',
             'type' => 'nullable|string|in:Invoices,Bills,Factures,Workers',
             'user_id' => 'nullable|integer',
+            'country' => 'nullable|string',
+            'job_region' => 'nullable|string',
         ]);
 
         $defaults = [
@@ -274,6 +288,8 @@ class ManagementRecordsController extends Controller
             'expense_code' => null,
             'type' => null,
             'user_id' => null,
+            'country' => null,
+            'job_region' => null
         ];
 
         $validatedData = array_merge($defaults, $validatedData);
@@ -292,6 +308,8 @@ class ManagementRecordsController extends Controller
             'expenseCode' => $validatedData['expense_code'],
             'type' => $validatedData['type'],
             'userId' => $validatedData['user_id'],
+            'country' => $validatedData['country'],
+            'jobRegion' => $validatedData['job_region'],
         ]);
 
         $document = $record->generate();
@@ -355,6 +373,7 @@ class ManagementRecordsController extends Controller
          * @param DateTime $options['startDate']
          * @param DateTime $options['endDate']
          * @param string $options['country']
+         * @param string $options['job_region']
          * @param string $options['moneyType']
          * @param string $options['invoiceType']
          * @param string|null $options['jobRegion']
@@ -468,6 +487,8 @@ class ManagementRecordsController extends Controller
             'sub_categories.*' => 'string',
             'start_date' => 'nullable|date',
             'end_date' => 'nullable|date',
+            /* 'country' => 'nullable|string',
+            'job_region' => 'nullable|string', */
         ]);
 
         $defaults = [
@@ -482,6 +503,8 @@ class ManagementRecordsController extends Controller
             'sub_categories' => null,
             'start_date' => null,
             'end_date' => null,
+            /* 'country' => null,
+            'job_region' => null, */
         ];
 
         $validatedData = array_merge($defaults, $validatedData);
@@ -503,6 +526,8 @@ class ManagementRecordsController extends Controller
             'productId' => $validatedData['product_id'],
             'categories' => $validatedData['categories'],
             'subCategories' => $validatedData['sub_categories'],
+            /* 'country' => $validatedData['country'],
+            'jobRegion' => $validatedData['job_region'], */
         ]);
 
         $document = $record->generate();
@@ -672,6 +697,7 @@ class ManagementRecordsController extends Controller
             'start_date' => 'nullable|date',
             'end_date' => 'nullable|date',
             'country' => 'nullable|string',
+            'job_region' => 'nullable|string',
             'money_type' => 'nullable|string',
             'expense_code' => 'nullable|string',
             'job_code' => 'nullable|string',
@@ -682,6 +708,7 @@ class ManagementRecordsController extends Controller
             'start_date' => null,
             'end_date' => null,
             'country' => null,
+            'job_region' => null,
             'money_type' => null,
             'expense_code' => null,
             'job_code' => null,
@@ -701,6 +728,7 @@ class ManagementRecordsController extends Controller
             'startDate' => ($validatedData['start_date']) ? new DateTime($validatedData['start_date']) : null,
             'endDate' => ($validatedData['end_date']) ? new DateTime($validatedData['end_date']) : null,
             'country' => $validatedData['country'],
+            'zone' => $validatedData['job_region'],
             'moneyType' => $validatedData['money_type'],
             'expenseCode' => $validatedData['expense_code'],
             'jobCode' => $validatedData['job_code'],

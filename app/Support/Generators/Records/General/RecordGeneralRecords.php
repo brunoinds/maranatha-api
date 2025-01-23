@@ -30,6 +30,7 @@ class RecordGeneralRecords
     private DateTime $startDate;
     private DateTime $endDate;
     private string|null $country = null;
+    private string|null $zone = null;
     private string|null $moneyType = null;
     private string|null $type = null;
     private string|null $expenseCode = null;
@@ -40,6 +41,7 @@ class RecordGeneralRecords
      * @param DateTime $options['startDate']
      * @param DateTime $options['endDate']
      * @param string $options['country']
+     * @param string $options['zone']
      * @param string $options['moneyType']
      * @param string $options['type']
      * @param string|null $options['expenseCode']
@@ -54,6 +56,7 @@ class RecordGeneralRecords
         $this->type = $options['type'];
         $this->expenseCode = $options['expenseCode'];
         $this->jobCode = $options['jobCode'];
+        $this->zone = $options['zone'];
     }
 
     private function getInvoicesData():Collection
@@ -63,6 +66,7 @@ class RecordGeneralRecords
                     ->with(['report', 'report.user'])
                     ->join('jobs', 'invoices.job_code', '=', 'jobs.code')
                     ->join('reports', 'invoices.report_id', '=', 'reports.id')
+                    ->select('invoices.*', 'reports.zone as report_zone', 'jobs.zone as job_zone', 'jobs.country as job_country')
                     ->where('invoices.date', '>=', $this->startDate)
                     ->where('invoices.date', '<=', $this->endDate)
                     ->where(function($query){
@@ -81,7 +85,11 @@ class RecordGeneralRecords
 
 
         if ($this->country !== null){
-            $invoicesInSpan = $invoicesInSpan->where('country', '=', $this->country);
+            $invoicesInSpan = $invoicesInSpan->where('job_country', '=', $this->country);
+        }
+
+        if ($this->zone !== null){
+            $invoicesInSpan = $invoicesInSpan->where('job_zone', '=', $this->zone);
         }
 
         if ($this->moneyType !== null){
@@ -104,6 +112,7 @@ class RecordGeneralRecords
 
                 'description' => $invoice['description'],
                 'country' => $invoice['country'],
+                'zone' => $invoice['zone'],
 
                 'job_code' => Job::sanitizeCode($invoice['job_code']),
                 'expense_code' => $invoice['expense_code'],
@@ -138,6 +147,10 @@ class RecordGeneralRecords
             $spendingsInSpan = $spendingsInSpan->where('job.country', '=', $this->country);
         }
 
+        if ($this->zone !== null){
+            $spendingsInSpan = $spendingsInSpan->where('job.zone', '=', $this->zone);
+        }
+
 
         $spendingsInSpan = collect($spendingsInSpan)->groupBy(function($spending){
             return $spending['attendance']['id'] . '/~/' . $spending['attendance']['created_at'] . '/~/' . $spending['job']['code'] . '/~/' . $spending['expense']['code'] . '/~/' . $spending['attendance_day']['worker_dni'] . '/~/' . $spending['worker']['supervisor'] . '/~/' . $spending['worker']['name'] . '/~/' . $spending['job']['zone'];
@@ -166,6 +179,7 @@ class RecordGeneralRecords
                 'attendance_from_date' => $attendanceFromDate,
                 'attendance_to_date' => $attendanceToDate,
                 'country' => $attendance->job->country,
+                'zone' => $attendance->job->zone,
                 'job_code' => Job::sanitizeCode(explode('/~/', $code)[2]),
                 'expense_code' => explode('/~/', $code)[3],
                 'worker_dni' => explode('/~/', $code)[4],
@@ -262,6 +276,7 @@ class RecordGeneralRecords
 
                 'description' => $attendance['description'],
                 'country' => $attendance['country'],
+                'zone' => $attendance['zone'],
 
                 'job_code' => Job::sanitizeCode($attendance['job_code']),
                 'expense_code' => $attendance['expense_code'],
@@ -282,6 +297,7 @@ class RecordGeneralRecords
             'endDate' => $this->endDate,
             'moneyType' => $this->moneyType,
             'country' => $this->country,
+            'zone' => $this->zone,
             'expenseCode' => $this->expenseCode,
             'jobCode' => $this->jobCode,
         ];
@@ -309,6 +325,12 @@ class RecordGeneralRecords
             if ($options['country'] !== null){
                 $query = $query->whereHas('warehouse', function($query) use ($options){
                     $query->where('country', $options['country']);
+                });
+            }
+
+            if ($options['zone'] !== null){
+                $query = $query->whereHas('warehouse', function($query) use ($options){
+                    $query->where('zone', $options['zone']);
                 });
             }
 
@@ -384,6 +406,7 @@ class RecordGeneralRecords
                             return $product->name . ' - ' . $product->category;
                         })->unique()->implode(', '),
                         'country' => $outcome->warehouse->country,
+                        'zone' => $outcome->warehouse->zone,
 
                         'job_code' => Job::sanitizeCode($outcome->job_code),
                         'expense_code' => $outcome->expense_code,
@@ -467,6 +490,10 @@ class RecordGeneralRecords
                     'key' => 'country',
                 ],
                 [
+                    'title' => 'Zona',
+                    'key' => 'zone',
+                ],
+                [
                     'title' => 'Job',
                     'key' => 'job_code',
                 ],
@@ -507,6 +534,7 @@ class RecordGeneralRecords
                 'expenseCode' => $this->expenseCode,
                 'jobCode' => $this->jobCode,
                 'type' => $this->type,
+                'zone' => $this->zone,
             ],
         ];
     }

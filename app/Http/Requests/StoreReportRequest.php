@@ -31,6 +31,7 @@ class StoreReportRequest extends FormRequest
             'type' => ['required', Rule::in(['Bill', 'Facture'])],
             'money_type' => [Rule::in(MoneyType::toArray())],
             'country' => ['string', 'max:2'],
+            'zone' => ['string', 'max:100'],
             'metadata' => ['array']
         ];
     }
