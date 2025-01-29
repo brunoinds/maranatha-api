@@ -73,8 +73,8 @@ class RecordInventoryProductsKardex
             'productId' => $this->productId,
             'categories' => $this->categories,
             'subCategories' => $this->subCategories,
-            'country' => $this->country,
-            'jobRegion' => $this->jobRegion
+            /* 'country' => $this->country,
+            'jobRegion' => $this->jobRegion */
         ];
 
         $list = [];
