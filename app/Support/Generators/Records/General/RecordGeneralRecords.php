@@ -110,7 +110,13 @@ class RecordGeneralRecords
                 'ticket_start_date' => Carbon::parse($invoice['date'])->format('d/m/Y'),
                 'ticket_end_date' => Carbon::parse($invoice['date'])->format('d/m/Y'),
 
-                'description' => $invoice['description'],
+                'description' => (function() use ($invoice){
+                    if (isset($invoice['provider']) && !is_null($invoice['provider'])){
+                        $invoice['description'] .= ' - ' . $invoice['provider'];
+                    }
+
+                    return $invoice['description'];
+                })(),
                 'country' => $invoice['country'],
                 'zone' => $invoice['zone'],
 
