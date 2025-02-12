@@ -397,6 +397,9 @@ class ReportPDFCreator
 
                     collect(explode("\n", $mergeData['text']))->each(function($line, $i) use ($newPdf){
                         $newPdf->SetXY(10, 10 + ($i * 3.4));
+
+                        $line = iconv('UTF-8', 'cp1250', $line);
+
                         $newPdf->Write(0, $line);
                     });
 
@@ -410,6 +413,7 @@ class ReportPDFCreator
 
                     collect(explode("\n", $mergeData['text']))->each(function($line, $i) use ($newPdf){
                         $newPdf->SetXY(10, 10 + ($i * 3.4));
+                        $line = iconv('UTF-8', 'cp1250', $line);
                         $newPdf->Write(0, $line);
                     });
                     $currentPage++;
