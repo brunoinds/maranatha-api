@@ -136,6 +136,10 @@ class ReportAssistant{
 
             $invoiceDescription = $invoice->description;
 
+            if ($invoice->provider){
+                $invoiceDescription .= ' - ' . $invoice->provider;
+            }
+
             //Check if is invoice with multiples Jobs, by brackets:
             $hasKeysWithTextInside = preg_match('/\[(.*?)\]/', $invoiceDescription, $matches);
             if ($hasKeysWithTextInside){
