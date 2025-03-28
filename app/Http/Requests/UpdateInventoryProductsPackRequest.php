@@ -25,7 +25,7 @@ class UpdateInventoryProductsPackRequest extends FormRequest
             'name' => ['required', 'string', 'max:1000'],
             'products' => ['required', 'array'],
             'products.*.product_id' => ['required', 'integer', 'exists:inventory_products,id'],
-            'products.*.quantity' => ['required', 'numeric', 'min:1']
+            'products.*.quantity' => ['required', 'numeric', 'min:0']
         ];
     }
 }
