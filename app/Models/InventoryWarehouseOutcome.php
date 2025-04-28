@@ -91,6 +91,9 @@ class InventoryWarehouseOutcome extends Model
         });
 
         $this->uncountableItems()->each(function ($uncountableItem) use (&$currencies, $outcome) {
+            if (!isset($uncountableItem->outcomes_details[$outcome->id])) {
+                return;
+            }
             $outcomeDetails = $uncountableItem->outcomes_details[$outcome->id];
             if (!isset($currencies[$outcomeDetails['sell_currency']])) {
                 $currencies[$outcomeDetails['sell_currency']] = 0;
