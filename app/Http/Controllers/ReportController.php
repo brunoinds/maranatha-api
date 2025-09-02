@@ -27,21 +27,20 @@ class ReportController extends Controller
 {
     public function index()
     {
-
-        if (!auth()->user()->isAdmin()){
+        if (!auth()->user()->isAdmin()) {
             return response()->json(['message' => 'Unauthorized'], 401);
         }
 
-        $allReports = Report::all();
+        $allReports = Report::with([
+            'user:id,name,email,username', // Only load needed user fields
+            'invoices:id,report_id,amount' // Only load needed invoice fields
+        ])->get();
 
-        $allReports->each(function ($report) {
-            $report->user = $report->user()->get()->first()->toArray();
-        });
-
-        $allReports->each(function ($report) {
+        $allReports->each(function (Report $report) {
+            $report->user = $report->user->toArray();
             $report->invoices = [
-                'count' => $report->invoices()->count(),
-                'total_amount' => $report->invoices()->sum('amount'),
+                'count' => $report->invoices->count(),
+                'total_amount' => $report->invoices->sum('amount'),
             ];
         });
 
@@ -67,13 +66,19 @@ class ReportController extends Controller
 
     public function myReports()
     {
-        $myReports = collect(Report::all()->where('user_id', auth()->user()->id)->values());
-        $myReports->each(function ($report) {
+        $myReports = Report::where('user_id', auth()->user()->id)
+            ->with([
+                'invoices:id,report_id,amount' // Only load needed invoice fields
+            ])
+            ->get();
+
+        $myReports->each(function (Report $report) {
             $report->invoices = [
-                'count' => $report->invoices()->count(),
-                'total_amount' => $report->invoices()->sum('amount'),
+                'count' => $report->invoices->count(),
+                'total_amount' => $report->invoices->sum('amount'),
             ];
         });
+
         return response()->json($myReports->toArray());
     }
 

@@ -105,19 +105,11 @@ class Report extends Model
 
     public function firstInvoiceDate()
     {
-        $firstInvoice = $this->invoices()->orderBy('date', 'asc')->first();
-        if ($firstInvoice === null){
-            return null;
-        }
-        return $firstInvoice->date;
+        return $this->invoices()->min('date');
     }
+
     public function lastInvoiceDate()
     {
-        $lastInvoice = $this->invoices()->orderBy('date', 'desc')->first();
-
-        if ($lastInvoice === null){
-            return null;
-        }
-        return $lastInvoice->date;
+        return $this->invoices()->max('date');
     }
 }
