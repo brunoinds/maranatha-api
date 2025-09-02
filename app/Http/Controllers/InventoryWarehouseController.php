@@ -140,8 +140,8 @@ class InventoryWarehouseController extends Controller
 
         //Include the value of method amount() as property:
         $incomes->map(function ($income) {
-            $income->amount = $income->amount();
-            $income->items_count = $income->items()->count() + $income->uncountableItems()->count();
+            $income->amount_data = $income->amount();
+            $income->items_count_data = $income->items()->count() + $income->uncountableItems()->count();
             return $income;
         });
 
@@ -169,36 +169,33 @@ class InventoryWarehouseController extends Controller
 
     public function listLoans(InventoryWarehouse $warehouse)
     {
-        $loans = $warehouse->loans;
-        $loans->each(function ($loan) {
-            $loan->productItem;
-            $loan->productItem?->product;
-            $loan->loanedBy;
-            $loan->loanedTo;
-        });
+        $loans = $warehouse->loans()->with([
+            'productItem:id,inventory_product_id,status,batch,amount,currency',
+            'productItem.product:id,name,description,category,brand,unit',
+            'loanedBy:id,name,username,email',
+            'loanedTo:id,name,username,email'
+        ])->get();
 
         return response()->json($loans->toArray());
     }
 
     public function listLoansByUsers(InventoryWarehouse $warehouse)
     {
-        $loans = $warehouse->loans->groupBy('loaned_to_user_id')->map(function ($userLoans) {
-            $userLoans = $userLoans->map(function ($loan) {
-                $loan->productItem;
-                $loan->productItem?->product;
-                $loan->loanedBy;
-                $loan->loanedTo;
-                return $loan;
-            });
+        $loans = $warehouse->loans()->with([
+            'productItem:id,inventory_product_id,status,batch,amount,currency',
+            'productItem.product:id,name,description,category,brand,unit',
+            'loanedBy:id,name,username,email',
+            'loanedTo:id,name,username,email'
+        ])->get();
 
+        $groupedLoans = $loans->groupBy('loaned_to_user_id')->map(function ($userLoans) {
             return [
-                'user' => User::find($userLoans[0]->loaned_to_user_id),
+                'user' => $userLoans->first()->loanedTo->toArray(),
                 'loans' => $userLoans->toArray()
             ];
         });
 
-
-        return response()->json($loans->values()->toArray());
+        return response()->json($groupedLoans->values()->toArray());
     }
 
     public function listOutcomeRequests(InventoryWarehouse $warehouse)
