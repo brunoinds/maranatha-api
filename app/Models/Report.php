@@ -39,11 +39,13 @@ class Report extends Model
         'status' => ReportStatus::class,
         'metadata' => 'array',
     ];
-    public function amount(){
+    public function amount()
+    {
         return $this->invoices()->sum('amount');
     }
 
-    public function amountIn(MoneyType $currency){
+    public function amountIn(MoneyType $currency)
+    {
         $moneyType = MoneyType::from($this->money_type->value);
         if ($this->money_type === $currency){
             return $this->amount();
@@ -59,25 +61,31 @@ class Report extends Model
     }
 
     //! This method should be removed soon
-    public function amountInSoles(){
+    public function amountInSoles()
+    {
         return $this->amountIn(MoneyType::PEN);
     }
 
     //! This method should be removed soon
-    public function amountInDollars(){
+    public function amountInDollars()
+    {
         return $this->amountIn(MoneyType::USD);
     }
 
-    public function invoices(){
+    public function invoices()
+    {
         return $this->hasMany(Invoice::class);
     }
-    public function user(){
+    public function user()
+    {
         return $this->belongsTo(User::class);
     }
-    public function balances(){
+    public function balances()
+    {
         return $this->hasMany(Balance::class);
     }
-    public function delete(){
+    public function delete()
+    {
         $this->invoices()->delete();
         $this->balances()->delete();
         return parent::delete();
@@ -95,14 +103,16 @@ class Report extends Model
         $this->save();
     }
 
-    public function firstInvoiceDate(){
+    public function firstInvoiceDate()
+    {
         $firstInvoice = $this->invoices()->orderBy('date', 'asc')->first();
         if ($firstInvoice === null){
             return null;
         }
         return $firstInvoice->date;
     }
-    public function lastInvoiceDate(){
+    public function lastInvoiceDate()
+    {
         $lastInvoice = $this->invoices()->orderBy('date', 'desc')->first();
 
         if ($lastInvoice === null){
