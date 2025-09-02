@@ -36,15 +36,21 @@ class ReportController extends Controller
             'invoices:id,report_id,amount' // Only load needed invoice fields
         ])->get();
 
-        $allReports->each(function (Report $report) {
-            $report->user = $report->user->toArray();
-            $report->invoices = [
-                'count' => $report->invoices->count(),
-                'total_amount' => $report->invoices->sum('amount'),
-            ];
+        $allReports = $allReports->map(function (Report $report) {
+            $item = array_merge(
+                $report->toArray(),
+                [
+                    'user' => $report->user->toArray(),
+                    'invoices' => [
+                        'count' => $report->invoices->count(),
+                        'total_amount' => $report->invoices->sum('amount'),
+                    ]
+                ]
+            );
+            return $item;
         });
 
-        return response()->json($allReports->toArray());
+        return response()->json($allReports);
     }
 
     public function create()
@@ -72,14 +78,21 @@ class ReportController extends Controller
             ])
             ->get();
 
-        $myReports->each(function (Report $report) {
-            $report->invoices = [
-                'count' => $report->invoices->count(),
-                'total_amount' => $report->invoices->sum('amount'),
-            ];
+        $myReports = $myReports->map(function (Report $report) {
+            $item = array_merge(
+                $report->toArray(),
+                [
+                    'user' => $report->user->toArray(),
+                    'invoices' => [
+                        'count' => $report->invoices->count(),
+                        'total_amount' => $report->invoices->sum('amount'),
+                    ]
+                ]
+            );
+            return $item;
         });
 
-        return response()->json($myReports->toArray());
+        return response()->json($myReports);
     }
 
     public function update(UpdateReportRequest $request, Report $report)
