@@ -140,8 +140,8 @@ class InventoryWarehouseController extends Controller
 
         //Include the value of method amount() as property:
         $incomes->map(function ($income) {
-            $income->amount_data = $income->amount();
-            $income->items_count_data = $income->items()->count() + $income->uncountableItems()->count();
+            $income->amount = $income->amount();
+            $income->items_count = $income->items()->count() + $income->uncountableItems()->count();
             return $income;
         });
 
@@ -151,7 +151,6 @@ class InventoryWarehouseController extends Controller
     public function listOutcomes(InventoryWarehouse $warehouse)
     {
         $outcomes = $warehouse->outcomes;
-
         //Do not include ->items from eager loading:
         $outcomes->makeHidden('items');
 
