@@ -5,6 +5,11 @@ use Illuminate\Http\Request;
 
 define('LARAVEL_START', microtime(true));
 
+//Check if version of PHP > 8.1 if so, ignore Errors:
+if (version_compare(PHP_VERSION, '8.1') >= 0) {
+    error_reporting(E_ALL & ~E_DEPRECATED);
+}
+
 /*
 |--------------------------------------------------------------------------
 | Check If The Application Is Under Maintenance

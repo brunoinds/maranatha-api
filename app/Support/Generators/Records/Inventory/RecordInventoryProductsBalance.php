@@ -267,10 +267,6 @@ class RecordInventoryProductsBalance
                 [
                     'title' => 'Total',
                     'key' => 'stock_amount'
-                ],
-                [
-                    'title' => 'q',
-                    'key' => 'q'
                 ]
             ],
             'body' => collect($body)->map(function($item){
