@@ -50,6 +50,7 @@ jobs:
             chmod 755 /home/medstudier/maranatha.top/public &&
             chmod 755 /home/medstudier/maranatha.top/storage &&
             cd /home/medstudier/maranatha.top &&
+            php artisan config:clear &&
             php artisan migrate --force &&
             php artisan config:clear &&
             service lsws restart
