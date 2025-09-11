@@ -1,0 +1,56 @@
+name: Deploy Laravel On Push To Main
+on:
+  push:
+    branches:
+      - migrate-server
+jobs:
+  web-deploy:
+    name: Deploy
+    runs-on: ubuntu-latest
+    steps:
+      - name: 💻 Get the latest code
+        uses: actions/checkout@v4
+      - name: 📀 Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: 8.2
+      - name: 🔑 Copy .env
+        run: php -r "file_exists('.env') || copy('.env.example', '.env');"
+      - name: 📦 Install Laravel Dependencies
+        run: composer install --ignore-platform-reqs && composer dump-autoload -o
+      - name: ♾️ Prepare storage link
+        run: chmod -R 775 storage/
+      - name: 🔗 Generate Laravel storage link
+        run: php artisan config:cache && php artisan storage:link && php artisan config:cache
+      - name: 👮🏻 Directory Permissions
+        run: chmod -R 777 storage bootstrap/cache
+      - name: 🧪 Run Laravel Tests
+        run: php artisan test
+      - name: 🗂️ Sync files
+        uses: easingthemes/ssh-deploy@main
+        with:
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}  # Your private SSH key (PEM format, no passphrase)
+          REMOTE_HOST: 187.110.167.70
+          REMOTE_USER: root
+          REMOTE_PORT: 22
+          TARGET: "/home/medstudier/maranatha.top"
+          SOURCE: "."
+          ARGS: "-rlgoDzvc -i --delete-after --delay-updates"
+          EXCLUDE: ".env,storage/logs,storage/keys,storage/app/public,public/storage,public/storage/**,database/database.sqlite,resources,resources/**"
+      - name: 💫 Clear cache and update permissions
+        uses: appleboy/ssh-action@v0.1.7
+        with:
+          host: 187.110.167.70
+          username: root
+          port: 22
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            chown medstudier /home/medstudier/maranatha.top -R &&
+            chmod 755 /home/medstudier/maranatha.top &&
+            chmod 755 /home/medstudier/maranatha.top/public &&
+            chmod 755 /home/medstudier/maranatha.top/storage &&
+            cd /home/medstudier/maranatha.top &&
+            php artisan config:clear &&
+            php artisan migrate --force &&
+            php artisan config:clear &&
+            service lsws restart
