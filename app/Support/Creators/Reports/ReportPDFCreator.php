@@ -256,7 +256,7 @@ class ReportPDFCreator
                 }
                 $srcUrl = Storage::disk('public')->path($path);
                 $listSrcs[] = [
-                    'src' => $srcUrl,
+                    'src' =>  'data:image/png;base64,' . base64_encode(file_get_contents($srcUrl)),
                     'invoice' => $invoice,
                     'type' => 'image'
                 ];
@@ -305,6 +305,8 @@ class ReportPDFCreator
                     <article>
                         <h1>'.$jobName.' '.Job::sanitizeCode($invoice->job_code) . ' - '.$invoice->expense_code . '<br> '.$invoiceDescription.'</h1>
                         <img src="'.$fileSrc.'">
+
+                        <span>'.$fileSrc.'</span>
                     </article>
                 ';
 
@@ -431,8 +433,12 @@ class ReportPDFCreator
 
     public function create($options = []) : string
     {
-        $dompdf = new Dompdf();
-        $dompdf->getOptions()->setChroot([base_path('public') . '/storage/']);
+        $opts = new \Dompdf\Options();
+        $opts->set('isRemoteEnabled', true);
+        $opts->set('isHtml5ParserEnabled', true);
+        $opts->set('chroot', base_path('public') . '/storage/');
+
+        $dompdf = new Dompdf($opts);
 
         $totalFramesToRenderCount = 0;
         $finishedFramesToRenderCount = 0;
