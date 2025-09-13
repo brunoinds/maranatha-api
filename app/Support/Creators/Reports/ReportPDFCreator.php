@@ -305,8 +305,6 @@ class ReportPDFCreator
                     <article>
                         <h1>'.$jobName.' '.Job::sanitizeCode($invoice->job_code) . ' - '.$invoice->expense_code . '<br> '.$invoiceDescription.'</h1>
                         <img src="'.$fileSrc.'">
-
-                        <span>'.$fileSrc.'</span>
                     </article>
                 ';
 
