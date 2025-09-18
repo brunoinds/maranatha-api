@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "4c1512bf2c103c73ef23b70d6ba0397b",
+    "content-hash": "5c9ee4fb6f8b2fca304d8d1baa3200b4",
     "packages": [
         {
             "name": "avadim/fast-excel-helper",
@@ -310,6 +310,47 @@
                 }
             ],
             "time": "2025-02-28T13:11:00+00:00"
+        },
+        {
+            "name": "brunoinds/currency-getgeo-api-laravel",
+            "version": "v1.0.2",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/brunoinds/currency-getgeoapi-laravel.git",
+                "reference": "9a73ec28473bde71c559f720f42c3562c49d2d25"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/brunoinds/currency-getgeoapi-laravel/zipball/9a73ec28473bde71c559f720f42c3562c49d2d25",
+                "reference": "9a73ec28473bde71c559f720f42c3562c49d2d25",
+                "shasum": ""
+            },
+            "require": {
+                "nesbot/carbon": "^2.0",
+                "vlucas/phpdotenv": "^5.0"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Brunoinds\\CurrencyGetGetApiLaravel\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Bruno Freire",
+                    "email": "brunoqm99@gmail.com"
+                }
+            ],
+            "description": "A simple PHP library for exchanging currencies based on api.getgeoapi.com",
+            "support": {
+                "issues": "https://github.com/brunoinds/currency-getgeoapi-laravel/issues",
+                "source": "https://github.com/brunoinds/currency-getgeoapi-laravel/tree/v1.0.2"
+            },
+            "time": "2025-09-18T14:21:38+00:00"
         },
         {
             "name": "brunoinds/frankfurter-laravel",

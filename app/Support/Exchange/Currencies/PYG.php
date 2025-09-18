@@ -14,8 +14,8 @@ class PYG{
         }
 
         try {
-            \Brunoinds\ParaguayDolarLaravel\Exchange::useStore(\App\Support\Exchange\Adapters\PYGAdapter::getStore());
-            return \Brunoinds\ParaguayDolarLaravel\Exchange::on($date)->convert(\Brunoinds\ParaguayDolarLaravel\Enums\Currency::USD, $amount)->to(\Brunoinds\ParaguayDolarLaravel\Enums\Currency::PYG);
+            \Brunoinds\CurrencyGetGetApiLaravel\Exchange::useStore(\App\Support\Exchange\Adapters\PYGAdapter::getStore());
+            return \Brunoinds\CurrencyGetGetApiLaravel\Exchange::on($date)->convert(\Brunoinds\CurrencyGetGetApiLaravel\Enums\Currency::USD, $amount)->to(\Brunoinds\CurrencyGetGetApiLaravel\Enums\Currency::PYG);
         } catch (\Throwable $th) {
             Log::warning('Failed to convert USD to PYG', ['date' => $date, 'amount' => $amount, 'error' => $th->getMessage()]);
             return 0;
@@ -28,8 +28,8 @@ class PYG{
         }
 
         try {
-            \Brunoinds\ParaguayDolarLaravel\Exchange::useStore(\App\Support\Exchange\Adapters\PYGAdapter::getStore());
-            return \Brunoinds\ParaguayDolarLaravel\Exchange::on($date)->convert(\Brunoinds\ParaguayDolarLaravel\Enums\Currency::PYG, $amount)->to(\Brunoinds\ParaguayDolarLaravel\Enums\Currency::USD);
+            \Brunoinds\CurrencyGetGetApiLaravel\Exchange::useStore(\App\Support\Exchange\Adapters\PYGAdapter::getStore());
+            return \Brunoinds\CurrencyGetGetApiLaravel\Exchange::on($date)->convert(\Brunoinds\CurrencyGetGetApiLaravel\Enums\Currency::PYG, $amount)->to(\Brunoinds\CurrencyGetGetApiLaravel\Enums\Currency::USD);
         } catch (\Throwable $th) {
             Log::warning('Failed to convert PYG to USD', ['date' => $date, 'amount' => $amount, 'error' => $th->getMessage()]);
             return 0;

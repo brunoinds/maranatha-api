@@ -1,4 +1,4 @@
-<?php 
+<?php
 
 namespace App\Support\Exchange\Adapters;
 
@@ -7,7 +7,7 @@ use SoftinkLab\LaravelKeyvalueStorage\Facades\KVOption;
 
 class PYGAdapter{
     private static $db = [
-        'name' => 'Brunoinds\ParaguayDolarLaravel',
+        'name' => 'Brunoinds\CurrencyGetGetApiLaravel',
         'value' => null,
     ];
     public function get()
@@ -26,10 +26,10 @@ class PYGAdapter{
         self::$db['value'] = $value;
     }
 
-    public static function getStore(): \Brunoinds\ParaguayDolarLaravel\Store\Store
+    public static function getStore(): \Brunoinds\CurrencyGetGetApiLaravel\Store\Store
     {
         $adapter = new self();
-        $store = \Brunoinds\ParaguayDolarLaravel\Store\Store::newFromAdapter($adapter);
+        $store = \Brunoinds\CurrencyGetGetApiLaravel\Store\Store::newFromAdapter($adapter);
         return $store;
     }
 }
