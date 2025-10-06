@@ -1,4 +1,4 @@
-name: Deploy Laravel
+name: Deploy Laravel On Push To Main
 on:
   push:
     branches:
@@ -17,7 +17,7 @@ jobs:
       - name: 🔑 Copy .env
         run: php -r "file_exists('.env') || copy('.env.example', '.env');"
       - name: 📦 Install Laravel Dependencies
-        run: composer update --ignore-platform-reqs
+        run: composer install --ignore-platform-reqs && composer dump-autoload -o
       - name: ♾️ Prepare storage link
         run: chmod -R 775 storage/
       - name: 🔗 Generate Laravel storage link
@@ -27,23 +27,30 @@ jobs:
       - name: 🧪 Run Laravel Tests
         run: php artisan test
       - name: 🗂️ Sync files
-        uses: SamKirkland/FTP-Deploy-Action@v4.3.4
+        uses: easingthemes/ssh-deploy@main
         with:
-          server: ${{ secrets.FTP_SERVER }}
-          username: ${{ secrets.FTP_USERNAME }}
-          password: ${{ secrets.FTP_PASSWORD }}
-          server-dir: /
-          exclude: |
-                  .env
-                  storage/app/public
-                  public/storage
-                  public/storage/**
-                  database/database.sqlite
-                  resources/ionic
-                  resources/ionic/**
-      - name: 🧼  Clear server cache
-        run: curl -X GET https://maranatha.imedicineapp.com/api/cd/config-cache
-      - name: ⏰ Migrate on server
-        run: curl -X GET https://maranatha.imedicineapp.com/api/cd/migrate
-      - name: 🧼  Clear server cache
-        run: curl -X GET https://maranatha.imedicineapp.com/api/cd/config-cache
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}  # Your private SSH key (PEM format, no passphrase)
+          REMOTE_HOST: 187.110.167.70
+          REMOTE_USER: root
+          REMOTE_PORT: 22
+          TARGET: "/home/medstudier/maranatha.top"
+          SOURCE: "."
+          ARGS: "-rlgoDzvc -i --delete-after --delay-updates"
+          EXCLUDE: ".env,storage/logs,storage/keys,storage/app/public,public/storage,public/storage/**,database/database.sqlite,resources,resources/**,public/.user.ini"
+      - name: 💫 Clear cache and update permissions
+        uses: appleboy/ssh-action@v0.1.7
+        with:
+          host: 187.110.167.70
+          username: root
+          port: 22
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            chown -R medstudier:medstudier /home/medstudier/maranatha.top &&
+            chmod 755 /home/medstudier/maranatha.top &&
+            chmod 755 /home/medstudier/maranatha.top/public &&
+            chmod 755 /home/medstudier/maranatha.top/storage &&
+            cd /home/medstudier/maranatha.top &&
+            php artisan config:clear &&
+            php artisan migrate --force &&
+            php artisan config:clear &&
+            service lsws restart
