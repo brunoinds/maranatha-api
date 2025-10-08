@@ -7,7 +7,8 @@ use App\Helpers\Enums\InventoryProductItemStatus;
 use App\Models\InventoryProductItem;
 use App\Models\InventoryProductItemUncountable;
 use App\Helpers\Toolbox;
-
+use DateTime;
+use Carbon\Carbon;
 
 class RecordInventoryProductsBalance
 {
@@ -72,7 +73,7 @@ class RecordInventoryProductsBalance
 
             $items = [];
             $query->groupBy(['inventory_product_id','buy_currency', 'buy_amount', 'inventory_warehouse_id'])
-                    ->select()->each(function($item) use (&$options, &$items){
+                    ->select()->each(function($item) use (&$options, &$items, $instance){
                         $query = InventoryProductItem::query();
                         if ($options['moneyType'] !== null && $item->buy_currency !== $options['moneyType']){
                             return;
@@ -100,6 +101,33 @@ class RecordInventoryProductsBalance
                             }
                         }
 
+                        $productItemsLoaded = $productItems->with('income', 'outcome')->get();
+
+                        $previousStockQuantity = (function() use ($productItemsLoaded, $instance){
+                            $previousIncomesProductsItems = (clone $productItemsLoaded)->filter(function($item) use ($instance){
+                                return Carbon::parse($item->income->date)->isBefore($instance->startDate);
+                            });
+                            $previousOutcomesProductsItems = (clone $productItemsLoaded)->filter(function($item) use ($instance){
+                                if ($item->outcome === null){
+                                    return false;
+                                }
+                                return Carbon::parse($item->outcome->date)->isBefore($instance->startDate);
+                            });
+                            return $previousIncomesProductsItems->count() - $previousOutcomesProductsItems->count();
+                        })();
+                        $incomeInPeriodQuantity = (clone $productItemsLoaded)->filter(function($item) use ($instance){
+                            return Carbon::parse($item->income->date)->isBetween($instance->startDate, $instance->endDate);
+                        })->count();
+                        $outcomeInPeriodQuantity = (clone $productItemsLoaded)->filter(function($item) use ($instance){
+                            if ($item->outcome === null){
+                                return false;
+                            }
+                            return Carbon::parse($item->outcome->date)->isBetween($instance->startDate, $instance->endDate);
+                        })->count();
+                        $inPeriodStockQuantity = $previousStockQuantity + $incomeInPeriodQuantity - $outcomeInPeriodQuantity;
+
+
+
                         $items[] = [
                             'id' => (clone $productItems)->first()->product->id,
                             'name' => (clone $productItems)->first()->product->name,
@@ -108,11 +136,12 @@ class RecordInventoryProductsBalance
                             'currency' => (clone $productItems)->first()->buy_currency,
                             'warehouse' => (clone $productItems)->first()->warehouse->name,
 
-                            'income_quantity' => (clone $productItems)->count(),
-                            'outcome_quantity' => (clone $productItems)->where('status', InventoryProductItemStatus::Sold)->count(),
+                            'previous_stock_quantity' => $previousStockQuantity,
+                            'income_quantity' => $incomeInPeriodQuantity,
+                            'outcome_quantity' => $outcomeInPeriodQuantity,
 
-                            'stock_quantity' => (clone $productItems)->where('status', InventoryProductItemStatus::InStock)->count(),
-                            'stock_amount' => (clone $productItems)->where('status', InventoryProductItemStatus::InStock)->sum('buy_amount'),
+                            'stock_quantity' => $inPeriodStockQuantity,
+                            'stock_amount' => (clone $productItems)->first()->buy_amount * $inPeriodStockQuantity,
                             'unit_price' => (clone $productItems)->first()->buy_amount,
                         ];
                     });
@@ -138,7 +167,7 @@ class RecordInventoryProductsBalance
 
             $items = [];
             $query->groupBy(['inventory_product_id','buy_currency', 'buy_amount'])
-                    ->select()->each(function($item) use (&$options, &$items){
+                    ->select()->each(function($item) use (&$options, &$items, $instance){
                         $query = InventoryProductItemUncountable::query();
                         if ($options['moneyType'] !== null && $item->buy_currency !== $options['moneyType']){
                             return;
@@ -166,6 +195,27 @@ class RecordInventoryProductsBalance
                             }
                         }
 
+                        $productItemsLoaded = $productItems->get();
+
+                        $previousStockQuantity = (function() use ($productItemsLoaded, $instance){
+                            $previousIncomesProductsItems = (clone $productItemsLoaded)->filter(function($item) use ($instance){
+                                return Carbon::parse($item->income->date)->isBefore($instance->startDate);
+                            });
+
+                            $previousOutomesBalances =$previousIncomesProductsItems->map(function($item) use ($instance){
+                                $balance = $item->quantity_inserted;
+                                $item->outcomes->filter(function($outcome) use ($instance){
+                                    return Carbon::parse($outcome->date)->isBefore($instance->startDate);
+                                })->each(function($outcome) use ($item, &$balance){
+                                    $balance -= $item->outcomes_details[$outcome->id]['quantity'];
+                                });
+
+                                return $balance;
+                            });
+
+                            return $previousIncomesProductsItems->sum('quantity_inserted') - $previousOutomesBalances->sum();
+                        })();
+
                         $items[] = [
                             'id' => (clone $productItems)->first()->product->id,
                             'name' => (clone $productItems)->first()->product->name,
@@ -173,7 +223,7 @@ class RecordInventoryProductsBalance
                             'sub_category' => (clone $productItems)->first()->product->sub_category,
                             'currency' => (clone $productItems)->first()->buy_currency->value,
                             'warehouse' => (clone $productItems)->first()->warehouse->name,
-
+                            'previous_stock_quantity' => $previousStockQuantity,
                             'income_quantity' => (clone $productItems)->sum('quantity_inserted'),
                             'outcome_quantity' => (clone $productItems)->sum('quantity_used'),
                             'stock_quantity' => (clone $productItems)->sum('quantity_remaining'),
@@ -201,6 +251,7 @@ class RecordInventoryProductsBalance
                 'sub_category' => $item['sub_category'],
                 'currency' => $item['currency'],
                 'warehouse' => $item['warehouse'],
+                'previous_stock_quantity' => $item['previous_stock_quantity'],
                 'income_quantity' => $item['income_quantity'],
                 'outcome_quantity' => $item['outcome_quantity'],
                 'stock_quantity' => $item['stock_quantity'],
@@ -234,15 +285,19 @@ class RecordInventoryProductsBalance
                     'key' => 'warehouse'
                 ],
                 [
-                    'title' => 'Ingreso',
+                    'title' => 'Saldo Inicial',
+                    'key' => 'previous_stock_quantity'
+                ],
+                [
+                    'title' => 'Ingresos',
                     'key' => 'income_quantity'
                 ],
                 [
-                    'title' => 'Salida',
+                    'title' => 'Salidas',
                     'key' => 'outcome_quantity'
                 ],
                 [
-                    'title' => 'Actual',
+                    'title' => 'Saldo Final',
                     'key' => 'stock_quantity'
                 ],
                 [
@@ -261,6 +316,8 @@ class RecordInventoryProductsBalance
             'body' => collect($body)->map(function($item){
                 return [
                     ...$item,
+                    'income_quantity' => '+' . $item['income_quantity'],
+                    'outcome_quantity' => '-' . $item['outcome_quantity'],
                     'stock_amount' => Toolbox::moneyFormat($item['stock_amount'], $item['currency']),
                     'unit_price' => Toolbox::moneyFormat($item['unit_price'], $item['currency']),
                 ];
