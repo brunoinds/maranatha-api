@@ -289,7 +289,7 @@ class RecordInventoryProductsKardex
 
                 $balance = [
                     'quantity' => $totalQuantity,
-                    'amount' => (clone $productItems)->first()->calculateSellPriceFromBuyPrice($totalQuantity),
+                    'amount' => (clone $productItems)->first()->buy_amount,
                     'total' => (clone $productItems)->sum('buy_amount'),
                 ];
 

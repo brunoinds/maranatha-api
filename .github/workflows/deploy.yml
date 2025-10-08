@@ -36,7 +36,7 @@ jobs:
           TARGET: "/home/medstudier/maranatha.top"
           SOURCE: "."
           ARGS: "-rlgoDzvc -i --delete-after --delay-updates"
-          EXCLUDE: ".env,storage/logs,storage/keys,storage/app/public,public/storage,public/storage/**,database/database.sqlite,resources,resources/**,public/.user.ini"
+          EXCLUDE: ".env,storage/logs,storage/keys,storage/app/public,public/storage,public/storage/**,database/database.sqlite,resources,resources/**,public/.user.ini,public/php.ini"
       - name: 💫 Clear cache and update permissions
         uses: appleboy/ssh-action@v0.1.7
         with:

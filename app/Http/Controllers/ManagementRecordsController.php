@@ -509,12 +509,12 @@ class ManagementRecordsController extends Controller
 
         $validatedData = array_merge($defaults, $validatedData);
 
-        if (RecordsCache::getRecord('inventoryProductsKardex', $validatedData)){
+        /* if (RecordsCache::getRecord('inventoryProductsKardex', $validatedData)){
             return response()->json([
                 ...RecordsCache::getRecord('inventoryProductsKardex', $validatedData),
                 'is_cached' => true
             ]);
-        }
+        } */
 
         $record = new RecordInventoryProductsKardex([
             'startDate' => ($validatedData['start_date']) ? new DateTime($validatedData['start_date']) : null,
@@ -707,6 +707,13 @@ class ManagementRecordsController extends Controller
 
         $validatedData = array_merge($defaults, $validatedData);
 
+        if (RecordsCache::getRecord('inventoryIncomesLoanables', $validatedData)){
+            return response()->json([
+                ...RecordsCache::getRecord('inventoryIncomesLoanables', $validatedData),
+                'is_cached' => true
+            ]);
+        }
+
         $record = new RecordInventoryIncomesLoanables([
             'warehouseIds' => $validatedData['warehouse_ids'],
             'startDate' => ($validatedData['start_date']) ? new DateTime($validatedData['start_date']) : null,
@@ -715,7 +722,7 @@ class ManagementRecordsController extends Controller
 
         $document = $record->generate();
 
-        //RecordsCache::storeRecord('inventoryIncomesLoanables', $validatedData, $document);
+        RecordsCache::storeRecord('inventoryIncomesLoanables', $validatedData, $document);
 
         return response()->json([
             ...$document,
