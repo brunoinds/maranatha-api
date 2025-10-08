@@ -287,12 +287,10 @@ class RecordInventoryProductsKardex
 
                 $totalQuantity = (clone $productItems)->sum('quantity_inserted');
 
-                ddh($productItems);
-
                 $balance = [
                     'quantity' => $totalQuantity,
-                    'amount' => (clone $productItems)->first()->buy_amount,
-                    'total' => (clone $productItems)->sum('buy_amount'),
+                    'amount' => (clone $productItems)->first()->calculateSellPriceFromBuyPrice(1),
+                    'total' => (clone $productItems)->first()->calculateSellPriceFromBuyPrice($totalQuantity),
                 ];
 
                 if (count($list) > 0){
@@ -410,7 +408,7 @@ class RecordInventoryProductsKardex
                         'in_amount' => null,
                         'in_total' => null,
                         'out_quantity' => $itemsSold->sum('quantity'),
-                        'out_amount' => $itemsSold->sum('sell_amount'),
+                        'out_amount' =>  $itemsSold->sum('sell_amount') / $itemsSold->sum('quantity'),
                         'out_total' => $itemsSold->sum('sell_amount'),
                         'balance_quantity' => $balance['quantity'],
                         'balance_amount' => $balance['amount'],
