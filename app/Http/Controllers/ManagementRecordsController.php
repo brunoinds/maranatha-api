@@ -543,6 +543,8 @@ class ManagementRecordsController extends Controller
     public function inventoryProductsBalance()
     {
         $validatedData = request()->validate([
+            'start_date' => 'nullable|date',
+            'end_date' => 'nullable|date',
             'money_type' => 'nullable|string',
             'warehouse_ids' => 'nullable|array',
             'warehouse_ids.*' => 'string',
@@ -554,6 +556,8 @@ class ManagementRecordsController extends Controller
         ]);
 
         $defaults = [
+            'start_date' => null,
+            'end_date' => null,
             'money_type' => null,
             'warehouse_ids' => null,
             'product_id' => null,
@@ -571,6 +575,8 @@ class ManagementRecordsController extends Controller
         }
 
         $record = new RecordInventoryProductsBalance([
+            'startDate' => ($validatedData['start_date']) ? new DateTime($validatedData['start_date']) : null,
+            'endDate' => ($validatedData['end_date']) ? new DateTime($validatedData['end_date']) : null,
             'moneyType' => $validatedData['money_type'],
             'warehouseIds' => $validatedData['warehouse_ids'],
             'productId' => $validatedData['product_id'],
@@ -707,12 +713,12 @@ class ManagementRecordsController extends Controller
 
         $validatedData = array_merge($defaults, $validatedData);
 
-        /* if (RecordsCache::getRecord('inventoryIncomesLoanables', $validatedData)){
+        if (RecordsCache::getRecord('inventoryIncomesLoanables', $validatedData)){
             return response()->json([
                 ...RecordsCache::getRecord('inventoryIncomesLoanables', $validatedData),
                 'is_cached' => true
             ]);
-        } */
+        }
 
         $record = new RecordInventoryIncomesLoanables([
             'warehouseIds' => $validatedData['warehouse_ids'],

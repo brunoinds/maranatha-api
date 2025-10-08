@@ -12,6 +12,8 @@ use App\Helpers\Toolbox;
 class RecordInventoryProductsBalance
 {
 
+    private DateTime|null $startDate = null;
+    private DateTime|null $endDate = null;
     private string|null $moneyType = null;
     private array|null $warehouseIds = null;
     private string|null $productId = null;
@@ -30,6 +32,8 @@ class RecordInventoryProductsBalance
      */
 
     public function __construct(array $options){
+        $this->startDate = $options['startDate'] ?? null;
+        $this->endDate = $options['endDate'] ?? null;
         $this->moneyType = $options['moneyType'] ?? null;
         $this->warehouseIds = $options['warehouseIds'] ?? null;
         $this->productId = $options['productId'] ?? null;
@@ -41,6 +45,8 @@ class RecordInventoryProductsBalance
     {
         $instance = $this;
         $options = [
+            'startDate' => $this->startDate,
+            'endDate' => $this->endDate,
             'moneyType' => $this->moneyType,
             'warehouseIds' => $this->warehouseIds,
             'productId' => $this->productId,
@@ -102,19 +108,12 @@ class RecordInventoryProductsBalance
                             'currency' => (clone $productItems)->first()->buy_currency,
                             'warehouse' => (clone $productItems)->first()->warehouse->name,
 
-
-                            /* 'q' => (clone $productItems)->toRawSql(), */
                             'income_quantity' => (clone $productItems)->count(),
                             'outcome_quantity' => (clone $productItems)->where('status', InventoryProductItemStatus::Sold)->count(),
 
                             'stock_quantity' => (clone $productItems)->where('status', InventoryProductItemStatus::InStock)->count(),
                             'stock_amount' => (clone $productItems)->where('status', InventoryProductItemStatus::InStock)->sum('buy_amount'),
                             'unit_price' => (clone $productItems)->first()->buy_amount,
-                            /*
-                            'outcome_amount' => (clone $productItems)->first()?->buy_amount ?? 0,
-                            'balance_quantity' => (clone $productItems)->count() - (clone $productItems)->where('status', InventoryProductItemStatus::Sold)->count(),
-                            'balance_total_amount' => ((clone $productItems)->count() - (clone $productItems)->where('status', InventoryProductItemStatus::Sold)->count()) * ((clone $productItems)->first()?->buy_amount ?? 0)
-                            */
                         ];
                     });
 
@@ -175,17 +174,11 @@ class RecordInventoryProductsBalance
                             'currency' => (clone $productItems)->first()->buy_currency->value,
                             'warehouse' => (clone $productItems)->first()->warehouse->name,
 
-                            /* 'q' => (clone $productItems)->toRawSql(), */
                             'income_quantity' => (clone $productItems)->sum('quantity_inserted'),
                             'outcome_quantity' => (clone $productItems)->sum('quantity_used'),
                             'stock_quantity' => (clone $productItems)->sum('quantity_remaining'),
                             'stock_amount' => (clone $productItems)->sum('quantity_remaining') * (clone $productItems)->first()->calculateSellPriceFromBuyPrice(1),
                             'unit_price' => (clone $productItems)->first()->calculateSellPriceFromBuyPrice(1),
-                            /*
-                            'outcome_amount' => (clone $productItems)->first()->calculateSellPriceFromBuyPrice(1),
-                            'balance_quantity' => (clone $productItems)->sum('quantity_used'),
-                            'balance_total_amount' => (((clone $productItems)->first()->calculateSellPriceFromBuyPrice(1) * (clone $productItems)->sum('quantity_inserted')) - ((clone $productItems)->sum('quantity_used') * (clone $productItems)->first()->calculateSellPriceFromBuyPrice(1)))
-                            */
                         ];
                     });
 
@@ -213,10 +206,6 @@ class RecordInventoryProductsBalance
                 'stock_quantity' => $item['stock_quantity'],
                 'stock_amount' => $item['stock_amount'],
                 'unit_price' => $item['unit_price'],
-                /* 'q' => $item['q'], */
-                /* 'outcome_amount' => Toolbox::moneyFormat($item['outcome_amount'], $item['currency']),
-                'balance_quantity' => $item['balance_quantity'],
-                'balance_total_amount' => Toolbox::moneyFormat($item['balance_total_amount'], $item['currency']) */
             ];
         });
 
