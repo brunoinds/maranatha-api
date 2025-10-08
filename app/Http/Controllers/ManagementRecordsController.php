@@ -21,7 +21,7 @@ use App\Support\Generators\Records\General\RecordGeneralRecords;
 use DateTime;
 use Carbon\Carbon;
 use App\Support\Cache\RecordsCache;
-
+use App\Support\Generators\Records\Inventory\RecordInventoryIncomesLoanables;
 
 class ManagementRecordsController extends Controller
 {
@@ -683,6 +683,39 @@ class ManagementRecordsController extends Controller
         $document = $record->generate();
 
         RecordsCache::storeRecord('inventoryProductsLoansKardex', $validatedData, $document);
+
+        return response()->json([
+            ...$document,
+            'is_cached' => false
+        ]);
+    }
+
+    public function inventoryIncomesLoanables()
+    {
+        $validatedData = request()->validate([
+            'warehouse_ids' => 'nullable|array',
+            'warehouse_ids.*' => 'string',
+            'start_date' => 'nullable|date',
+            'end_date' => 'nullable|date',
+        ]);
+
+        $defaults = [
+            'warehouse_ids' => null,
+            'start_date' => null,
+            'end_date' => null,
+        ];
+
+        $validatedData = array_merge($defaults, $validatedData);
+
+        $record = new RecordInventoryIncomesLoanables([
+            'warehouseIds' => $validatedData['warehouse_ids'],
+            'startDate' => ($validatedData['start_date']) ? new DateTime($validatedData['start_date']) : null,
+            'endDate' => ($validatedData['end_date']) ? new DateTime($validatedData['end_date']) : null,
+        ]);
+
+        $document = $record->generate();
+
+        //RecordsCache::storeRecord('inventoryIncomesLoanables', $validatedData, $document);
 
         return response()->json([
             ...$document,

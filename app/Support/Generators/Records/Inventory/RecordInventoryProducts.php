@@ -58,7 +58,6 @@ class RecordInventoryProducts
                 'unit' => $item->unit,
                 'code' => $item->code,
                 'status' => $item->status,
-                'image' => $item->image,
                 'is_loanable' => $item->is_loanable ? 'Sí' : 'No'
             ];
         });
@@ -106,10 +105,6 @@ class RecordInventoryProducts
                 [
                     'title' => 'Estado',
                     'key' => 'status'
-                ],
-                [
-                    'title' => 'Imagen',
-                    'key' => 'image'
                 ],
                 [
                     'title' => 'Es Prestable',
