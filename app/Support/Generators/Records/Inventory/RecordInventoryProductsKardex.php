@@ -287,6 +287,8 @@ class RecordInventoryProductsKardex
 
                 $totalQuantity = (clone $productItems)->sum('quantity_inserted');
 
+                ddh($productItems);
+
                 $balance = [
                     'quantity' => $totalQuantity,
                     'amount' => (clone $productItems)->first()->buy_amount,
