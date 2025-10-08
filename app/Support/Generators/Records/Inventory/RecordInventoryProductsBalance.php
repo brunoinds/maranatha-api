@@ -223,7 +223,7 @@ class RecordInventoryProductsBalance
                             'sub_category' => (clone $productItems)->first()->product->sub_category,
                             'currency' => (clone $productItems)->first()->buy_currency->value,
                             'warehouse' => (clone $productItems)->first()->warehouse->name,
-                            'previous_stock_quantity' => $previousStockQuantity,
+                            'previous_stock_quantity' => number_format($previousStockQuantity, 2),
                             'income_quantity' => (clone $productItems)->sum('quantity_inserted'),
                             'outcome_quantity' => (clone $productItems)->sum('quantity_used'),
                             'stock_quantity' => (clone $productItems)->sum('quantity_remaining'),
@@ -248,8 +248,8 @@ class RecordInventoryProductsBalance
                 'product_id' => $item['id'],
                 'product_name' => $item['name'],
                 'category' => $item['category'],
-                'sub_category' => $item['sub_category'],
-                'currency' => $item['currency'],
+                //'sub_category' => $item['sub_category'],
+                //'currency' => $item['currency'],
                 'warehouse' => $item['warehouse'],
                 'previous_stock_quantity' => $item['previous_stock_quantity'],
                 'income_quantity' => $item['income_quantity'],
@@ -276,10 +276,10 @@ class RecordInventoryProductsBalance
                     'title' => 'Categoria',
                     'key' => 'category'
                 ],
-                [
+                /* [
                     'title' => 'Sub Categoria',
                     'key' => 'sub_category'
-                ],
+                ], */
                 [
                     'title' => 'Almacen',
                     'key' => 'warehouse'
@@ -304,10 +304,10 @@ class RecordInventoryProductsBalance
                     'title' => 'Precio Unitario',
                     'key' => 'unit_price'
                 ],
-                [
+                /* [
                     'title' => 'Moneda',
                     'key' => 'currency'
-                ],
+                ], */
                 [
                     'title' => 'Total',
                     'key' => 'stock_amount'
