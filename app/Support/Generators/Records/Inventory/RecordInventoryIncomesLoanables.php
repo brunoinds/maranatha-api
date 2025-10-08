@@ -76,14 +76,14 @@ class RecordInventoryIncomesLoanables
         $incomes->each(function($income) use (&$lines) {
             // Process loanable items
             $loanableItemsGrouped = $income->items->groupBy(function ($item) {
-                return $item->product_id . '|' . $item->buy_currency . '|' . $item->buy_amount;
+                return $item->inventory_product_id . '|' . $item->buy_currency . '|' . $item->buy_amount;
             });
 
             $loanableItemsGrouped->each(function($items, $identifier) use (&$lines, $income) {
                 $firstItem = $items->first();
                 $lines[] = [
                     'income_id' => $income->id,
-                    'product_id' => $firstItem->product_id,
+                    'product_id' => $firstItem->inventory_product_id,
                     'product_name' => $firstItem->product->name,
                     'date' => $income->date,
                     'ticket_number' => $income->ticket_number,
@@ -96,14 +96,14 @@ class RecordInventoryIncomesLoanables
 
             // Process loanable uncountable items
             $loanableUncountableItemsGrouped = $income->uncountableItems->groupBy(function ($item) {
-                return $item->product_id . '|' . $item->buy_currency . '|' . $item->buy_amount;
+                return $item->inventory_product_id . '|' . $item->buy_currency . '|' . $item->buy_amount;
             });
 
             $loanableUncountableItemsGrouped->each(function($items, $identifier) use (&$lines, $income) {
                 $firstItem = $items->first();
                 $lines[] = [
                     'income_id' => $income->id,
-                    'product_id' => $firstItem->product_id,
+                    'product_id' => $firstItem->inventory_product_id,
                     'product_name' => $firstItem->product->name,
                     'date' => $income->date,
                     'ticket_number' => $income->ticket_number,
@@ -144,6 +144,10 @@ class RecordInventoryIncomesLoanables
                 [
                     'title' => 'ID de Ingreso',
                     'key' => 'income_id'
+                ],
+                [
+                    'title' => 'ID de Producto',
+                    'key' => 'product_id'
                 ],
                 [
                     'title' => 'Producto',

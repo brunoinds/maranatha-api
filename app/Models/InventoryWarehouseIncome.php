@@ -52,7 +52,7 @@ class InventoryWarehouseIncome extends Model
 
     public function items()
     {
-        return $this->hasMany(InventoryProductItem::class);
+        return $this->hasMany(InventoryProductItem::class, 'inventory_warehouse_income_id', 'id');
     }
 
     public function uncountableItems()
