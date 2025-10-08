@@ -249,7 +249,7 @@ class RecordInventoryProductsBalance
                 'product_name' => $item['name'],
                 'category' => $item['category'],
                 //'sub_category' => $item['sub_category'],
-                //'currency' => $item['currency'],
+                'currency' => $item['currency'],
                 'warehouse' => $item['warehouse'],
                 'previous_stock_quantity' => $item['previous_stock_quantity'],
                 'income_quantity' => $item['income_quantity'],
