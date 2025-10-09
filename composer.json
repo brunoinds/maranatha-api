@@ -37,6 +37,7 @@
         "spatie/laravel-backup": "^8.8",
         "spatie/laravel-google-cloud-storage": "^2.2",
         "spatie/temporary-directory": "^2.2",
+        "staudenmeir/eloquent-has-many-deep": "^1.19",
         "staudenmeir/eloquent-json-relations": "^1.10",
         "tightenco/ziggy": "^1.8",
         "yaza/laravel-google-drive-storage": "^2.0"

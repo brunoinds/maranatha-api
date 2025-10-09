@@ -509,12 +509,12 @@ class ManagementRecordsController extends Controller
 
         $validatedData = array_merge($defaults, $validatedData);
 
-        if (RecordsCache::getRecord('inventoryProductsKardex', $validatedData)){
+        /* if (RecordsCache::getRecord('inventoryProductsKardex', $validatedData)){
             return response()->json([
                 ...RecordsCache::getRecord('inventoryProductsKardex', $validatedData),
                 'is_cached' => true
             ]);
-        }
+        } */
 
         $record = new RecordInventoryProductsKardex([
             'startDate' => ($validatedData['start_date']) ? new DateTime($validatedData['start_date']) : null,

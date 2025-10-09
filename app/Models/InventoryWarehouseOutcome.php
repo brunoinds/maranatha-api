@@ -22,6 +22,8 @@ class InventoryWarehouseOutcome extends Model
 {
     use HasFactory;
     use \Staudenmeir\EloquentJsonRelations\HasJsonRelationships;
+    use \Staudenmeir\EloquentHasManyDeep\HasRelationships;
+
 
 
     protected $fillable = [
@@ -52,6 +54,16 @@ class InventoryWarehouseOutcome extends Model
         return collect(InventoryProductItemUncountable::whereIn('id', $uncountableItemsIds)->get());
 
         //return $this->hasManyJson(InventoryProductItemUncountable::class, 'inventory_warehouse_outcome_ids');
+    }
+
+    public function relationUncountableItems()
+    {
+        // Use EloquentJsonRelations to define a hasManyJson relationship
+        return $this->hasManyJson(
+            InventoryProductItemUncountable::class,
+            'inventory_warehouse_outcome_ids',
+            'id'
+        );
     }
 
     public function products()
