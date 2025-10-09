@@ -20,6 +20,7 @@ class RecordInventoryProductsBalance
     private string|null $productId = null;
     private array|null $categories = null;
     private array|null $subCategories = null;
+    private bool|null $ignoreVoidPricing = null;
 
     /**
         * RecordInventoryProductsBalance constructor.
@@ -30,6 +31,7 @@ class RecordInventoryProductsBalance
         * @param string|null $options['productId']
         * @param string|null $options['categories']
         * @param string|null $options['subCategories']
+        * @param bool|null $options['ignoreVoidPricing']
      */
 
     public function __construct(array $options){
@@ -40,6 +42,7 @@ class RecordInventoryProductsBalance
         $this->productId = $options['productId'] ?? null;
         $this->categories = $options['categories'] ?? null;
         $this->subCategories = $options['subCategories'] ?? null;
+        $this->ignoreVoidPricing = $options['ignoreVoidPricing'] ?? null;
     }
 
     private function getProductsItems():Collection
@@ -52,7 +55,8 @@ class RecordInventoryProductsBalance
             'warehouseIds' => $this->warehouseIds,
             'productId' => $this->productId,
             'categories' => $this->categories,
-            'subCategories' => $this->subCategories
+            'subCategories' => $this->subCategories,
+            'ignoreVoidPricing' => $this->ignoreVoidPricing
         ];
 
 
@@ -67,6 +71,9 @@ class RecordInventoryProductsBalance
             }
             if ($options['productId'] !== null){
                 $query = $query->where('inventory_product_id', $options['productId']);
+            }
+            if ($options['ignoreVoidPricing'] !== null && $options['ignoreVoidPricing'] === true){
+                $query = $query->where('buy_amount', '>', 0);
             }
 
 
@@ -162,6 +169,9 @@ class RecordInventoryProductsBalance
             }
             if ($options['productId'] !== null){
                 $query = $query->where('inventory_product_id', $options['productId']);
+            }
+            if ($options['ignoreVoidPricing'] !== null && $options['ignoreVoidPricing'] === true){
+                $query = $query->where('buy_amount', '>', 0);
             }
 
 

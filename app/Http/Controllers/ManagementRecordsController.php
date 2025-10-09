@@ -478,8 +478,6 @@ class ManagementRecordsController extends Controller
             'money_type' => 'nullable|string',
             'warehouse_ids' => 'nullable|array',
             'warehouse_ids.*' => 'string',
-            'expense_code' => 'nullable|string',
-            'job_code' => 'nullable|string',
             'product_id' => 'nullable|string',
             'categories' => 'nullable|array',
             'categories.*' => 'string',
@@ -487,24 +485,18 @@ class ManagementRecordsController extends Controller
             'sub_categories.*' => 'string',
             'start_date' => 'nullable|date',
             'end_date' => 'nullable|date',
-            /* 'country' => 'nullable|string',
-            'job_region' => 'nullable|string', */
         ]);
 
         $defaults = [
             'money_type' => null,
             'warehouse_ids' => null,
-            'expense_code' => null,
-            'job_code' => null,
             'product_id' => null,
             'start_date' => null,
             'end_date' => null,
             'categories' => null,
             'sub_categories' => null,
             'start_date' => null,
-            'end_date' => null,
-            /* 'country' => null,
-            'job_region' => null, */
+            'end_date' => null
         ];
 
         $validatedData = array_merge($defaults, $validatedData);
@@ -549,6 +541,7 @@ class ManagementRecordsController extends Controller
             'categories.*' => 'string',
             'sub_categories' => 'nullable|array',
             'sub_categories.*' => 'string',
+            'ignore_void_pricing' => 'nullable|in:true,false',
         ]);
 
         $defaults = [
@@ -559,16 +552,17 @@ class ManagementRecordsController extends Controller
             'product_id' => null,
             'categories' => null,
             'sub_categories' => null,
+            'ignore_void_pricing' => null,
         ];
 
         $validatedData = array_merge($defaults, $validatedData);
 
-        if (RecordsCache::getRecord('inventoryProductsBalance', $validatedData)){
+        /* if (RecordsCache::getRecord('inventoryProductsBalance', $validatedData)){
             return response()->json([
                 ...RecordsCache::getRecord('inventoryProductsBalance', $validatedData),
                 'is_cached' => true
             ]);
-        }
+        } */
 
         $record = new RecordInventoryProductsBalance([
             'startDate' => ($validatedData['start_date']) ? new DateTime($validatedData['start_date']) : null,
@@ -578,6 +572,7 @@ class ManagementRecordsController extends Controller
             'productId' => $validatedData['product_id'],
             'categories' => $validatedData['categories'],
             'subCategories' => $validatedData['sub_categories'],
+            'ignoreVoidPricing' => is_null($validatedData['ignore_void_pricing']) ? null : $validatedData['ignore_void_pricing'] === 'true',
         ]);
 
         $document = $record->generate();
