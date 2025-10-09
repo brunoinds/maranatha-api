@@ -17,6 +17,7 @@ use Illuminate\Support\Number;
 
 
 
+
 class RecordInventoryProductsKardex
 {
 
@@ -169,11 +170,11 @@ class RecordInventoryProductsKardex
                             ->get();
                         $line['quantity'] = $products->count();
                         $line['unit_price'] = $products->first()->buy_amount;
-                        $line['total_price'] = $products->count() * $products->first()->buy_amount;
+                        $line['total_price'] = round($products->count() * $products->first()->buy_amount, 2);
 
                         if ($line['quantity'] > 0){
-                            $balance['quantity'] += $line['quantity'];
-                            $balance['total_amount'] += $line['total_price'];
+                            $balance['quantity'] = round($balance['quantity'] + $line['quantity'], 2);
+                            $balance['total_amount'] = round($balance['total_amount'] + $line['total_price'], 2);
 
                             $line['balance_quantity'] = $balance['quantity'];
                             $line['balance_total_amount'] = $balance['total_amount'];
@@ -188,11 +189,11 @@ class RecordInventoryProductsKardex
                             ->get();
                         $totalQuantity = $products->sum('quantity_inserted');
                         $line['quantity'] = $totalQuantity;
-                        $line['unit_price'] = $totalQuantity > 0 ? $products->first()->buy_amount / $totalQuantity : 0;
+                        $line['unit_price'] = $totalQuantity > 0 ?  round($products->first()->buy_amount / $totalQuantity, 2) : 0;
                         $line['total_price'] = $products->first()->buy_amount;
                         if ($line['quantity'] > 0){
-                            $balance['quantity'] += $line['quantity'];
-                            $balance['total_amount'] += $line['total_price'];
+                            $balance['quantity'] = round($balance['quantity'] + $line['quantity'], 2);
+                            $balance['total_amount'] = round($balance['total_amount'] + $line['total_price'], 2);
 
                             $line['balance_quantity'] = $balance['quantity'];
                             $line['balance_total_amount'] = $balance['total_amount'];
@@ -222,11 +223,11 @@ class RecordInventoryProductsKardex
                             ->get();
                         $line['quantity'] = $products->count();
                         $line['unit_price'] = $products->first()->sell_amount;
-                        $line['total_price'] = $products->count() * $products->first()->sell_amount;
+                        $line['total_price'] = round($products->count() * $products->first()->sell_amount, 2);
 
                         if ($line['quantity'] > 0){
-                            $balance['quantity'] -= $line['quantity'];
-                            $balance['total_amount'] -= $line['total_price'];
+                            $balance['quantity'] = round($balance['quantity'] - $line['quantity'], 2);
+                            $balance['total_amount'] = round($balance['total_amount'] - $line['total_price'], 2);
 
                             $line['balance_quantity'] = $balance['quantity'];
                             $line['balance_total_amount'] = $balance['total_amount'];
@@ -242,15 +243,15 @@ class RecordInventoryProductsKardex
                             $outcomeDetails = $uncountableItem->outcomes_details[$outcome->id];
 
 
-                            $line['total_price'] += $outcomeDetails['sell_amount'];
-                            $line['unit_price'] = $outcomeDetails['sell_amount'] / $outcomeDetails['quantity'];
-                            $line['quantity'] += $outcomeDetails['quantity'];
+                            $line['total_price'] = round($line['total_price'] + $outcomeDetails['sell_amount'], 2);
+                            $line['unit_price'] = round($outcomeDetails['sell_amount'] / $outcomeDetails['quantity'], 2);
+                            $line['quantity'] = round($line['quantity'] + $outcomeDetails['quantity'], 2);
                         });
 
                         if ($line['quantity'] > 0){
-                            $line['unit_price'] = $line['total_price'] / $line['quantity'];
-                            $balance['quantity'] -= $line['quantity'];
-                            $balance['total_amount'] -= $line['total_price'];
+                            $line['unit_price'] = round($line['total_price'] / $line['quantity'], 2);
+                            $balance['quantity'] = round($balance['quantity'] - $line['quantity'], 2);
+                            $balance['total_amount'] = round($balance['total_amount'] - $line['total_price'], 2);
 
                             $line['balance_quantity'] = $balance['quantity'];
                             $line['balance_total_amount'] = $balance['total_amount'];
@@ -267,8 +268,8 @@ class RecordInventoryProductsKardex
                     'product_name' => $line['product']?->name,
                     'product_category' => $line['product']?->category,
                     'product_sub_category' => $line['product']?->sub_category,
-                    'operation_type' => $line['operation_type'],
-                    'date' => $line['transaction']->date,
+                    'operation_type' => $line['operation_type'] === 'Income' ? 'Ingreso' : 'Salida',
+                    'date' => Carbon::parse($line['transaction']->date)->format('d/m/Y'),
                     'transaction_number' => $line['transaction']->ticket_number,
                     'job_code' => $line['transaction']?->job?->code,
                     'job_name' => $line['transaction']?->job?->name,
@@ -285,7 +286,7 @@ class RecordInventoryProductsKardex
                     'outcome_total' => '',
 
                     'balance_quantity' => $line['balance_quantity'],
-                    'balance_unit_price' => $line['balance_quantity'] > 0 ? $line['balance_total_amount'] / $line['balance_quantity'] : 0,
+                    'balance_unit_price' => $line['balance_quantity'] > 0 ? round($line['balance_total_amount'] / $line['balance_quantity'], 2) : 0,
                     'balance_total' => $line['balance_total_amount'],
                 ];
 
@@ -342,7 +343,7 @@ class RecordInventoryProductsKardex
                 'product_name' => $product->name,
                 'product_category' => $product->category,
                 'product_sub_category' => $product->sub_category,
-                'operation_type' => 'Stock',
+                'operation_type' => 'Stock Anterior',
                 'date' => '',
                 'transaction_number' => '',
                 'job_code' => '',
@@ -360,7 +361,7 @@ class RecordInventoryProductsKardex
                 'outcome_total' => '',
 
                 'balance_quantity' => $previousBalance['quantity'],
-                'balance_unit_price' => $previousBalance['quantity'] > 0 ? $previousBalance['total_amount'] / $previousBalance['quantity'] : 0,
+                'balance_unit_price' => $previousBalance['quantity'] > 0 ? round($previousBalance['total_amount'] / $previousBalance['quantity'], 2) : 0,
                 'balance_total' => $previousBalance['total_amount'],
             ]);
 
@@ -413,15 +414,15 @@ class RecordInventoryProductsKardex
             $incomes->each(function($income) use ($product, &$balance){
                 $incomeQuery =  $income->items()->where('inventory_product_id', $product->id)
                     ->where('buy_currency', $this->moneyType);
-                $balance['quantity'] += $incomeQuery->count();
-                $balance['total_amount'] += $incomeQuery->sum('buy_amount');
+                $balance['quantity'] = round($balance['quantity'] + $incomeQuery->count(), 2);
+                $balance['total_amount'] = round($balance['total_amount'] + $incomeQuery->sum('buy_amount'), 2);
             });
 
             $outcomes->each(function($outcome) use ($product, &$balance){
                 $outcomeQuery = $outcome->items()->where('inventory_product_id', $product->id)
                     ->where('buy_currency', $this->moneyType);
-                $balance['quantity'] -= $outcomeQuery->count();
-                $balance['total_amount'] -= $outcomeQuery->sum('sell_amount');
+                $balance['quantity'] = round($balance['quantity'] - $outcomeQuery->count(), 2);
+                $balance['total_amount'] = round($balance['total_amount'] - $outcomeQuery->sum('sell_amount'), 2);
             });
 
             return $balance;
@@ -435,8 +436,8 @@ class RecordInventoryProductsKardex
             $incomes->each(function($income) use ($product, &$balance){
                 $incomeQuery = $income->uncountableItems()->where('inventory_product_id', $product->id)
                     ->where('buy_currency', $this->moneyType);
-                $balance['quantity'] += $incomeQuery->sum('quantity_inserted');
-                $balance['total_amount'] += $incomeQuery->sum('buy_amount');
+                $balance['quantity'] = round($balance['quantity'] + $incomeQuery->sum('quantity_inserted'), 2);
+                $balance['total_amount'] = round($balance['total_amount'] + $incomeQuery->sum('buy_amount'), 2);
             });
 
             $outcomes->each(function($outcome) use ($product, &$balance){
@@ -446,8 +447,8 @@ class RecordInventoryProductsKardex
                             return;
                         }
                         $outcomeDetails = $uncountableItem->outcomes_details[$outcome->id];
-                        $balance['quantity'] -= $outcomeDetails['quantity'];
-                        $balance['total_amount'] -= $outcomeDetails['sell_amount'];
+                        $balance['quantity'] = round($balance['quantity'] - $outcomeDetails['quantity'], 2);
+                        $balance['total_amount'] = round($balance['total_amount'] - $outcomeDetails['sell_amount'], 2);
                     });
             });
 
