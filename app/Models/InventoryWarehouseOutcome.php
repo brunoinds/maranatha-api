@@ -45,7 +45,7 @@ class InventoryWarehouseOutcome extends Model
         return $this->hasMany(InventoryProductItem::class, 'inventory_warehouse_outcome_id');
     }
 
-    public function uncountableItems()
+    /* public function uncountableItems()
     {
         // Get the IDs of the related items using whereJsonContains
         $uncountableItemsIds = InventoryProductItemUncountable::where('inventory_warehouse_outcome_ids', 'LIKE', '%' . $this->id . '%')
@@ -54,11 +54,10 @@ class InventoryWarehouseOutcome extends Model
         return collect(InventoryProductItemUncountable::whereIn('id', $uncountableItemsIds)->get());
 
         //return $this->hasManyJson(InventoryProductItemUncountable::class, 'inventory_warehouse_outcome_ids');
-    }
+    } */
 
-    public function relationUncountableItems()
+    public function uncountableItems()
     {
-        // Use EloquentJsonRelations to define a hasManyJson relationship
         return $this->hasManyJson(
             InventoryProductItemUncountable::class,
             'inventory_warehouse_outcome_ids',
@@ -205,7 +204,7 @@ class InventoryWarehouseOutcome extends Model
             });
         }
 
-        $incomesUncountable = $this->uncountableItems()->groupBy(function($item){
+        $incomesUncountable = $this->uncountableItems->groupBy(function($item){
             return $item->inventory_warehouse_income_id;
         });
 

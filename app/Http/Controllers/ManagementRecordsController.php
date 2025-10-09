@@ -521,13 +521,9 @@ class ManagementRecordsController extends Controller
             'endDate' => ($validatedData['end_date']) ? new DateTime($validatedData['end_date']) : null,
             'moneyType' => $validatedData['money_type'],
             'warehouseIds' => $validatedData['warehouse_ids'],
-            'expenseCode' => $validatedData['expense_code'],
-            'jobCode' => $validatedData['job_code'],
             'productId' => $validatedData['product_id'],
             'categories' => $validatedData['categories'],
             'subCategories' => $validatedData['sub_categories'],
-            /* 'country' => $validatedData['country'],
-            'jobRegion' => $validatedData['job_region'], */
         ]);
 
         $document = $record->generate();

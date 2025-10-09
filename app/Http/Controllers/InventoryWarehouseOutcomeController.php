@@ -168,7 +168,7 @@ class InventoryWarehouseOutcomeController extends Controller
     {
         return response()->json([
             'countable_items' => $inventoryWarehouseOutcome->items,
-            'uncountable_items' => $inventoryWarehouseOutcome->uncountableItems()->map(function($item) use ($inventoryWarehouseOutcome){
+            'uncountable_items' => $inventoryWarehouseOutcome->uncountableItems->map(function($item) use ($inventoryWarehouseOutcome){
                 return [
                     'id' => $item->id,
                     'inventory_product_id' => $item->inventory_product_id,

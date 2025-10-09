@@ -25,14 +25,9 @@ class RecordInventoryProductsKardex
     private DateTime|null $endDate = null;
     private string|null $moneyType = null;
     private array|null $warehouseIds = null;
-    private string|null $expenseCode = null;
-    private string|null $jobCode = null;
     private string|null $productId = null;
     private array|null $categories = null;
     private array|null $subCategories = null;
-    /* private array|null $country = null;
-    private array|null $jobRegion = null; */
-
 
 
     /**
@@ -43,8 +38,6 @@ class RecordInventoryProductsKardex
         * @param DateTime|null $options['endDate']
         * @param string|null $options['moneyType']
         * @param string|null $options['warehouseIds']
-        * @param string|null $options['expenseCode']
-        * @param string|null $options['jobCode']
         * @param string|null $options['productId']
         * @param string|null $options['categories']
         * @param string|null $options['subCategories']
@@ -57,13 +50,9 @@ class RecordInventoryProductsKardex
         $this->endDate = $options['endDate'] ?? null;
         $this->moneyType = $options['moneyType'] ?? null;
         $this->warehouseIds = $options['warehouseIds'] ?? null;
-        $this->expenseCode = $options['expenseCode'] ?? null;
-        $this->jobCode = $options['jobCode'] ?? null;
         $this->productId = $options['productId'] ?? null;
         $this->categories = $options['categories'] ?? null;
         $this->subCategories = $options['subCategories'] ?? null;
-        /* $this->country = $options['country'] ?? null;
-        $this->jobRegion = $options['jobRegion'] ?? null; */
     }
 
     private function getKardex():Collection
@@ -73,14 +62,14 @@ class RecordInventoryProductsKardex
             'endDate' => $this->endDate,
             'moneyType' => $this->moneyType,
             'warehouseIds' => $this->warehouseIds,
-            'expenseCode' => $this->expenseCode,
-            'jobCode' => $this->jobCode,
             'productId' => $this->productId,
             'categories' => $this->categories,
             'subCategories' => $this->subCategories,
-            /* 'country' => $this->country,
-            'jobRegion' => $this->jobRegion */
         ];
+
+        if ($options['moneyType'] === null){
+            $options['moneyType'] = 'PEN';
+        }
 
         $productsLines = collect([]);
 
@@ -89,8 +78,18 @@ class RecordInventoryProductsKardex
 
         $productsIds = $countableProductsIds->merge($uncountableProductsIds);
 
+        if ($options['productId'] !== null){
+            $productsIds = collect([$options['productId']]);
+        }
 
         InventoryProduct::whereIn('id', $productsIds)->where('is_loanable', false)->get()->each(function($product) use ($options, &$productsLines){
+            if ($options['categories'] !== null && !in_array($product->category, $options['categories'])){
+                return;
+            }
+            if ($options['subCategories'] !== null && !in_array($product->sub_category, $options['subCategories'])){
+                return;
+            }
+
             $lines = [];
             $previousBalance = $this->getProductPreviousBalance($product);
 
@@ -119,7 +118,7 @@ class RecordInventoryProductsKardex
                         $q->where('inventory_product_id', $product->id)
                         ->where('buy_currency', $options['moneyType']);
                     })
-                    ->orWhereHas('relationUncountableItems', function($q) use ($product, $options){
+                    ->orWhereHas('uncountableItems', function($q) use ($product, $options){
                         $q->where('inventory_product_id', $product->id)
                         ->where('buy_currency', $options['moneyType']);
                     });
@@ -236,7 +235,7 @@ class RecordInventoryProductsKardex
                         }
                     }else{
                         //Uncountable products:
-                        $outcome->relationUncountableItems()->where('inventory_product_id', $product->id)->where('date', '>=', $this->startDate)->where('buy_currency', $options['moneyType'])->each(function ($uncountableItem) use ($outcome, &$line, $options) {
+                        $outcome->uncountableItems()->where('inventory_product_id', $product->id)->where('date', '>=', $this->startDate)->where('buy_currency', $options['moneyType'])->each(function ($uncountableItem) use ($outcome, &$line, $options) {
                             if (!isset($uncountableItem->outcomes_details[$outcome->id])) {
                                 return;
                             }
@@ -262,7 +261,7 @@ class RecordInventoryProductsKardex
                 });
             });
 
-            $list = collect($lines)->map(function($line, $index){
+            $list = collect($lines)->map(function($line, $index) use ($options){
                 $item = [
                     'order' => $index + 1,
                     'product_name' => $line['product']?->name,
@@ -276,6 +275,7 @@ class RecordInventoryProductsKardex
                     'expense_code' => $line['transaction']?->expense?->code,
                     'expense_name' => $line['transaction']?->expense?->name,
                     'warehouse_name' => $line['transaction']?->warehouse?->name,
+                    'money_type' => $options['moneyType'],
 
                     'income_quantity' => '',
                     'income_unit_price' => '',
@@ -322,6 +322,7 @@ class RecordInventoryProductsKardex
                     'expense_code' => '',
                     'expense_name' => '',
                     'warehouse_name' => '',
+                    'money_type' => '',
 
                     'income_quantity' => '',
                     'income_unit_price' => '',
@@ -351,6 +352,8 @@ class RecordInventoryProductsKardex
                 'expense_code' => '',
                 'expense_name' => '',
                 'warehouse_name' => '',
+                'money_type' => '',
+
 
                 'income_quantity' => '',
                 'income_unit_price' => '',
@@ -396,7 +399,7 @@ class RecordInventoryProductsKardex
                     $q->where('inventory_product_id', $product->id)
                     ->where('buy_currency', $this->moneyType);
                 })
-                ->orWhereHas('relationUncountableItems', function($q) use ($product){
+                ->orWhereHas('uncountableItems', function($q) use ($product){
                     $q->where('inventory_product_id', $product->id)
                     ->where('buy_currency', $this->moneyType);
                 });
@@ -441,7 +444,7 @@ class RecordInventoryProductsKardex
             });
 
             $outcomes->each(function($outcome) use ($product, &$balance){
-                $outcome->relationUncountableItems()->where('inventory_product_id', $product->id)
+                $outcome->uncountableItems()->where('inventory_product_id', $product->id)
                     ->where('buy_currency', $this->moneyType)->get()->each(function($uncountableItem) use ($outcome, &$balance) {
                         if (!isset($uncountableItem->outcomes_details[$outcome->id])) {
                             return;
@@ -515,6 +518,10 @@ class RecordInventoryProductsKardex
                     'key' => 'warehouse_name'
                 ],
                 [
+                    'title' => 'Moneda',
+                    'key' => 'money_type'
+                ],
+                [
                     'title' => 'Ingresos: Cantidad',
                     'key' => 'income_quantity'
                 ],
@@ -564,8 +571,6 @@ class RecordInventoryProductsKardex
                 'endDate' => $this->endDate,
                 'moneyType' => $this->moneyType,
                 'warehouseIds' => $this->warehouseIds,
-                'expenseCode' => $this->expenseCode,
-                'jobCode' => $this->jobCode,
                 'productId' => $this->productId,
                 'categories' => $this->categories,
                 'subCategories' => $this->subCategories

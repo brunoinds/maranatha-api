@@ -124,7 +124,7 @@ class WarehouseOutcomeProductsPdfCreator
             $productsIds[] = $groupedItems->first()->product->id;
         });
 
-        $this->outcome->uncountableItems()->groupBy(function($item){
+        $this->outcome->uncountableItems->groupBy(function($item){
             return $item->inventory_product_id ;
         })->each(function($groupedItems) use (&$productsIds){
             $productsIds[] = $groupedItems->first()->product->id;
@@ -195,7 +195,7 @@ class WarehouseOutcomeProductsPdfCreator
             ];
         });
 
-        $this->outcome->uncountableItems()->groupBy(function($item) use ($outcomeInstance){
+        $this->outcome->uncountableItems->groupBy(function($item) use ($outcomeInstance){
             return $item->inventory_product_id . $item->outcomes_details[$outcomeInstance->id]['sell_currency'] . $item->outcomes_details[$outcomeInstance->id]['sell_amount'];
         })->each(function($groupedItems) use (&$items, &$iteration, &$productsImages, $outcomeInstance){
             $i = ++$iteration;
