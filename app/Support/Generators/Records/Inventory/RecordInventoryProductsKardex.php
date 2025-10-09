@@ -459,7 +459,8 @@ class RecordInventoryProductsKardex
         }
     }
 
-    private function createTable():array{
+    private function createTable():array
+    {
         $items = $this->getKardex();
         $body = collect($items)->map(function($item){
             return $item;
