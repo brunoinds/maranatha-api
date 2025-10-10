@@ -159,6 +159,7 @@ class RecordInventoryProductsKardex
                         'total_price' => 0,
                         'balance_quantity' => $balance['quantity'],
                         'balance_total_amount' => $balance['total_amount'],
+                        'transaction_number' => $income->ticket_number ?? 'ENT-00' . $income->id
                     ];
 
                     if ($product->unitNature() === 'Integer'){
@@ -212,6 +213,7 @@ class RecordInventoryProductsKardex
                         'total_price' => 0,
                         'balance_quantity' => $balance['quantity'],
                         'balance_total_amount' => $balance['total_amount'],
+                        'transaction_number' => 'SAL-00' . $outcome->id
                     ];
 
                     if ($product->unitNature() === 'Integer'){
@@ -269,7 +271,7 @@ class RecordInventoryProductsKardex
                     'product_sub_category' => $line['product']?->sub_category,
                     'operation_type' => $line['operation_type'] === 'Income' ? 'Ingreso' : 'Salida',
                     'date' => Carbon::parse($line['transaction']->date)->format('d/m/Y'),
-                    'transaction_number' => $line['transaction']->ticket_number,
+                    'transaction_number' => $line['transaction_number'],
                     'job_code' => $line['transaction']?->job?->code,
                     'job_name' => $line['transaction']?->job?->name,
                     'expense_code' => $line['transaction']?->expense?->code,
@@ -495,7 +497,7 @@ class RecordInventoryProductsKardex
                     'key' => 'date'
                 ],
                 [
-                    'title' => 'Número de ticket',
+                    'title' => 'Nº Ticket',
                     'key' => 'transaction_number'
                 ],
                 [
