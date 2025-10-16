@@ -213,24 +213,36 @@ class RecordInventoryProductsBalance
 
                             return $previousIncomesProductsItems->sum('quantity_inserted') - $previousOutcomesBalances->sum();
                         })();
-                        $incomeInPeriodQuantity = (clone $productItemsLoaded)->filter(function($item) use ($instance){
+
+                        $incomesInPeriod = (clone $productItemsLoaded)->filter(function($item) use ($instance){
                             if ($item->income === null){
                                 return false;
                             }
                             return Carbon::parse($item->income->date)->isBetween($instance->startDate, $instance->endDate);
-                        })->sum('quantity_inserted');
+                        });
+
+
+
+                        $incomeInPeriodQuantity = $incomesInPeriod->sum('quantity_inserted');
+                        $incomeInPeriodAmount = $incomesInPeriod->sum('buy_amount');
+
                         $outcomeInPeriodQuantity = (function() use ($productItemsLoaded, $instance){
                             $sumExits = 0;
-                            (clone $productItemsLoaded)->each(function($item) use ($instance, &$sumExits){
+                            $sumAmounts = 0;
+                            (clone $productItemsLoaded)->each(function($item) use ($instance, &$sumExits, &$sumAmounts){
                                 $item->outcomes->filter(function($outcome) use ($instance){
                                     return Carbon::parse($outcome->date)->isBetween($instance->startDate, $instance->endDate);
-                                })->each(function($outcome) use ($item, &$sumExits){
+                                })->each(function($outcome) use ($item, &$sumExits, &$sumAmounts){
                                     $sumExits += $item->outcomes_details[$outcome->id]['quantity'];
+                                    $sumAmounts += $item->outcomes_details[$outcome->id]['sell_amount'];
                                 });
                             });
-                            return $sumExits;
+                            return [
+                                'quantity' => $sumExits,
+                                'amount' => $sumAmounts,
+                            ];
                         })();
-                        $inPeriodStockQuantity = $previousStockQuantity + $incomeInPeriodQuantity - $outcomeInPeriodQuantity;
+                        $inPeriodStockQuantity = $previousStockQuantity + $incomeInPeriodQuantity - $outcomeInPeriodQuantity['quantity'];
 
                         $items[] = [
                             'id' => (clone $productItems)->first()->product->id,
@@ -241,10 +253,10 @@ class RecordInventoryProductsBalance
                             'warehouse' => (clone $productItems)->first()->warehouse->name,
                             'previous_stock_quantity' => number_format($previousStockQuantity, 2),
                             'income_quantity' => $incomeInPeriodQuantity,
-                            'outcome_quantity' => $outcomeInPeriodQuantity,
+                            'outcome_quantity' => $outcomeInPeriodQuantity['quantity'],
                             'stock_quantity' => $inPeriodStockQuantity,
-                            'stock_amount' => $inPeriodStockQuantity * (clone $productItems)->first()->calculateSellPriceFromBuyPrice(1),
-                            'unit_price' => (clone $productItems)->first()->calculateSellPriceFromBuyPrice(1),
+                            'stock_amount' => $incomeInPeriodAmount - $outcomeInPeriodQuantity['amount'],
+                            'unit_price' => ($inPeriodStockQuantity > 0) ? round(($incomeInPeriodAmount - $outcomeInPeriodQuantity['amount']) / $inPeriodStockQuantity, 2) : 0,
                         ];
                     });
 
