@@ -557,12 +557,12 @@ class ManagementRecordsController extends Controller
 
         $validatedData = array_merge($defaults, $validatedData);
 
-        if (RecordsCache::getRecord('inventoryProductsBalance', $validatedData)){
+        /* if (RecordsCache::getRecord('inventoryProductsBalance', $validatedData)){
             return response()->json([
                 ...RecordsCache::getRecord('inventoryProductsBalance', $validatedData),
                 'is_cached' => true
             ]);
-        }
+        } */
 
         $record = new RecordInventoryProductsBalance([
             'startDate' => ($validatedData['start_date']) ? new DateTime($validatedData['start_date']) : null,

@@ -21,8 +21,8 @@ use Illuminate\Support\Number;
 class RecordInventoryProductsKardex
 {
 
-    private DateTime|null $startDate = null;
-    private DateTime|null $endDate = null;
+    private DateTime|string|null $startDate = null;
+    private DateTime|string|null $endDate = null;
     private string|null $moneyType = null;
     private array|null $warehouseIds = null;
     private string|null $productId = null;
@@ -53,6 +53,10 @@ class RecordInventoryProductsKardex
         $this->productId = $options['productId'] ?? null;
         $this->categories = $options['categories'] ?? null;
         $this->subCategories = $options['subCategories'] ?? null;
+
+
+        $this->startDate = Carbon::parse($this->startDate, 'America/Lima')->startOfDay()->setTimezone('America/Lima')->toIso8601String();
+        $this->endDate = Carbon::parse($this->endDate, 'America/Lima')->endOfDay()->setTimezone('America/Lima')->toIso8601String();
     }
 
     private function getKardex():Collection

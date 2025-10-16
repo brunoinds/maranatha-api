@@ -6,6 +6,9 @@ use Illuminate\Console\Command;
 
 use DateTime;
 use App\Support\Exchange\Currencies\PYG;
+use Carbon\Carbon;
+use App\Models\InventoryWarehouseIncome;
+use App\Models\InventoryWarehouseOutcome;
 
 class Test extends Command
 {
@@ -28,7 +31,12 @@ class Test extends Command
      */
     public function handle()
     {
-        $result = PYG::convertFromDollar(DateTime::createFromFormat('Y-m-d', '2025-09-18'), 1);
-        $this->info('1USD = ' . $result . 'PYG at ' . DateTime::createFromFormat('Y-m-d', '2025-09-18')->format('Y-m-d'));
+        $startDate = Carbon::parse('2025-10-01', 'America/Lima')->startOfDay()->setTimezone('America/Lima')->toIso8601String();
+
+        $this->info('Searching for outcomes from >=' . $startDate);
+
+        InventoryWarehouseOutcome::where('date', '>=', $startDate)->select('date')->get()->each(function($outcome){
+            $this->info($outcome->date);
+        });
     }
 }

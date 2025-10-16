@@ -79,7 +79,7 @@ class InventoryProductItemUncountable extends Model
 
     public function outcomes()
     {
-        return $this->hasMany(InventoryWarehouseOutcome::class, 'id', 'inventory_warehouse_outcome_ids');
+        return $this->belongsToJson(InventoryWarehouseOutcome::class, 'inventory_warehouse_outcome_ids');
     }
 
     public function calculateSellPriceFromBuyPrice(float $quantity): float

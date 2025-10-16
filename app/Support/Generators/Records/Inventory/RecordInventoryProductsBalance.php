@@ -59,6 +59,11 @@ class RecordInventoryProductsBalance
             'ignoreVoidPricing' => $this->ignoreVoidPricing
         ];
 
+        if ($options['moneyType'] === null){
+            $options['moneyType'] = 'PEN';
+        }
+
+
 
         $countableItems = (function() use ($options, $instance){
             $query = InventoryProductItem::query();
@@ -79,22 +84,13 @@ class RecordInventoryProductsBalance
 
 
             $items = [];
-            $query->groupBy(['inventory_product_id','buy_currency', 'buy_amount', 'inventory_warehouse_id'])
+            $query->groupBy(['inventory_product_id', 'inventory_warehouse_id'])
                     ->select()->each(function($item) use (&$options, &$items, $instance){
                         $query = InventoryProductItem::query();
-                        if ($options['moneyType'] !== null && $item->buy_currency !== $options['moneyType']){
-                            return;
-                        }
-                        if ($options['warehouseIds'] !== null && !in_array($item->inventory_warehouse_id, $options['warehouseIds'])){
-                            return;
-                        }
-                        if ($options['productId'] !== null && $item->inventory_product_id !== $options['productId']){
-                            return;
-                        }
 
-                        $productItems = $query->where('buy_currency', $item->buy_currency)
-                            ->where('buy_amount', $item->buy_amount)
-                            ->where('inventory_product_id', $item->inventory_product_id);
+                        $productItems = $query->where('inventory_product_id', $item->inventory_product_id)
+                            ->where('inventory_warehouse_id', $item->inventory_warehouse_id)
+                            ->where('buy_currency', $item->buy_currency);
 
                         if ($options['categories'] !== null){
                             if (!in_array((clone $productItems)->first()->product->category, $options['categories'])){
@@ -176,22 +172,14 @@ class RecordInventoryProductsBalance
 
 
             $items = [];
-            $query->groupBy(['inventory_product_id','buy_currency', 'buy_amount'])
+            $query->groupBy(['inventory_product_id', 'inventory_warehouse_id'])
                     ->select()->each(function($item) use (&$options, &$items, $instance){
                         $query = InventoryProductItemUncountable::query();
-                        if ($options['moneyType'] !== null && $item->buy_currency !== $options['moneyType']){
-                            return;
-                        }
-                        if ($options['warehouseIds'] !== null && !in_array($item->inventory_warehouse_id, $options['warehouseIds'])){
-                            return;
-                        }
-                        if ($options['productId'] !== null && $item->inventory_product_id !== $options['productId']){
-                            return;
-                        }
 
-                        $productItems = $query->where('buy_currency', $item->buy_currency)
-                            ->where('buy_amount', $item->buy_amount)
-                            ->where('inventory_product_id', $item->inventory_product_id);
+                        $productItems = $query->where('inventory_product_id', $item->inventory_product_id)
+                            ->where('inventory_warehouse_id', $item->inventory_warehouse_id)
+                            ->where('buy_currency', $item->buy_currency);
+
 
                         if ($options['categories'] !== null){
                             if (!in_array((clone $productItems)->first()->product->category, $options['categories'])){
@@ -212,19 +200,37 @@ class RecordInventoryProductsBalance
                                 return Carbon::parse($item->income->date)->isBefore($instance->startDate);
                             });
 
-                            $previousOutomesBalances =$previousIncomesProductsItems->map(function($item) use ($instance){
-                                $balance = $item->quantity_inserted;
+                            $previousOutcomesBalances = $previousIncomesProductsItems->map(function($item) use ($instance){
+                                $sumExits = 0;
                                 $item->outcomes->filter(function($outcome) use ($instance){
                                     return Carbon::parse($outcome->date)->isBefore($instance->startDate);
-                                })->each(function($outcome) use ($item, &$balance){
-                                    $balance -= $item->outcomes_details[$outcome->id]['quantity'];
+                                })->each(function($outcome) use ($item, &$sumExits){
+                                    $sumExits += $item->outcomes_details[$outcome->id]['quantity'];
                                 });
 
-                                return $balance;
+                                return $sumExits;
                             });
 
-                            return $previousIncomesProductsItems->sum('quantity_inserted') - $previousOutomesBalances->sum();
+                            return $previousIncomesProductsItems->sum('quantity_inserted') - $previousOutcomesBalances->sum();
                         })();
+                        $incomeInPeriodQuantity = (clone $productItemsLoaded)->filter(function($item) use ($instance){
+                            if ($item->income === null){
+                                return false;
+                            }
+                            return Carbon::parse($item->income->date)->isBetween($instance->startDate, $instance->endDate);
+                        })->sum('quantity_inserted');
+                        $outcomeInPeriodQuantity = (function() use ($productItemsLoaded, $instance){
+                            $sumExits = 0;
+                            (clone $productItemsLoaded)->each(function($item) use ($instance, &$sumExits){
+                                $item->outcomes->filter(function($outcome) use ($instance){
+                                    return Carbon::parse($outcome->date)->isBetween($instance->startDate, $instance->endDate);
+                                })->each(function($outcome) use ($item, &$sumExits){
+                                    $sumExits += $item->outcomes_details[$outcome->id]['quantity'];
+                                });
+                            });
+                            return $sumExits;
+                        })();
+                        $inPeriodStockQuantity = $previousStockQuantity + $incomeInPeriodQuantity - $outcomeInPeriodQuantity;
 
                         $items[] = [
                             'id' => (clone $productItems)->first()->product->id,
@@ -234,10 +240,10 @@ class RecordInventoryProductsBalance
                             'currency' => (clone $productItems)->first()->buy_currency->value,
                             'warehouse' => (clone $productItems)->first()->warehouse->name,
                             'previous_stock_quantity' => number_format($previousStockQuantity, 2),
-                            'income_quantity' => (clone $productItems)->sum('quantity_inserted'),
-                            'outcome_quantity' => (clone $productItems)->sum('quantity_used'),
-                            'stock_quantity' => (clone $productItems)->sum('quantity_remaining'),
-                            'stock_amount' => (clone $productItems)->sum('quantity_remaining') * (clone $productItems)->first()->calculateSellPriceFromBuyPrice(1),
+                            'income_quantity' => $incomeInPeriodQuantity,
+                            'outcome_quantity' => $outcomeInPeriodQuantity,
+                            'stock_quantity' => $inPeriodStockQuantity,
+                            'stock_amount' => $inPeriodStockQuantity * (clone $productItems)->first()->calculateSellPriceFromBuyPrice(1),
                             'unit_price' => (clone $productItems)->first()->calculateSellPriceFromBuyPrice(1),
                         ];
                     });
