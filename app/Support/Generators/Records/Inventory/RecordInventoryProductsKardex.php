@@ -104,6 +104,7 @@ class RecordInventoryProductsKardex
 
             $incomes = InventoryWarehouseIncome::whereIn('inventory_warehouse_id', $options['warehouseIds'])
                 ->where('date', '>=', $this->startDate)
+                ->where('date', '<=', $this->endDate)
                 ->where(function($query) use ($product, $options) {
                     $query->whereHas('items', function($q) use ($product, $options){
                         $q->where('inventory_product_id', $product->id)
@@ -117,6 +118,7 @@ class RecordInventoryProductsKardex
 
             $outcomes = InventoryWarehouseOutcome::whereIn('inventory_warehouse_id', $options['warehouseIds'])
                 ->where('date', '>=', $this->startDate)
+                ->where('date', '<=', $this->endDate)
                 ->where(function($query) use ($product, $options) {
                     $query->whereHas('items', function($q) use ($product, $options){
                         $q->where('inventory_product_id', $product->id)

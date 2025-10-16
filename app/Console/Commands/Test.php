@@ -31,7 +31,7 @@ class Test extends Command
      */
     public function handle()
     {
-        $startDate = Carbon::parse('2025-10-01', 'America/Lima')->startOfDay()->setTimezone('America/Lima')->toIso8601String();
+        $startDate = Carbon::parse('2025-09-01', 'America/Lima')->startOfDay()->setTimezone('America/Lima')->toIso8601String();
 
         $this->info('Searching for outcomes from >=' . $startDate);
 
