@@ -195,23 +195,32 @@ class RecordInventoryProductsBalance
 
                         $productItemsLoaded = $productItems->get();
 
-                        $previousStockQuantity = (function() use ($productItemsLoaded, $instance){
+                        $previousStock = (function() use ($productItemsLoaded, $instance){
                             $previousIncomesProductsItems = (clone $productItemsLoaded)->filter(function($item) use ($instance){
                                 return Carbon::parse($item->income->date)->isBefore($instance->startDate);
                             });
 
                             $previousOutcomesBalances = $previousIncomesProductsItems->map(function($item) use ($instance){
                                 $sumExits = 0;
+                                $sumAmounts = 0;
                                 $item->outcomes->filter(function($outcome) use ($instance){
                                     return Carbon::parse($outcome->date)->isBefore($instance->startDate);
-                                })->each(function($outcome) use ($item, &$sumExits){
+                                })->each(function($outcome) use ($item, &$sumExits, &$sumAmounts){
                                     $sumExits += $item->outcomes_details[$outcome->id]['quantity'];
+                                    $sumAmounts += $item->outcomes_details[$outcome->id]['sell_amount'];
                                 });
 
-                                return $sumExits;
+                                return [
+                                    'quantity' => $sumExits,
+                                    'amount' => $sumAmounts,
+                                ];
                             });
 
-                            return $previousIncomesProductsItems->sum('quantity_inserted') - $previousOutcomesBalances->sum();
+
+                            return [
+                                'quantity' => $previousIncomesProductsItems->sum('quantity_inserted') - $previousOutcomesBalances->sum('quantity'),
+                                'amount' => $previousIncomesProductsItems->sum('buy_amount') - $previousOutcomesBalances->sum('amount'),
+                            ];
                         })();
 
                         $incomesInPeriod = (clone $productItemsLoaded)->filter(function($item) use ($instance){
@@ -242,7 +251,7 @@ class RecordInventoryProductsBalance
                                 'amount' => $sumAmounts,
                             ];
                         })();
-                        $inPeriodStockQuantity = $previousStockQuantity + $incomeInPeriodQuantity - $outcomeInPeriodQuantity['quantity'];
+                        $inPeriodStockQuantity = $previousStock['quantity'] + $incomeInPeriodQuantity - $outcomeInPeriodQuantity['quantity'];
 
                         $items[] = [
                             'id' => (clone $productItems)->first()->product->id,
@@ -251,12 +260,12 @@ class RecordInventoryProductsBalance
                             'sub_category' => (clone $productItems)->first()->product->sub_category,
                             'currency' => (clone $productItems)->first()->buy_currency->value,
                             'warehouse' => (clone $productItems)->first()->warehouse->name,
-                            'previous_stock_quantity' => number_format($previousStockQuantity, 2),
+                            'previous_stock_quantity' => number_format($previousStock['quantity'], 2),
                             'income_quantity' => $incomeInPeriodQuantity,
                             'outcome_quantity' => $outcomeInPeriodQuantity['quantity'],
                             'stock_quantity' => $inPeriodStockQuantity,
-                            'stock_amount' => $incomeInPeriodAmount - $outcomeInPeriodQuantity['amount'],
-                            'unit_price' => ($inPeriodStockQuantity > 0) ? round(($incomeInPeriodAmount - $outcomeInPeriodQuantity['amount']) / $inPeriodStockQuantity, 2) : 0,
+                            'stock_amount' => $previousStock['amount'] + $incomeInPeriodAmount - $outcomeInPeriodQuantity['amount'],
+                            'unit_price' => ($inPeriodStockQuantity > 0) ? round(($previousStock['amount'] + $incomeInPeriodAmount - $outcomeInPeriodQuantity['amount']) / $inPeriodStockQuantity, 2) : 0,
                         ];
                     });
 
