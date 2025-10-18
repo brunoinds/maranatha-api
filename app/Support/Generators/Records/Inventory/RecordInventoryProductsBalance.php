@@ -106,7 +106,7 @@ class RecordInventoryProductsBalance
 
                         $productItemsLoaded = $productItems->with('income', 'outcome')->get();
 
-                        $previousStockQuantity = (function() use ($productItemsLoaded, $instance){
+                        $previousStock = (function() use ($productItemsLoaded, $instance){
                             $previousIncomesProductsItems = (clone $productItemsLoaded)->filter(function($item) use ($instance){
                                 return Carbon::parse($item->income->date)->isBefore($instance->startDate);
                             });
@@ -116,18 +116,27 @@ class RecordInventoryProductsBalance
                                 }
                                 return Carbon::parse($item->outcome->date)->isBefore($instance->startDate);
                             });
-                            return $previousIncomesProductsItems->count() - $previousOutcomesProductsItems->count();
+                            return [
+                                'quantity' => $previousIncomesProductsItems->count() - $previousOutcomesProductsItems->count(),
+                                'amount' => $previousIncomesProductsItems->sum('buy_amount') - $previousOutcomesProductsItems->sum('sell_amount'),
+                            ];
                         })();
-                        $incomeInPeriodQuantity = (clone $productItemsLoaded)->filter(function($item) use ($instance){
+                        $incomeInPeriod = (clone $productItemsLoaded)->filter(function($item) use ($instance){
                             return Carbon::parse($item->income->date)->isBetween($instance->startDate, $instance->endDate);
-                        })->count();
-                        $outcomeInPeriodQuantity = (clone $productItemsLoaded)->filter(function($item) use ($instance){
+                        });
+                        $incomeInPeriodQuantity = $incomeInPeriod->count();
+                        $incomeInPeriodAmount = $incomeInPeriod->sum('buy_amount');
+
+                        $outcomeInPeriod = (clone $productItemsLoaded)->filter(function($item) use ($instance){
                             if ($item->outcome === null){
                                 return false;
                             }
                             return Carbon::parse($item->outcome->date)->isBetween($instance->startDate, $instance->endDate);
-                        })->count();
-                        $inPeriodStockQuantity = $previousStockQuantity + $incomeInPeriodQuantity - $outcomeInPeriodQuantity;
+                        });
+                        $outcomeInPeriodQuantity = $outcomeInPeriod->count();
+                        $outcomeInPeriodAmount = $outcomeInPeriod->sum('sell_amount');
+                        $inPeriodStockQuantity = $previousStock['quantity'] + $incomeInPeriodQuantity - $outcomeInPeriodQuantity;
+                        $inPeriodStockAmount = $previousStock['amount'] + $incomeInPeriodAmount - $outcomeInPeriodAmount;
 
 
 
@@ -139,13 +148,13 @@ class RecordInventoryProductsBalance
                             'currency' => (clone $productItems)->first()->buy_currency,
                             'warehouse' => (clone $productItems)->first()->warehouse->name,
 
-                            'previous_stock_quantity' => $previousStockQuantity,
+                            'previous_stock_quantity' => $previousStock['quantity'],
                             'income_quantity' => $incomeInPeriodQuantity,
                             'outcome_quantity' => $outcomeInPeriodQuantity,
 
                             'stock_quantity' => $inPeriodStockQuantity,
-                            'stock_amount' => (clone $productItems)->first()->buy_amount * $inPeriodStockQuantity,
-                            'unit_price' => (clone $productItems)->first()->buy_amount,
+                            'stock_amount' => round($inPeriodStockAmount, 2),
+                            'unit_price' => $inPeriodStockQuantity > 0 ? round($inPeriodStockAmount / $inPeriodStockQuantity, 2) : 0,
                         ];
                     });
 
@@ -358,7 +367,7 @@ class RecordInventoryProductsBalance
                     'stock_amount' => Toolbox::moneyFormat($item['stock_amount'], $item['currency']),
                     'unit_price' => Toolbox::moneyFormat($item['unit_price'], $item['currency']),
                 ];
-            }),
+            })->sortBy('product_id')->values()->toArray(),
             'footer' => [
                 'totals' => [
                     'title' => 'Totales',
