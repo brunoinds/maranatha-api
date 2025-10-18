@@ -567,17 +567,7 @@ class RecordInventoryProductsKardex
                     'key' => 'balance_total'
                 ],
             ],
-            'body' => collect($body)->map(function($item){
-                return [
-                    ...$item,
-                    'income_unit_price' => ($item['income_unit_price'] != '') ? Toolbox::moneyFormat((float) $item['income_unit_price'], $this->moneyType) : '',
-                    'outcome_unit_price' => ($item['outcome_unit_price'] != '') ? Toolbox::moneyFormat((float) $item['outcome_unit_price'], $this->moneyType) : '',
-                    'balance_unit_price' => ($item['balance_unit_price'] != '') ? Toolbox::moneyFormat((float) $item['balance_unit_price'], $this->moneyType) : '',
-                    'income_total' => ($item['income_total'] != '') ? Toolbox::moneyFormat((float) $item['income_total'], $this->moneyType) : '',
-                    'outcome_total' => ($item['outcome_total'] != '') ? Toolbox::moneyFormat((float) $item['outcome_total'], $this->moneyType) : '',
-                    'balance_total' => ($item['balance_total'] != '') ? Toolbox::moneyFormat((float) $item['balance_total'], $this->moneyType) : '',
-                ];
-            }),
+            'body' => $body,
         ];
     }
 
