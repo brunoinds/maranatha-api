@@ -110,6 +110,7 @@ jobs:
             ln -nfs $SHARED_PATH/.env $RELEASE_PATH/.env
 
             # Link resources/ionic (custom directory)
+            mkdir -p $RELEASE_PATH/resources
             rm -rf $RELEASE_PATH/resources/ionic
             ln -nfs $SHARED_PATH/resources/ionic $RELEASE_PATH/resources/ionic
 
