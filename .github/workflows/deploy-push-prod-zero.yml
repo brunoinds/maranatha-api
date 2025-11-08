@@ -48,9 +48,8 @@ jobs:
             mkdir -p $SHARED_PATH/storage/framework/{cache,sessions,views}
             mkdir -p $SHARED_PATH/storage/app/public
 
-            # Create shared resources directories (only app and www, NOT views)
-            mkdir -p $SHARED_PATH/resources/app
-            mkdir -p $SHARED_PATH/resources/www
+            # Create shared resources directories
+            mkdir -p $SHARED_PATH/resources/ionic
 
             # Create shared public/.well-known directory
             mkdir -p $SHARED_PATH/public/.well-known
@@ -110,13 +109,9 @@ jobs:
             rm -f $RELEASE_PATH/.env
             ln -nfs $SHARED_PATH/.env $RELEASE_PATH/.env
 
-            # Link resources/app (custom directory)
-            rm -rf $RELEASE_PATH/resources/app
-            ln -nfs $SHARED_PATH/resources/app $RELEASE_PATH/resources/app
-
-            # Link resources/www (custom directory)
-            rm -rf $RELEASE_PATH/resources/www
-            ln -nfs $SHARED_PATH/resources/www $RELEASE_PATH/resources/www
+            # Link resources/ionic (custom directory)
+            rm -rf $RELEASE_PATH/resources/ionic
+            ln -nfs $SHARED_PATH/resources/ionic $RELEASE_PATH/resources/ionic
 
             # Create public/storage symlink
             rm -rf $RELEASE_PATH/public/storage
@@ -135,8 +130,7 @@ jobs:
             chown -R $DEPLOY_USER:$DEPLOY_USER $RELEASE_PATH
             chmod -R 755 $RELEASE_PATH
             chmod -R 775 $SHARED_PATH/storage
-            chmod -R 775 $SHARED_PATH/resources/app
-            chmod -R 775 $SHARED_PATH/resources/www
+            chmod -R 775 $SHARED_PATH/resources/ionic
             chmod -R 775 $SHARED_PATH/public/.well-known
             chmod 664 $SHARED_PATH/database.sqlite
 
@@ -187,8 +181,7 @@ jobs:
             echo ""
             echo "📂 Shared directories linked:"
             echo "  - storage/"
-            echo "  - resources/app/"
-            echo "  - resources/www/"
+            echo "  - resources/ionic/"
             echo "  - public/.well-known/"
             echo "  - .env"
             echo "  - database/database.sqlite"
