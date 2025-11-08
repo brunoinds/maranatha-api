@@ -1,0 +1,215 @@
+name: Deploy Laravel With Zero Downtime
+on:
+  push:
+    branches:
+      - main
+jobs:
+  web-deploy:
+    name: Deploy
+    runs-on: ubuntu-latest
+    steps:
+      - name: 💻 Get the latest code
+        uses: actions/checkout@v4
+      - name: 📀 Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: 8.3
+      - name: 🔑 Copy .env
+        run: php -r "file_exists('.env') || copy('.env.example', '.env');"
+      - name: 📦 Install Laravel Dependencies
+        run: composer install --ignore-platform-reqs
+      - name: ♾️ Prepare storage link
+        run: chmod -R 775 storage/
+      - name: 👮🏻 Directory Permissions
+        run: chmod -R 777 storage bootstrap/cache
+      - name: 🧪 Run Laravel Tests
+        run: php artisan test
+
+      - name: 🚀 Prepare deployment structure
+        uses: appleboy/ssh-action@v0.1.7
+        with:
+          host: 69.6.214.100
+          username: root
+          port: 22022
+          key: ${{ secrets.VPS_SSH_PRIVATE_KEY }}
+          script: |
+            set -e
+
+            # Variables
+            DEPLOY_USER="wwimed"
+            DEPLOY_PATH="/home/wwimed/maranatha.top"
+            RELEASE_NAME="${{ github.run_number }}_${{ github.sha }}"
+            RELEASE_PATH="$DEPLOY_PATH/releases/$RELEASE_NAME"
+            SHARED_PATH="$DEPLOY_PATH/shared"
+
+            echo "🔧 Creating directory structure..."
+            mkdir -p $DEPLOY_PATH/{releases,shared}
+            mkdir -p $SHARED_PATH/storage/{app,framework,logs}
+            mkdir -p $SHARED_PATH/storage/framework/{cache,sessions,views}
+            mkdir -p $SHARED_PATH/storage/app/public
+
+            # Create shared resources directories (only app and www, NOT views)
+            mkdir -p $SHARED_PATH/resources/app
+            mkdir -p $SHARED_PATH/resources/www
+
+            # Create shared public/.well-known directory
+            mkdir -p $SHARED_PATH/public/.well-known
+
+            # Check if .env exists
+            if [ ! -f "$SHARED_PATH/.env" ]; then
+              echo "⚠️  .env not found in shared directory!"
+              exit 1
+            fi
+
+            # Check if database.sqlite exists
+            if [ ! -f "$SHARED_PATH/database.sqlite" ]; then
+              echo "⚠️  database.sqlite not found in shared directory!"
+              exit 1
+            fi
+
+            echo "📁 Creating new release directory..."
+            mkdir -p $RELEASE_PATH
+
+      - name: 🗂️ Sync files to new release
+        uses: easingthemes/ssh-deploy@main
+        with:
+          SSH_PRIVATE_KEY: ${{ secrets.VPS_SSH_PRIVATE_KEY }}
+          REMOTE_HOST: 69.6.214.100
+          REMOTE_USER: root
+          REMOTE_PORT: 22022
+          TARGET: "/home/wwimed/maranatha.top/releases/${{ github.run_number }}_${{ github.sha }}"
+          SOURCE: "."
+          ARGS: "-rlgoDzvc -i --delete-after"
+          EXCLUDE: ".env,storage/logs,storage/keys,storage/app/public,public/storage,public/storage/**,database/database.sqlite,resources,resources/**,public/.user.ini,public/php.ini"
+
+      - name: 🔗 Link shared resources and activate release
+        uses: appleboy/ssh-action@v0.1.7
+        with:
+          host: 69.6.214.100
+          username: root
+          port: 22022
+          key: ${{ secrets.VPS_SSH_PRIVATE_KEY }}
+          script: |
+            set -e
+
+            # Variables
+            DEPLOY_USER="wwimed"
+            DEPLOY_PATH="/home/wwimed/maranatha.top"
+            RELEASE_NAME="${{ github.run_number }}_${{ github.sha }}"
+            RELEASE_PATH="$DEPLOY_PATH/releases/$RELEASE_NAME"
+            SHARED_PATH="$DEPLOY_PATH/shared"
+            CURRENT_PATH="$DEPLOY_PATH/current"
+
+            echo "🔗 Creating symlinks to shared resources..."
+
+            # Link storage
+            rm -rf $RELEASE_PATH/storage
+            ln -nfs $SHARED_PATH/storage $RELEASE_PATH/storage
+
+            # Link .env
+            rm -f $RELEASE_PATH/.env
+            ln -nfs $SHARED_PATH/.env $RELEASE_PATH/.env
+
+            # Link resources/app (custom directory)
+            rm -rf $RELEASE_PATH/resources/app
+            ln -nfs $SHARED_PATH/resources/app $RELEASE_PATH/resources/app
+
+            # Link resources/www (custom directory)
+            rm -rf $RELEASE_PATH/resources/www
+            ln -nfs $SHARED_PATH/resources/www $RELEASE_PATH/resources/www
+
+            # Create public/storage symlink
+            rm -rf $RELEASE_PATH/public/storage
+            ln -nfs $SHARED_PATH/storage/app/public $RELEASE_PATH/public/storage
+
+            # Link public/.well-known (shared directory)
+            rm -rf $RELEASE_PATH/public/.well-known
+            ln -nfs $SHARED_PATH/public/.well-known $RELEASE_PATH/public/.well-known
+
+            # Link database.sqlite (shared file)
+            mkdir -p $RELEASE_PATH/database
+            rm -f $RELEASE_PATH/database/database.sqlite
+            ln -nfs $SHARED_PATH/database.sqlite $RELEASE_PATH/database/database.sqlite
+
+            echo "🔧 Setting permissions..."
+            chown -R $DEPLOY_USER:$DEPLOY_USER $RELEASE_PATH
+            chmod -R 755 $RELEASE_PATH
+            chmod -R 775 $SHARED_PATH/storage
+            chmod -R 775 $SHARED_PATH/resources/app
+            chmod -R 775 $SHARED_PATH/resources/www
+            chmod -R 775 $SHARED_PATH/public/.well-known
+            chmod 664 $SHARED_PATH/database.sqlite
+
+            echo "⚙️  Running Laravel optimizations..."
+            cd $RELEASE_PATH
+
+            # Optional: Put in maintenance mode for migrations
+            # php artisan down --retry=60 --secret="${{ secrets.MAINTENANCE_SECRET }}"
+
+            # Run migrations
+            php artisan migrate --force
+
+
+            # Clear and cache config
+            php artisan config:clear
+            php artisan config:cache
+            php artisan route:cache
+            php artisan view:cache
+            php artisan event:cache
+
+            echo "🔄 Switching to new release (atomic operation)..."
+            # CRITICAL: Remove current if it's a directory (not a symlink)
+            if [ -d "$CURRENT_PATH" ] && [ ! -L "$CURRENT_PATH" ]; then
+              echo "⚠️  WARNING: 'current' is a directory, not a symlink. Backing it up..."
+              mv $CURRENT_PATH ${CURRENT_PATH}_backup_$(date +%Y%m%d_%H%M%S)
+            fi
+
+            # Create/update the symlink atomically
+            ln -sfn $RELEASE_PATH $CURRENT_PATH
+
+            # Bring application back up
+            # php artisan up
+
+            echo "♻️  Restarting services..."
+            systemctl restart httpd || true
+
+            echo "🧹 Cleaning old releases (keeping last 3)..."
+            cd $DEPLOY_PATH/releases
+            ls -t | tail -n +4 | xargs rm -rf 2>/dev/null || true
+
+            echo "🧹 Cleaning old cache..."
+            cd $CURRENT_PATH && php artisan config:clear && php artisan cache:clear
+
+            echo "✅ Deployment completed successfully!"
+            echo "📦 Release: $RELEASE_NAME"
+            echo "🔗 Current is symlink: $([ -L $CURRENT_PATH ] && echo 'YES' || echo 'NO')"
+            echo "🔗 Current points to: $(readlink $CURRENT_PATH)"
+            echo ""
+            echo "📂 Shared directories linked:"
+            echo "  - storage/"
+            echo "  - resources/app/"
+            echo "  - resources/www/"
+            echo "  - public/.well-known/"
+            echo "  - .env"
+            echo "  - database/database.sqlite"
+
+      - name: 🔴 Rollback on failure
+        if: failure()
+        uses: appleboy/ssh-action@v0.1.7
+        with:
+          host: 69.6.214.100
+          username: root
+          port: 22022
+          key: ${{ secrets.VPS_SSH_PRIVATE_KEY }}
+          script: |
+            DEPLOY_PATH="/home/wwimed/maranatha.top"
+            RELEASE_NAME="${{ github.run_number }}_${{ github.sha }}"
+
+            echo "❌ Deployment failed! Cleaning up..."
+            rm -rf "$DEPLOY_PATH/releases/$RELEASE_NAME"
+
+            # Application will continue serving from previous release
+            echo "✅ Previous release still active"
+
+            chown -R wwimed:wwimed $DEPLOY_PATH
+
