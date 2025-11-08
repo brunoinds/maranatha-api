@@ -332,7 +332,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
 
     //Projects group:
     Route::group(['prefix' => 'projects'], function(){
-        Route::apiResource('jobs', ProjectJobController::class);
+        Route::apiResource('jobs', ProjectJobController::class)->names('project-jobs');
         Route::apiResource('structures', ProjectStructureController::class);
         Route::apiResource('construction-phases', ProjectConstructionPhaseController::class);
         Route::apiResource('construction-tasks', ProjectConstructionTaskController::class);
