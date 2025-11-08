@@ -79,7 +79,7 @@ jobs:
           TARGET: "/home/wwimed/maranatha.top/releases/${{ github.run_number }}_${{ github.sha }}"
           SOURCE: "."
           ARGS: "-rlgoDzvc -i --delete-after"
-          EXCLUDE: ".env,storage/logs,storage/keys,storage/app/public,public/storage,public/storage/**,database/database.sqlite,resources,resources/**,public/.user.ini,public/php.ini"
+          EXCLUDE: ".env,storage/logs,storage/keys,storage/app/public,public/storage,public/storage/**,database/database.sqlite,resources/ionic,resources/ionic/**,public/.user.ini,public/php.ini"
 
       - name: 🔗 Link shared resources and activate release
         uses: appleboy/ssh-action@v0.1.7
@@ -113,6 +113,9 @@ jobs:
             mkdir -p $RELEASE_PATH/resources
             rm -rf $RELEASE_PATH/resources/ionic
             ln -nfs $SHARED_PATH/resources/ionic $RELEASE_PATH/resources/ionic
+
+            # Ensure resources/views directory exists
+            mkdir -p $RELEASE_PATH/resources/views
 
             # Create public/storage symlink
             rm -rf $RELEASE_PATH/public/storage
