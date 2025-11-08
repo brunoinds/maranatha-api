@@ -11,7 +11,7 @@ class RecordsCache
     public static function getRecord(string $recordName, array $params): array|null
     {
         $hash = md5(json_encode($params));
-        $cachedValue = Cache::store('file')->get(RecordsCache::$cacheKey . '/' . $recordName . '/' . $hash);
+        $cachedValue = Cache::store('redis')->get(RecordsCache::$cacheKey . '/' . $recordName . '/' . $hash);
 
         if ($cachedValue){
             return json_decode($cachedValue, true);
@@ -29,12 +29,12 @@ class RecordsCache
     {
         $hash = md5(json_encode($params));
         $data = json_encode($data);
-        Cache::store('file')->put(RecordsCache::$cacheKey . '/' . $recordName . '/' . $hash, $data);
+        Cache::store('redis')->put(RecordsCache::$cacheKey . '/' . $recordName . '/' . $hash, $data);
     }
 
 
     public static function clearAll(): void
     {
-        Cache::store('file')->flush();
+        Cache::store('redis')->flush();
     }
 }

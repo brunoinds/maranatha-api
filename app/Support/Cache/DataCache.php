@@ -11,7 +11,7 @@ class DataCache
     public static function getRecord(string $recordName, array $params): array|null
     {
         $hash = md5($recordName . json_encode($params));
-        $cachedValue = Cache::store('file')->get($hash);
+        $cachedValue = Cache::store('redis')->get($hash);
 
         if ($cachedValue){
             return json_decode($cachedValue, true);
@@ -29,12 +29,12 @@ class DataCache
     {
         $hash = md5($recordName . json_encode($params));
         $data = json_encode($data);
-        Cache::store('file')->put($hash, $data);
+        Cache::store('redis')->put($hash, $data);
     }
 
     public static function clearRecord(string $recordName, array $params): void
     {
         $hash = md5($recordName . json_encode($params));
-        Cache::store('file')->forget($hash);
+        Cache::store('redis')->forget($hash);
     }
 }

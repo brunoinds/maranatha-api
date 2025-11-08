@@ -232,7 +232,7 @@ class ReportController extends Controller
             return response()->json(['message' => 'Progress ID not found'], 404);
         }
 
-        $progressItem = json_decode(Cache::store('file')->get('Maranatha/PDFRender/Progress/' . $progressId), true);
+        $progressItem = json_decode(Cache::store('redis')->get('Maranatha/PDFRender/Progress/' . $progressId), true);
         if ($progressItem === null){
             return response()->json(['message' => 'Progress not found'], 404);
         }

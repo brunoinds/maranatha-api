@@ -59,7 +59,7 @@ class Excel{
         $sheet->append($output->toArray());
     }
     public static function getWorkersSheet():array{
-        $cachedValue = Cache::store('file')->get('Maranatha/Spreadsheets/Workers');
+        $cachedValue = Cache::store('redis')->get('Maranatha/Spreadsheets/Workers');
 
         if ($cachedValue !== null){
             return $cachedValue;
@@ -144,7 +144,7 @@ class Excel{
 
 
         //Store for 30 minutes:
-        Cache::store('file')->put('Maranatha/Spreadsheets/Workers', $data, 30 * 60);
+        Cache::store('redis')->put('Maranatha/Spreadsheets/Workers', $data, 30 * 60);
 
         return $data;
     }

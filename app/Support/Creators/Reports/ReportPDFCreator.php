@@ -448,7 +448,7 @@ class ReportPDFCreator
                     'framesRendered' => $framesRendered,
                     'framesTotal' => $framesTotal
                 ];
-                Cache::store('file')->put('Maranatha/PDFRender/Progress/' . $options['progressId'], json_encode($progressItem));
+                Cache::store('redis')->put('Maranatha/PDFRender/Progress/' . $options['progressId'], json_encode($progressItem));
             };
             $dompdf->setCallbacks([
                 'checksum' => [
