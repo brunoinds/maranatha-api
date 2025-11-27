@@ -45,7 +45,8 @@ class RecordInventoryProductsKardex
 
      */
 
-    public function __construct(array $options){
+    public function __construct(array $options)
+    {
         $this->startDate = $options['startDate'] ?? null;
         $this->endDate = $options['endDate'] ?? null;
         $this->moneyType = $options['moneyType'] ?? null;
@@ -59,7 +60,7 @@ class RecordInventoryProductsKardex
         $this->endDate = Carbon::parse($this->endDate, 'America/Lima')->endOfDay()->setTimezone('America/Lima')->toIso8601String();
     }
 
-    private function getKardex():Collection
+    private function getKardex(): Collection
     {
         $options = [
             'startDate' => $this->startDate,
@@ -71,7 +72,7 @@ class RecordInventoryProductsKardex
             'subCategories' => $this->subCategories,
         ];
 
-        if ($options['moneyType'] === null){
+        if ($options['moneyType'] === null) {
             $options['moneyType'] = 'PEN';
         }
 
@@ -82,15 +83,15 @@ class RecordInventoryProductsKardex
 
         $productsIds = $countableProductsIds->merge($uncountableProductsIds);
 
-        if ($options['productId'] !== null){
+        if ($options['productId'] !== null) {
             $productsIds = collect([$options['productId']]);
         }
 
-        InventoryProduct::whereIn('id', $productsIds)->where('is_loanable', false)->get()->each(function($product) use ($options, &$productsLines){
-            if ($options['categories'] !== null && !in_array($product->category, $options['categories'])){
+        InventoryProduct::whereIn('id', $productsIds)->where('is_loanable', false)->get()->each(function ($product) use ($options, &$productsLines) {
+            if ($options['categories'] !== null && !in_array($product->category, $options['categories'])) {
                 return;
             }
-            if ($options['subCategories'] !== null && !in_array($product->sub_category, $options['subCategories'])){
+            if ($options['subCategories'] !== null && !in_array($product->sub_category, $options['subCategories'])) {
                 return;
             }
 
@@ -105,29 +106,29 @@ class RecordInventoryProductsKardex
             $incomes = InventoryWarehouseIncome::whereIn('inventory_warehouse_id', $options['warehouseIds'])
                 ->where('date', '>=', $this->startDate)
                 ->where('date', '<=', $this->endDate)
-                ->where(function($query) use ($product, $options) {
-                    $query->whereHas('items', function($q) use ($product, $options){
+                ->where(function ($query) use ($product, $options) {
+                    $query->whereHas('items', function ($q) use ($product, $options) {
                         $q->where('inventory_product_id', $product->id)
-                        ->where('buy_currency', $options['moneyType']);
+                            ->where('buy_currency', $options['moneyType']);
                     })
-                    ->orWhereHas('uncountableItems', function($q) use ($product, $options){
-                        $q->where('inventory_product_id', $product->id)
-                        ->where('buy_currency', $options['moneyType']);
-                    });
+                        ->orWhereHas('uncountableItems', function ($q) use ($product, $options) {
+                            $q->where('inventory_product_id', $product->id)
+                                ->where('buy_currency', $options['moneyType']);
+                        });
                 })->get();
 
             $outcomes = InventoryWarehouseOutcome::whereIn('inventory_warehouse_id', $options['warehouseIds'])
                 ->where('date', '>=', $this->startDate)
                 ->where('date', '<=', $this->endDate)
-                ->where(function($query) use ($product, $options) {
-                    $query->whereHas('items', function($q) use ($product, $options){
+                ->where(function ($query) use ($product, $options) {
+                    $query->whereHas('items', function ($q) use ($product, $options) {
                         $q->where('inventory_product_id', $product->id)
-                        ->where('buy_currency', $options['moneyType']);
+                            ->where('buy_currency', $options['moneyType']);
                     })
-                    ->orWhereHas('uncountableItems', function($q) use ($product, $options){
-                        $q->where('inventory_product_id', $product->id)
-                        ->where('buy_currency', $options['moneyType']);
-                    });
+                        ->orWhereHas('uncountableItems', function ($q) use ($product, $options) {
+                            $q->where('inventory_product_id', $product->id)
+                                ->where('buy_currency', $options['moneyType']);
+                        });
                 })->get();
 
 
@@ -135,15 +136,15 @@ class RecordInventoryProductsKardex
 
             $datesOrganized = collect([]);
 
-            $incomes->each(function($income) use (&$datesOrganized){
-                if ($datesOrganized->contains($income->date)){
+            $incomes->each(function ($income) use (&$datesOrganized) {
+                if ($datesOrganized->contains($income->date)) {
                     return;
                 }
                 $datesOrganized->push($income->date);
             });
 
-            $outcomes->each(function($outcome) use ($datesOrganized){
-                if ($datesOrganized->contains($outcome->date)){
+            $outcomes->each(function ($outcome) use ($datesOrganized) {
+                if ($datesOrganized->contains($outcome->date)) {
                     return;
                 }
                 $datesOrganized->push($outcome->date);
@@ -151,11 +152,11 @@ class RecordInventoryProductsKardex
 
             $datesOrganized->sort();
 
-            $datesOrganized->each(function($date) use ($incomes, $outcomes, $product, &$lines, &$balance, $options){
+            $datesOrganized->each(function ($date) use ($incomes, $outcomes, $product, &$lines, &$balance, $options) {
                 $incomes = $incomes->where('date', $date);
                 $outcomes = $outcomes->where('date', $date);
 
-                $incomes->each(function($income) use ($product, &$lines, &$balance, $options){
+                $incomes->each(function ($income) use ($product, &$lines, &$balance, $options) {
                     $line = [
                         'product' => $product,
                         'transaction' => $income,
@@ -168,7 +169,7 @@ class RecordInventoryProductsKardex
                         'transaction_number' => $income->ticket_number ?? 'ENT-00' . $income->id
                     ];
 
-                    if ($product->unitNature() === 'Integer'){
+                    if ($product->unitNature() === 'Integer') {
                         //Countable products:
                         $products = $income->items()->where('inventory_product_id', $product->id)
                             ->where('date', '>=', $this->startDate)
@@ -178,7 +179,7 @@ class RecordInventoryProductsKardex
                         $line['unit_price'] = $products->first()->buy_amount;
                         $line['total_price'] = round($products->count() * $products->first()->buy_amount, 2);
 
-                        if ($line['quantity'] > 0){
+                        if ($line['quantity'] > 0) {
                             $balance['quantity'] = round($balance['quantity'] + $line['quantity'], 2);
                             $balance['total_amount'] = round($balance['total_amount'] + $line['total_price'], 2);
 
@@ -187,17 +188,35 @@ class RecordInventoryProductsKardex
 
                             $lines[] = $line;
                         }
-                    }else{
+                    } else {
                         //Uncountable products:
                         $products = $income->uncountableItems()->where('inventory_product_id', $product->id)
                             ->where('date', '>=', $this->startDate)
                             ->where('buy_currency', $options['moneyType'])
                             ->get();
-                        $totalQuantity = $products->sum('quantity_inserted');
+
+                        $productsQuantityAndAmount = (function () use ($products) {
+                            $quantity = 0;
+                            $amount = 0;
+                            $products->each(function ($income) use (&$quantity, &$amount) {
+                                $pricePerUnit = ($income->quantity_inserted > 0) ? $income->buy_amount / $income->quantity_inserted : 0;
+                                $amount += $pricePerUnit * $income->quantity_inserted;
+                                $quantity += $income->quantity_inserted;
+                            });
+
+                            return [
+                                'quantity' => $quantity,
+                                'amount' => $amount,
+                            ];
+                        })();
+
+
+
+                        $totalQuantity = $productsQuantityAndAmount['quantity'];
                         $line['quantity'] = $totalQuantity;
-                        $line['unit_price'] = $totalQuantity > 0 ?  round($products->first()->buy_amount / $totalQuantity, 2) : 0;
-                        $line['total_price'] = $products->first()->buy_amount;
-                        if ($line['quantity'] > 0){
+                        $line['unit_price'] = $totalQuantity > 0 ? round($productsQuantityAndAmount['amount'] / $totalQuantity, 2) : 0;
+                        $line['total_price'] = $productsQuantityAndAmount['amount'];
+                        if ($line['quantity'] > 0) {
                             $balance['quantity'] = round($balance['quantity'] + $line['quantity'], 2);
                             $balance['total_amount'] = round($balance['total_amount'] + $line['total_price'], 2);
 
@@ -209,7 +228,7 @@ class RecordInventoryProductsKardex
                     }
                 });
 
-                $outcomes->each(function($outcome) use ($product, &$lines, &$balance, $options){
+                $outcomes->each(function ($outcome) use ($product, &$lines, &$balance, $options) {
                     $line = [
                         'product' => $product,
                         'transaction' => $outcome,
@@ -222,7 +241,7 @@ class RecordInventoryProductsKardex
                         'transaction_number' => 'SAL-00' . $outcome->id
                     ];
 
-                    if ($product->unitNature() === 'Integer'){
+                    if ($product->unitNature() === 'Integer') {
                         //Countable products:
                         $products = $outcome->items()->where('inventory_product_id', $product->id)
                             ->where('date', '>=', $this->startDate)
@@ -232,7 +251,7 @@ class RecordInventoryProductsKardex
                         $line['unit_price'] = $products->first()->sell_amount;
                         $line['total_price'] = round($products->count() * $products->first()->sell_amount, 2);
 
-                        if ($line['quantity'] > 0){
+                        if ($line['quantity'] > 0) {
                             $balance['quantity'] = round($balance['quantity'] - $line['quantity'], 2);
                             $balance['total_amount'] = round($balance['total_amount'] - $line['total_price'], 2);
 
@@ -241,7 +260,7 @@ class RecordInventoryProductsKardex
 
                             $lines[] = $line;
                         }
-                    }else{
+                    } else {
                         //Uncountable products:
                         $outcome->uncountableItems()->where('inventory_product_id', $product->id)->where('date', '>=', $this->startDate)->where('buy_currency', $options['moneyType'])->each(function ($uncountableItem) use ($outcome, &$line, $options) {
                             if (!isset($uncountableItem->outcomes_details[$outcome->id])) {
@@ -255,7 +274,7 @@ class RecordInventoryProductsKardex
                             $line['quantity'] = round($line['quantity'] + $outcomeDetails['quantity'], 2);
                         });
 
-                        if ($line['quantity'] > 0){
+                        if ($line['quantity'] > 0) {
                             $line['unit_price'] = round($line['total_price'] / $line['quantity'], 2);
                             $balance['quantity'] = round($balance['quantity'] - $line['quantity'], 2);
                             $balance['total_amount'] = round($balance['total_amount'] - $line['total_price'], 2);
@@ -269,7 +288,7 @@ class RecordInventoryProductsKardex
                 });
             });
 
-            $list = collect($lines)->map(function($line, $index) use ($options){
+            $list = collect($lines)->map(function ($line, $index) use ($options) {
                 $item = [
                     'order' => $index + 1,
                     'product_name' => $line['product']?->name,
@@ -298,11 +317,11 @@ class RecordInventoryProductsKardex
                     'balance_total' => $line['balance_total_amount'],
                 ];
 
-                if ($line['operation_type'] === 'Income'){
+                if ($line['operation_type'] === 'Income') {
                     $item['income_quantity'] = $line['quantity'];
                     $item['income_unit_price'] = $line['unit_price'];
                     $item['income_total'] = $line['total_price'];
-                }else{
+                } else {
                     $item['outcome_quantity'] = $line['quantity'];
                     $item['outcome_unit_price'] = $line['unit_price'];
                     $item['outcome_total'] = $line['total_price'];
@@ -316,7 +335,7 @@ class RecordInventoryProductsKardex
 
 
 
-            if ($productsLines->count() > 0){
+            if ($productsLines->count() > 0) {
                 $productsLines = $productsLines->push([
                     'order' => '',
                     'product_name' => '',
@@ -389,47 +408,45 @@ class RecordInventoryProductsKardex
     {
         $incomes = InventoryWarehouseIncome::whereIn('inventory_warehouse_id', $this->warehouseIds)
             ->where('date', '<', $this->startDate)
-            ->where(function($query) use ($product) {
-                $query->whereHas('items', function($q) use ($product){
+            ->where(function ($query) use ($product) {
+                $query->whereHas('items', function ($q) use ($product) {
                     $q->where('inventory_product_id', $product->id)
-                    ->where('buy_currency', $this->moneyType);
+                        ->where('buy_currency', $this->moneyType);
                 })
-                ->orWhereHas('uncountableItems', function($q) use ($product){
-                    $q->where('inventory_product_id', $product->id)
-                    ->where('buy_currency', $this->moneyType);
-                });
+                    ->orWhereHas('uncountableItems', function ($q) use ($product) {
+                        $q->where('inventory_product_id', $product->id)
+                            ->where('buy_currency', $this->moneyType);
+                    });
             })->get();
 
         $outcomes = InventoryWarehouseOutcome::whereIn('inventory_warehouse_id', $this->warehouseIds)
             ->where('date', '<', $this->startDate)
-            ->where(function($query) use ($product) {
-                $query->whereHas('items', function($q) use ($product){
+            ->where(function ($query) use ($product) {
+                $query->whereHas('items', function ($q) use ($product) {
                     $q->where('inventory_product_id', $product->id)
-                    ->where('buy_currency', $this->moneyType);
+                        ->where('buy_currency', $this->moneyType);
                 })
-                ->orWhereHas('uncountableItems', function($q) use ($product){
-                    $q->where('inventory_product_id', $product->id)
-                    ->where('buy_currency', $this->moneyType);
-                });
+                    ->orWhereHas('uncountableItems', function ($q) use ($product) {
+                        $q->where('inventory_product_id', $product->id)
+                            ->where('buy_currency', $this->moneyType);
+                    });
             })->get();
 
 
-        if ($product->unitNature() === 'Integer'){
+        if ($product->unitNature() === 'Integer') {
             $balance = [
                 'quantity' => 0,
                 'total_amount' => 0
             ];
 
-
-
-            $incomes->each(function($income) use ($product, &$balance){
-                $incomeQuery =  $income->items()->where('inventory_product_id', $product->id)
+            $incomes->each(function ($income) use ($product, &$balance) {
+                $incomeQuery = $income->items()->where('inventory_product_id', $product->id)
                     ->where('buy_currency', $this->moneyType);
                 $balance['quantity'] = round($balance['quantity'] + $incomeQuery->count(), 2);
                 $balance['total_amount'] = round($balance['total_amount'] + $incomeQuery->sum('buy_amount'), 2);
             });
 
-            $outcomes->each(function($outcome) use ($product, &$balance){
+            $outcomes->each(function ($outcome) use ($product, &$balance) {
                 $outcomeQuery = $outcome->items()->where('inventory_product_id', $product->id)
                     ->where('buy_currency', $this->moneyType);
                 $balance['quantity'] = round($balance['quantity'] - $outcomeQuery->count(), 2);
@@ -437,23 +454,37 @@ class RecordInventoryProductsKardex
             });
 
             return $balance;
-        }else{
+        } else {
             $balance = [
                 'quantity' => 0,
                 'total_amount' => 0
             ];
 
 
-            $incomes->each(function($income) use ($product, &$balance){
+            $incomes->each(function ($income) use ($product, &$balance) {
                 $incomeQuery = $income->uncountableItems()->where('inventory_product_id', $product->id)
                     ->where('buy_currency', $this->moneyType);
-                $balance['quantity'] = round($balance['quantity'] + $incomeQuery->sum('quantity_inserted'), 2);
-                $balance['total_amount'] = round($balance['total_amount'] + $incomeQuery->sum('buy_amount'), 2);
+                $incomesInPreviousQuantityAndAmount = (function () use ($incomeQuery) {
+                    $quantity = 0;
+                    $amount = 0;
+                    $incomeQuery->get()->each(function ($income) use (&$quantity, &$amount) {
+                        $pricePerUnit = ($income->quantity_inserted > 0) ? $income->buy_amount / $income->quantity_inserted : 0;
+                        $amount += $pricePerUnit * $income->quantity_inserted;
+                        $quantity += $income->quantity_inserted;
+                    });
+
+                    return [
+                        'quantity' => $quantity,
+                        'amount' => $amount,
+                    ];
+                })();
+                $balance['quantity'] = round($balance['quantity'] + $incomesInPreviousQuantityAndAmount['quantity'], 2);
+                $balance['total_amount'] = round($balance['total_amount'] + $incomesInPreviousQuantityAndAmount['amount'], 2);
             });
 
-            $outcomes->each(function($outcome) use ($product, &$balance){
+            $outcomes->each(function ($outcome) use ($product, &$balance) {
                 $outcome->uncountableItems()->where('inventory_product_id', $product->id)
-                    ->where('buy_currency', $this->moneyType)->get()->each(function($uncountableItem) use ($outcome, &$balance) {
+                    ->where('buy_currency', $this->moneyType)->get()->each(function ($uncountableItem) use ($outcome, &$balance) {
                         if (!isset($uncountableItem->outcomes_details[$outcome->id])) {
                             return;
                         }
@@ -467,10 +498,10 @@ class RecordInventoryProductsKardex
         }
     }
 
-    private function createTable():array
+    private function createTable(): array
     {
         $items = $this->getKardex();
-        $body = collect($items)->map(function($item){
+        $body = collect($items)->map(function ($item) {
             return $item;
         });
 
@@ -572,7 +603,8 @@ class RecordInventoryProductsKardex
     }
 
 
-    public function generate():array{
+    public function generate(): array
+    {
         return [
             'data' => $this->createTable(),
             'query' => [

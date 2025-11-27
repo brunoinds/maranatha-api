@@ -27,7 +27,7 @@ class InventoryWarehouseController extends Controller
 
     public function listProductItems(InventoryWarehouse $warehouse, InventoryProduct $product)
     {
-        $getCountableProductItems = function() use ($warehouse, $product){
+        $getCountableProductItems = function () use ($warehouse, $product) {
             $incomesIds = $warehouse->items()
                 ->where('inventory_product_id', $product->id)
                 ->groupBy('inventory_warehouse_income_id')
@@ -35,7 +35,7 @@ class InventoryWarehouseController extends Controller
                 ->pluck('inventory_warehouse_income_id')
                 ->unique();
 
-            $movements = $incomesIds->map(function($incomeId) use ($warehouse, $product){
+            $movements = $incomesIds->map(function ($incomeId) use ($warehouse, $product) {
                 $items = $warehouse->items()->where('inventory_product_id', $product->id)->where('inventory_warehouse_income_id', $incomeId);
 
                 return [
@@ -44,14 +44,14 @@ class InventoryWarehouseController extends Controller
                     'price' => (clone $items)->first()->buy_amount,
                     'currency' => (clone $items)->first()->buy_currency,
                     'total_price' => (clone $items)->sum('buy_amount'),
-                    'outcomes' => (function() use ($items){
+                    'outcomes' => (function () use ($items) {
                         $outcomeItems = (clone $items)->whereNotNull('inventory_warehouse_outcome_id')
                             ->groupBy('inventory_warehouse_outcome_id')
                             ->select('inventory_warehouse_outcome_id')
                             ->pluck('inventory_warehouse_outcome_id')
                             ->unique();
 
-                        return $outcomeItems->map(function($outcomeId) use ($items){
+                        return $outcomeItems->map(function ($outcomeId) use ($items) {
                             $outcomeItems = $items->where('inventory_warehouse_outcome_id', $outcomeId);
                             return [
                                 'outcome_id' => $outcomeId,
@@ -59,7 +59,8 @@ class InventoryWarehouseController extends Controller
                             ];
                         });
                     })(),
-                    'remaining_count' =>  $warehouse->items()->where('inventory_product_id', $product->id)->where('inventory_warehouse_income_id', $incomeId)->where(['inventory_warehouse_outcome_id' => NULL])->count()
+                    'remaining_count' => $warehouse->items()->where('inventory_product_id', $product->id)->where('inventory_warehouse_income_id', $incomeId)->where(['inventory_warehouse_outcome_id' => NULL])->count(),
+                    'remaining_price' => $warehouse->items()->where('inventory_product_id', $product->id)->where('inventory_warehouse_income_id', $incomeId)->where(['inventory_warehouse_outcome_id' => NULL])->sum('buy_amount'),
                 ];
             });
 
@@ -77,7 +78,7 @@ class InventoryWarehouseController extends Controller
             ];
         };
 
-        $getUncountableProductItems = function() use ($warehouse, $product){
+        $getUncountableProductItems = function () use ($warehouse, $product) {
             $incomesIds = $warehouse->uncountableItems()
                 ->where('inventory_product_id', $product->id)
                 ->groupBy('inventory_warehouse_income_id')
@@ -85,26 +86,36 @@ class InventoryWarehouseController extends Controller
                 ->pluck('inventory_warehouse_income_id')
                 ->unique();
 
-            $movements = $incomesIds->map(function($incomeId) use ($warehouse, $product){
+            $movements = $incomesIds->map(function ($incomeId) use ($warehouse, $product) {
                 $items = $warehouse->uncountableItems()->where('inventory_product_id', $product->id)->where('inventory_warehouse_income_id', $incomeId);
+
+
+                $outcomes = (function () use ($items) {
+                    $outcomesDetails = $items->first()->outcomes_details;
+                    $results = [];
+                    foreach ($outcomesDetails as $outcomeId => $outcomeDetails) {
+                        $results[] = [
+                            'outcome_id' => $outcomeId,
+                            'count' => $outcomeDetails['quantity'],
+                        ];
+                    }
+                    return $results;
+                })();
+
+                $count = (clone $items)->first()->quantity_inserted;
+                $price = (clone $items)->first()->calculateSellPriceFromBuyPrice(1);
+                $remainingCount = (clone $items)->first()->quantity_remaining;
+                $totalPrice = (clone $items)->sum('buy_amount');
+
                 return [
                     'income_id' => $incomeId,
-                    'count' => (clone $items)->first()->quantity_inserted,
-                    'price' => (clone $items)->first()->calculateSellPriceFromBuyPrice(1),
+                    'count' => $count,
+                    'price' => $price,
                     'currency' => (clone $items)->first()->buy_currency,
-                    'total_price' => (clone $items)->sum('buy_amount'),
-                    'outcomes' => (function() use ($items){
-                        $outcomesDetails = $items->first()->outcomes_details;
-                        $results = [];
-                        foreach ($outcomesDetails as $outcomeId => $outcomeDetails){
-                            $results[] = [
-                                'outcome_id' => $outcomeId,
-                                'count' => $outcomeDetails['quantity'],
-                            ];
-                        }
-                        return $results;
-                    })(),
-                    'remaining_count' =>  (clone $items)->first()->quantity_remaining
+                    'total_price' => $totalPrice,
+                    'outcomes' => $outcomes,
+                    'remaining_count' => $remainingCount,
+                    'remaining_price' => ($remainingCount * $price)
                 ];
             });
 
@@ -123,9 +134,9 @@ class InventoryWarehouseController extends Controller
         };
 
 
-        if ($product->unitNature() === 'Integer'){
+        if ($product->unitNature() === 'Integer') {
             $productItems = $getCountableProductItems();
-        }elseif ($product->unitNature() === 'Float'){
+        } elseif ($product->unitNature() === 'Float') {
             $productItems = $getUncountableProductItems();
         }
 
@@ -215,7 +226,7 @@ class InventoryWarehouseController extends Controller
 
     public function listStock(InventoryWarehouse $warehouse)
     {
-        if (DataCache::getRecord('warehouseStockList', [$warehouse->id])){
+        if (DataCache::getRecord('warehouseStockList', [$warehouse->id])) {
             return response()->json([
                 'items' => DataCache::getRecord('warehouseStockList', [$warehouse->id]),
                 'is_cached' => true
@@ -247,7 +258,7 @@ class InventoryWarehouseController extends Controller
         foreach ($validated['products'] as $product) {
             $inventoryProduct = InventoryProduct::find($product['product_id']);
 
-            $getCountableProductResume = function() use ($product, $warehouse, $validated, $batchSize){
+            $getCountableProductResume = function () use ($product, $warehouse, $validated, $batchSize) {
                 // Split the product quantity into manageable batches
                 $quantity = $product['quantity'];
                 $productItemsIdsChosen = [];
@@ -332,7 +343,7 @@ class InventoryWarehouseController extends Controller
                     'prices' => $prices,
                 ];
             };
-            $getUncountableProductResume = function() use ($product, $warehouse, $validated){
+            $getUncountableProductResume = function () use ($product, $warehouse, $validated) {
                 // Split the product quantity into manageable batches:
                 $quantityRequired = $product['quantity'];
 
@@ -344,16 +355,16 @@ class InventoryWarehouseController extends Controller
                     ->where('status', 'InStock')
                     ->orderBy('order', 'asc')
                     ->select(['id', 'quantity_remaining'])
-                    ->each(function($item) use (&$productsItemsSelected, $quantityRequired, &$quantityReached){
+                    ->each(function ($item) use (&$productsItemsSelected, $quantityRequired, &$quantityReached) {
                         $quantityToReach = $quantityRequired - $quantityReached;
-                        if ($item->quantity_remaining >= $quantityToReach){
+                        if ($item->quantity_remaining >= $quantityToReach) {
                             $quantityReached += $quantityToReach;
                             $productsItemsSelected[] = [
                                 'item_id' => $item->id,
                                 'quantity' => $quantityToReach,
                             ];
                             return false;
-                        }elseif ($item->quantity_remaining < $quantityToReach){
+                        } elseif ($item->quantity_remaining < $quantityToReach) {
                             $quantityReached += $item->quantity_remaining;
                             $productsItemsSelected[] = [
                                 'item_id' => $item->id,
@@ -362,7 +373,9 @@ class InventoryWarehouseController extends Controller
                         }
                     });
 
-                $productItemsIdsChosen = array_map(function($item){ return $item['item_id']; }, $productsItemsSelected);
+                $productItemsIdsChosen = array_map(function ($item) {
+                    return $item['item_id'];
+                }, $productsItemsSelected);
 
 
                 // Handle batch queries for buy_currency and other info
@@ -383,9 +396,11 @@ class InventoryWarehouseController extends Controller
                 foreach ($itemsChosenToSellBuyCurrenciesFounds as $buyCurrency) {
                     $amount = $this->batchQuery(function ($items) use ($buyCurrency) {
                         $amountSum = 0;
-                        InventoryProductItemUncountable::whereIn('id', array_map(function($item){ return $item['item_id']; }, $items))
+                        InventoryProductItemUncountable::whereIn('id', array_map(function ($item) {
+                            return $item['item_id'];
+                        }, $items))
                             ->where('buy_currency', $buyCurrency)
-                            ->each(function(InventoryProductItemUncountable $inventoryProductItemUncountable) use ($items, &$amountSum){
+                            ->each(function (InventoryProductItemUncountable $inventoryProductItemUncountable) use ($items, &$amountSum) {
                                 $item = collect($items)->firstWhere('item_id', $inventoryProductItemUncountable->id);
                                 $amountSum += $inventoryProductItemUncountable->calculateSellPriceFromBuyPrice($item['quantity']);
                             });
@@ -396,7 +411,7 @@ class InventoryWarehouseController extends Controller
                     $prices[] = [
                         'currency' => $buyCurrency->value,
                         'amount' => $amount,
-                        'count' => array_reduce($productsItemsSelected, function($carry, $item) use ($buyCurrency){
+                        'count' => array_reduce($productsItemsSelected, function ($carry, $item) use ($buyCurrency) {
                             return $carry + $item['quantity'];
                         }, 0),
                     ];
@@ -409,12 +424,12 @@ class InventoryWarehouseController extends Controller
                     'do_loan' => false,
                     'is_uncountable' => true,
                     'items_ids' => [],
-                    'items_uncountable' => array_map(function($item){
+                    'items_uncountable' => array_map(function ($item) {
                         return [
                             'id' => $item['item_id'],
                             'quantity' => $item['quantity'],
                         ];
-                    },$productsItemsSelected),
+                    }, $productsItemsSelected),
                     'items_aggregated' => collect($productsItemsSelected)->map(function ($item) {
                         $inventoryProductItemUncountable = InventoryProductItemUncountable::find($item['item_id']);
 
@@ -430,9 +445,9 @@ class InventoryWarehouseController extends Controller
                 ];
             };
 
-            if ($inventoryProduct->unitNature() === 'Integer'){
+            if ($inventoryProduct->unitNature() === 'Integer') {
                 $productsResume->push($getCountableProductResume());
-            }elseif ($inventoryProduct->unitNature() === 'Float'){
+            } elseif ($inventoryProduct->unitNature() === 'Float') {
                 $productsResume->push($getUncountableProductResume());
             }
         }
@@ -511,13 +526,13 @@ class InventoryWarehouseController extends Controller
 
             if (is_array($response)) {
                 $results = array_merge($results, $response);
-            }elseif (is_numeric($response)){
+            } elseif (is_numeric($response)) {
                 $results[] = $response;
                 $isNumeric = true;
             }
         }
 
-        if ($isNumeric){
+        if ($isNumeric) {
             return array_sum($results);
         }
 

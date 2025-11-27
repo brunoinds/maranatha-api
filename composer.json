@@ -29,6 +29,7 @@
         "laravel/sanctum": "^3.3",
         "laravel/tinker": "^2.8",
         "mikehaertl/php-shellcommand": "^1.7",
+        "predis/predis": "^3.3",
         "revolution/laravel-google-sheets": "^6.4",
         "sentry/sentry-laravel": "^4.4",
         "setasign/fpdf": "1.8.*",
