@@ -226,12 +226,12 @@ class InventoryWarehouseController extends Controller
 
     public function listStock(InventoryWarehouse $warehouse)
     {
-        if (DataCache::getRecord('warehouseStockList', [$warehouse->id])) {
+        /* if (DataCache::getRecord('warehouseStockList', [$warehouse->id])) {
             return response()->json([
                 'items' => DataCache::getRecord('warehouseStockList', [$warehouse->id]),
                 'is_cached' => true
             ]);
-        }
+        } */
 
         $stock = $warehouse->stock();
 

@@ -160,9 +160,6 @@ class InventoryAssistant
                 $totalSellAmount = $totalSellCount * $averageBuyPrice;
                 $averageSellPrice = Toolbox::toFixed($totalSellAmount / ($totalSellCount == 0 ? 1 : $totalSellCount));
 
-                if ($totalBuyCount !== 0) {
-                    $averageBuyPrices[$moneyType] = $averageBuyPrice;
-                }
                 if ($totalSellCount !== 0) {
                     $averageSellPrices[$moneyType] = $averageSellPrice;
                 }
@@ -174,18 +171,20 @@ class InventoryAssistant
                 ->where('inventory_warehouse_id', $warehouse->id)
                 ->select(['inventory_product_id', 'inventory_warehouse_id', 'quantity_inserted', 'quantity_used', 'buy_amount', 'buy_currency', 'outcomes_details']);
 
-            $productItemsBalanceQuery->get()->groupBy('buy_currency')->each(function ($productItems, $currency) use (&$amountBalances) {
-                $productItems->each(function ($productItem) use ($currency, &$amountBalances) {
+            $productItemsBalanceQuery->get()->groupBy('buy_currency')->each(function ($productItems, $currency) use (&$amountBalances, &$averageBuyPrices) {
+                $productItems->each(function ($productItem) use ($currency, &$amountBalances, &$averageBuyPrices) {
                     $pricePerUnit = ($productItem->quantity_inserted > 0) ? $productItem->buy_amount / $productItem->quantity_inserted : 0;
 
                     $amountBalances[$currency] += $pricePerUnit * $productItem->quantity_inserted;
+
+                    $averageBuyPrices[$currency] = $pricePerUnit;
 
                     collect($productItem->outcomes_details)->each(function ($outcome) use ($currency, &$amountBalances) {
                         $amountBalances[$currency] -= $outcome['sell_amount'];
                     });
                 });
-
             });
+
 
 
             //Remove the keys that are empty (null):
