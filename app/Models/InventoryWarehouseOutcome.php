@@ -146,13 +146,13 @@ class InventoryWarehouseOutcome extends Model
 
     public function markProductsItemsAsInStock()
     {
-        $this->items()->each(function ($item) {
-            $item->inventory_warehouse_outcome_id = null;
-            $item->status = InventoryProductItemStatus::InStock;
-            $item->sell_amount = $item->buy_amount;
-            $item->sell_currency = $item->buy_currency;
-            $item->save();
-        });
+        // Avoid N+1 queries by updating all items in bulk using Eloquent's update
+        $this->items()->update([
+            'inventory_warehouse_outcome_id' => null,
+            'status' => InventoryProductItemStatus::InStock,
+            'sell_amount' => \DB::raw('buy_amount'),
+            'sell_currency' => \DB::raw('buy_currency'),
+        ]);
 
         DataCache::clearRecord('warehouseStockList', [$this->inventory_warehouse_id]);
     }
