@@ -308,7 +308,7 @@ class RecordInventoryProductsBalance
                         'previous_stock_quantity' => number_format($previousStock['quantity'], 2),
                         'income_quantity' => $incomeInPeriodQuantity,
                         'outcome_quantity' => $outcomeInPeriodQuantity['quantity'],
-                        'stock_quantity' => $inPeriodStockQuantity,
+                        'stock_quantity' => number_format($inPeriodStockQuantity, 2),
                         'stock_amount' => $previousStock['amount'] + ($incomeInPeriodAmount - $outcomeInPeriodQuantity['amount']),
                         'unit_price' => ($inPeriodStockQuantity > 0) ? round(($previousStock['amount'] + $incomeInPeriodAmount - $outcomeInPeriodQuantity['amount']) / $inPeriodStockQuantity, 2) : 0,
                     ];
