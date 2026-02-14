@@ -229,60 +229,85 @@ class RecordInventoryProductsKardex
                 });
 
                 $outcomes->each(function ($outcome) use ($product, &$lines, &$balance, $options) {
-                    $line = [
+                    $baseLine = [
                         'product' => $product,
                         'transaction' => $outcome,
                         'operation_type' => 'Outcome',
-                        'quantity' => 0,
-                        'unit_price' => 0,
-                        'total_price' => 0,
-                        'balance_quantity' => $balance['quantity'],
-                        'balance_total_amount' => $balance['total_amount'],
                         'transaction_number' => 'SAL-00' . $outcome->id
                     ];
 
                     if ($product->unitNature() === 'Integer') {
-                        //Countable products:
+                        // Countable products: group by sell_amount and create one line per distinct price
                         $products = $outcome->items()->where('inventory_product_id', $product->id)
                             ->where('date', '>=', $this->startDate)
                             ->where('buy_currency', $options['moneyType'])
                             ->get();
-                        $line['quantity'] = $products->count();
-                        $line['unit_price'] = $products->first()->sell_amount;
-                        $line['total_price'] = round($products->count() * $products->first()->sell_amount, 2);
 
-                        if ($line['quantity'] > 0) {
-                            $balance['quantity'] = round($balance['quantity'] - $line['quantity'], 2);
-                            $balance['total_amount'] = round($balance['total_amount'] - $line['total_price'], 2);
-
-                            $line['balance_quantity'] = $balance['quantity'];
-                            $line['balance_total_amount'] = $balance['total_amount'];
-
-                            $lines[] = $line;
-                        }
-                    } else {
-                        //Uncountable products:
-                        $outcome->uncountableItems()->where('inventory_product_id', $product->id)->where('date', '>=', $this->startDate)->where('buy_currency', $options['moneyType'])->each(function ($uncountableItem) use ($outcome, &$line, $options) {
-                            if (!isset($uncountableItem->outcomes_details[$outcome->id])) {
-                                return;
-                            }
-                            $outcomeDetails = $uncountableItem->outcomes_details[$outcome->id];
-
-
-                            $line['total_price'] = round($line['total_price'] + $outcomeDetails['sell_amount'], 2);
-                            $line['unit_price'] = round($outcomeDetails['sell_amount'] / $outcomeDetails['quantity'], 2);
-                            $line['quantity'] = round($line['quantity'] + $outcomeDetails['quantity'], 2);
+                        $groupedBySellAmount = $products->groupBy(function ($item) {
+                            return (string) round($item->sell_amount, 2);
                         });
 
-                        if ($line['quantity'] > 0) {
-                            $line['unit_price'] = round($line['total_price'] / $line['quantity'], 2);
-                            $balance['quantity'] = round($balance['quantity'] - $line['quantity'], 2);
-                            $balance['total_amount'] = round($balance['total_amount'] - $line['total_price'], 2);
+                        $groupedBySellAmount->each(function ($itemsAtPrice, $sellAmountKey) use ($baseLine, &$lines, &$balance) {
+                            $unitPrice = (float) $sellAmountKey;
+                            $quantity = $itemsAtPrice->count();
+                            if ($quantity <= 0) {
+                                return;
+                            }
+                            $totalPrice = round($quantity * $unitPrice, 2);
 
-                            $line['balance_quantity'] = $balance['quantity'];
-                            $line['balance_total_amount'] = $balance['total_amount'];
+                            $balance['quantity'] = round($balance['quantity'] - $quantity, 2);
+                            $balance['total_amount'] = round($balance['total_amount'] - $totalPrice, 2);
 
-                            $lines[] = $line;
+                            $lines[] = array_merge($baseLine, [
+                                'quantity' => $quantity,
+                                'unit_price' => $unitPrice,
+                                'total_price' => $totalPrice,
+                                'balance_quantity' => $balance['quantity'],
+                                'balance_total_amount' => $balance['total_amount'],
+                            ]);
+                        });
+                    } else {
+                        // Uncountable products: aggregate by unit price (like items_aggregated), one line per distinct price
+                        $aggregatedByUnitPrice = [];
+                        $outcome->uncountableItems()
+                            ->where('inventory_product_id', $product->id)
+                            ->where('date', '>=', $this->startDate)
+                            ->where('buy_currency', $options['moneyType'])
+                            ->each(function ($uncountableItem) use ($outcome, &$aggregatedByUnitPrice) {
+                                if (!isset($uncountableItem->outcomes_details[$outcome->id])) {
+                                    return;
+                                }
+                                $outcomeDetails = $uncountableItem->outcomes_details[$outcome->id];
+                                $quantity = (float) ($outcomeDetails['quantity'] ?? 0);
+                                $sellAmount = (float) ($outcomeDetails['sell_amount'] ?? 0);
+                                $unitPrice = $quantity > 0 ? round($sellAmount / $quantity, 2) : 0;
+                                $key = (string) $unitPrice;
+
+                                if (!isset($aggregatedByUnitPrice[$key])) {
+                                    $aggregatedByUnitPrice[$key] = ['quantity' => 0, 'total_price' => 0];
+                                }
+                                $aggregatedByUnitPrice[$key]['quantity'] = round($aggregatedByUnitPrice[$key]['quantity'] + $quantity, 2);
+                                $aggregatedByUnitPrice[$key]['total_price'] = round($aggregatedByUnitPrice[$key]['total_price'] + $sellAmount, 2);
+                            });
+
+                        foreach ($aggregatedByUnitPrice as $unitPrice => $agg) {
+                            $quantity = $agg['quantity'];
+                            $totalPrice = $agg['total_price'];
+                            if ($quantity <= 0) {
+                                continue;
+                            }
+                            $unitPrice = (float) $unitPrice;
+
+                            $balance['quantity'] = round($balance['quantity'] - $quantity, 2);
+                            $balance['total_amount'] = round($balance['total_amount'] - $totalPrice, 2);
+
+                            $lines[] = array_merge($baseLine, [
+                                'quantity' => $quantity,
+                                'unit_price' => $unitPrice,
+                                'total_price' => $totalPrice,
+                                'balance_quantity' => $balance['quantity'],
+                                'balance_total_amount' => $balance['total_amount'],
+                            ]);
                         }
                     }
                 });
