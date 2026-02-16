@@ -46,16 +46,17 @@ class CheckOrphanateInventoryProductItems extends Command
 
         $rows = [];
         foreach ($columns as $fkColumn => $relatedTable) {
-            $count = DB::table($tableName)
+            $query = DB::table($tableName)
                 ->leftJoin($relatedTable, "{$tableName}.{$fkColumn}", '=', "{$relatedTable}.id")
                 ->whereNotNull("{$tableName}.{$fkColumn}")
-                ->whereNull("{$relatedTable}.id")
-                ->count();
-            $rows[] = [$fkColumn, $relatedTable, $count];
+                ->whereNull("{$relatedTable}.id");
+            $count = (clone $query)->count();
+            $missingIds = (clone $query)->distinct()->pluck("{$tableName}.{$fkColumn}")->sort()->values()->all();
+            $rows[] = [$fkColumn, $relatedTable, $count, $this->formatMissingIds($missingIds)];
         }
 
         $this->table(
-            ['Column (IS NOT NULL)', 'Related table', 'Orphan count'],
+            ['Column (IS NOT NULL)', 'Related table', 'Orphan count', 'Missing IDs (referenced but do not exist)'],
             $rows
         );
         $this->info('InventoryProductItem: rows above are items with a non-null FK whose related row no longer exists.');
@@ -77,41 +78,59 @@ class CheckOrphanateInventoryProductItems extends Command
 
         $rows = [];
         foreach ($columns as $fkColumn => $relatedTable) {
-            $count = DB::table($tableName)
+            $query = DB::table($tableName)
                 ->leftJoin($relatedTable, "{$tableName}.{$fkColumn}", '=', "{$relatedTable}.id")
                 ->whereNotNull("{$tableName}.{$fkColumn}")
-                ->whereNull("{$relatedTable}.id")
-                ->count();
-            $rows[] = [$fkColumn, $relatedTable, $count];
+                ->whereNull("{$relatedTable}.id");
+            $count = (clone $query)->count();
+            $missingIds = (clone $query)->distinct()->pluck("{$tableName}.{$fkColumn}")->sort()->values()->all();
+            $rows[] = [$fkColumn, $relatedTable, $count, $this->formatMissingIds($missingIds)];
         }
 
         $existingOutcomeIds = DB::table($outcomeTable)->pluck('id')->all();
+        $existingOutcomeIdsSet = array_flip($existingOutcomeIds);
 
         $uncountablesWithOutcomeIds = DB::table($tableName)
             ->whereNotNull('inventory_warehouse_outcome_ids')
             ->where('inventory_warehouse_outcome_ids', '!=', '[]')
             ->get();
 
-        $orphanOutcomeCount = 0;
+        $missingOutcomeIds = [];
         foreach ($uncountablesWithOutcomeIds as $row) {
             $ids = json_decode($row->inventory_warehouse_outcome_ids, true);
             if (!is_array($ids)) {
                 continue;
             }
             foreach ($ids as $outcomeId) {
-                if (!in_array($outcomeId, $existingOutcomeIds, true)) {
-                    $orphanOutcomeCount++;
-                    break;
+                if (!isset($existingOutcomeIdsSet[$outcomeId])) {
+                    $missingOutcomeIds[$outcomeId] = true;
                 }
             }
         }
+        $missingOutcomeIds = array_keys($missingOutcomeIds);
+        sort($missingOutcomeIds);
+        $orphanOutcomeCount = count($missingOutcomeIds);
 
-        $rows[] = ['inventory_warehouse_outcome_ids (items with ≥1 missing outcome)', $outcomeTable, $orphanOutcomeCount];
+        $rows[] = ['inventory_warehouse_outcome_ids (distinct missing outcome IDs)', $outcomeTable, $orphanOutcomeCount, $this->formatMissingIds($missingOutcomeIds)];
 
         $this->table(
-            ['Column (IS NOT NULL or has IDs)', 'Related table', 'Orphan count'],
+            ['Column (IS NOT NULL or has IDs)', 'Related table', 'Orphan count', 'Missing IDs (referenced but do not exist)'],
             $rows
         );
         $this->info('InventoryProductItemUncountable: rows above are items with a non-null FK or outcome IDs whose related row(s) no longer exist.');
+    }
+
+    private function formatMissingIds(array $ids, int $maxShow = 50): string
+    {
+        if (empty($ids)) {
+            return '—';
+        }
+        $total = count($ids);
+        $shown = array_slice($ids, 0, $maxShow);
+        $formatted = implode(', ', $shown);
+        if ($total > $maxShow) {
+            $formatted .= ' … and ' . ($total - $maxShow) . ' more';
+        }
+        return $formatted;
     }
 }
