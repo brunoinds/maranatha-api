@@ -52,7 +52,7 @@ class InventoryWarehouseController extends Controller
                             ->unique();
 
                         return $outcomeItems->map(function ($outcomeId) use ($items) {
-                            $outcomeItems = $items->where('inventory_warehouse_outcome_id', $outcomeId);
+                            $outcomeItems = (clone $items)->where('inventory_warehouse_outcome_id', $outcomeId);
                             return [
                                 'outcome_id' => $outcomeId,
                                 'count' => $outcomeItems->count(),
