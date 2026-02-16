@@ -159,6 +159,31 @@ class InventoryProductItemUncountable extends Model
         $this->save();
     }
 
+    /**
+     * Remove an outcome by ID (e.g. when the outcome record no longer exists).
+     * Used by fix-orphan commands to clean inconsistent state.
+     */
+    public function removeOutcomeId(int $outcomeId): void
+    {
+        $outcomesIds = $this->inventory_warehouse_outcome_ids ?? [];
+        $outcomesIds = array_values(array_diff($outcomesIds, [$outcomeId]));
+        $this->inventory_warehouse_outcome_ids = $outcomesIds;
+
+        $outcomesDetails = $this->outcomes_details ?? [];
+        if (isset($outcomesDetails[$outcomeId])) {
+            $qty = $outcomesDetails[$outcomeId]['quantity'] ?? 0;
+            $this->quantity_remaining += $qty;
+            $this->quantity_used -= $qty;
+        }
+        unset($outcomesDetails[$outcomeId]);
+        $this->outcomes_details = $outcomesDetails;
+
+        if ($this->quantity_remaining > 0) {
+            $this->status = InventoryProductItemUncountableStatus::InStock;
+        }
+        $this->save();
+    }
+
     public function editOutcome(InventoryWarehouseOutcome $outcome, float $quantity)
     {
         $this->removeOutcome($outcome);

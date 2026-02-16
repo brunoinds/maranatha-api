@@ -13,7 +13,7 @@ use Illuminate\Support\Facades\DB;
 
 class CheckOrphanateInventoryProductItems extends Command
 {
-    protected $signature = 'inventory:check-orphans';
+    protected $signature = 'inventory:check-orfanate-items';
 
     protected $description = 'Check for orphaned InventoryProductItem and InventoryProductItemUncountable records (FK pointing to deleted models)';
 
