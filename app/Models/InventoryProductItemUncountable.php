@@ -134,27 +134,28 @@ class InventoryProductItemUncountable extends Model
     public function removeOutcome(InventoryWarehouseOutcome $outcome)
     {
         //1. Remove from array of outcomesIds:
-        $outcomesIds = $this->inventory_warehouse_outcome_ids;
-        $outcomesIds = array_diff($outcomesIds, [$outcome->id]);
+        $outcomesIds = $this->inventory_warehouse_outcome_ids ?? [];
+        $outcomesIds = array_values(array_diff($outcomesIds, [$outcome->id]));
         $this->inventory_warehouse_outcome_ids = $outcomesIds;
 
-        //2. Remove from array of outcomesDetails:
-        $outcomesDetails = $this->outcomes_details;
+        //2. Remove from array of outcomesDetails (defensive: missing key can happen with inconsistent state):
+        $outcomesDetails = $this->outcomes_details ?? [];
 
-        //3. Update quantity_remaining and quantity_used:
-        $this->quantity_remaining += $outcomesDetails[$outcome->id]['quantity'];
-        $this->quantity_used -= $outcomesDetails[$outcome->id]['quantity'];
+        if (isset($outcomesDetails[$outcome->id])) {
+            //3. Update quantity_remaining and quantity_used:
+            $this->quantity_remaining += $outcomesDetails[$outcome->id]['quantity'] ?? 0;
+            $this->quantity_used -= $outcomesDetails[$outcome->id]['quantity'] ?? 0;
+        }
 
-        //4. Update outcome_details:
         unset($outcomesDetails[$outcome->id]);
         $this->outcomes_details = $outcomesDetails;
 
-        //5. Check if needs to change status:
+        //4. Check if needs to change status:
         if ($this->quantity_remaining > 0) {
             $this->status = InventoryProductItemUncountableStatus::InStock;
         }
 
-        //6. Save on DB:
+        //5. Save on DB:
         $this->save();
     }
 
