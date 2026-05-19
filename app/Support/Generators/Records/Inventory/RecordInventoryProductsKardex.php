@@ -253,7 +253,9 @@ class RecordInventoryProductsKardex
                             if ($quantity <= 0) {
                                 return;
                             }
-                            $totalPrice = round($quantity * $unitPrice, 2);
+                            // Use actual sell_amount sum (matches balance report and previous-balance logic).
+                            // count * round(sell_amount) over-deducts when items store values like 0.456 rounded to 0.46.
+                            $totalPrice = round($itemsAtPrice->sum('sell_amount'), 2);
 
                             $balance['quantity'] = round($balance['quantity'] - $quantity, 2);
                             $balance['total_amount'] = round($balance['total_amount'] - $totalPrice, 2);
