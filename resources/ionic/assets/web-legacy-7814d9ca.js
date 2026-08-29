@@ -1,0 +1,1 @@
+System.register(["./index-legacy-01f12a96.js"],(function(e,n){"use strict";var t;return{setters:[e=>{t=e.cN}],execute:function(){e("MdocumentScannerWeb",class extends t{async scanDocument(e){throw console.log(e),this.unimplemented("Not implemented on web.")}})}}}));
