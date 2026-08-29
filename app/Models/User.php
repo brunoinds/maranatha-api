@@ -46,6 +46,13 @@ class User extends Authenticatable
         'roles' => 'array',
         'permissions' => 'array'
     ];
+
+    // MySQL nao aceita DEFAULT em coluna TEXT: os defaults do schema vivem aqui.
+    protected $attributes = [
+        'roles' => '[]',
+        'permissions' => '[]',
+        'metadata' => '{}',
+    ];
     public function isAdmin(): bool
     {
         return $this->username === 'admin';

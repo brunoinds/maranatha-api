@@ -43,6 +43,18 @@ return [
             'foreign_key_constraints' => env('DB_FOREIGN_KEYS', true),
         ],
 
+        /*
+         * Conexao de REFERENCIA usada apenas por `php artisan mysql:parity`.
+         * Aponta para a copia do SQLite de producao contra a qual o MySQL
+         * importado e' comparado. Nao e' usada pela aplicacao em runtime.
+         */
+        'sqlite_ref' => [
+            'driver' => 'sqlite',
+            'database' => env('DB_REF_DATABASE', database_path('database.sqlite')),
+            'prefix' => '',
+            'foreign_key_constraints' => false,
+        ],
+
         'mysql' => [
             'driver' => 'mysql',
             'url' => env('DATABASE_URL'),

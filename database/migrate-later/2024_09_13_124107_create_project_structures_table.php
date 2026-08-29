@@ -25,7 +25,7 @@ return new class extends Migration
             $table->integer('stringers_count')->nullable(true)->default(null);
             $table->integer('facades_count')->nullable(true)->default(null);
 
-            $table->json('default_phases')->default('{"construction": [], "studio": []}');
+            $table->longText('default_phases');
         });
     }
 

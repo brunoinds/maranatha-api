@@ -17,7 +17,8 @@ return new class extends Migration
             $table->integer('worker_id');
             $table->integer('month');
             $table->integer('year');
-            $table->float(column: 'amount', total: 8, places: 2);
+            // 257 linhas passam de 1e6; double(8,2) daria ERROR 1264.
+            $table->double('amount');
             $table->string('currency');
             $table->string('description', 400)->nullable();
         });

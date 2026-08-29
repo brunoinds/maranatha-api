@@ -46,6 +46,13 @@ class InventoryWarehouseOutcomeRequest extends Model
         'type' => InventoryWarehouseOutcomeRequestType::class
     ];
 
+    // MySQL nao aceita DEFAULT em coluna TEXT: os defaults do schema vivem aqui.
+    protected $attributes = [
+        'requested_products' => '[]',
+        'received_products' => '[]',
+        'messages' => '[]',
+    ];
+
     public function addRequestedProduct(int $product_id, float $quantity)
     {
         $this->requested_products = array_merge($this->requested_products, [['product_id' => (int) $product_id, 'quantity' => (float) $quantity]]);

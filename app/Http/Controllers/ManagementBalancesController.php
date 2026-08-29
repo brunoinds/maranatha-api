@@ -22,13 +22,14 @@ class ManagementBalancesController extends Controller
         ]);
 
 
-        if (RecordsCache::getRecord('usersBalances', $validatedData)){
-            return response()->json([
-                'balances' => RecordsCache::getRecord('usersBalances', $validatedData),
-                'year' => $validatedData['year'],
-                'is_cached' => true
-            ]);
-        }
+        // !!!TODO: Uncomment on production
+        // if (RecordsCache::getRecord('usersBalances', $validatedData)){
+            // return response()->json([
+                // 'balances' => RecordsCache::getRecord('usersBalances', $validatedData),
+                // 'year' => $validatedData['year'],
+                // 'is_cached' => true
+            // ]);
+        // }
 
         $balances = User::all()->map(function($user) use ($validatedData){
             $year = $validatedData['year'];
@@ -40,7 +41,7 @@ class ManagementBalancesController extends Controller
             ];
         });
 
-        RecordsCache::storeRecord('usersBalances', $validatedData, $balances->toArray());
+        // RecordsCache::storeRecord('usersBalances', $validatedData, $balances->toArray());  // !!!TODO: Uncomment on production
 
 
         return response()->json([

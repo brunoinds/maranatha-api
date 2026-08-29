@@ -154,7 +154,7 @@ class InventoryWarehouseOutcome extends Model
             'sell_currency' => \DB::raw('buy_currency'),
         ]);
 
-        DataCache::clearRecord('warehouseStockList', [$this->inventory_warehouse_id]);
+        // DataCache::clearRecord('warehouseStockList', [$this->inventory_warehouse_id]);  // !!!TODO: Uncomment on production
     }
 
 
@@ -246,7 +246,7 @@ class InventoryWarehouseOutcome extends Model
             });
         }
 
-        DataCache::clearRecord('warehouseStockList', [$this->inventory_warehouse_id]);
+        // DataCache::clearRecord('warehouseStockList', [$this->inventory_warehouse_id]);  // !!!TODO: Uncomment on production
     }
 
     public function delete()

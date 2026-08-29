@@ -16,6 +16,10 @@ use App\Helpers\Toolbox;
 use Brick\Math\BigDecimal;
 
 
+// Todas as consultas de saldo levam ->orderBy('id') como desempate: as colunas
+// date/from_date tem valores repetidos, e sem um criterio estavel o SQLite ordena
+// pela ordem de rowid enquanto o InnoDB ordena pela ordem do indice — mudando a
+// sequencia das linhas na resposta da API.
 class BalanceAssistant{
     public static function generateUserBalanceByYear(User $user, int $year):array{
         $timeSpan = [
@@ -47,7 +51,7 @@ class BalanceAssistant{
             'end' => DateTime::createFromFormat('Y-m-d\\TH:i:sP', $year . '-12-31T23:59:59-05:00')->format('c'),
         ];
 
-        $balances = Balance::query()->where('user_id', $user->id)->where('date', '>=', $timeBounds['start'])->where('date', '<=', $timeBounds['end'])->orderBy('date', 'asc')->get();
+        $balances = Balance::query()->where('user_id', $user->id)->where('date', '>=', $timeBounds['start'])->where('date', '<=', $timeBounds['end'])->orderBy('date', 'asc')->orderBy('id')->get();
         $totalCredit = BigDecimal::of(0);
         $totalDebit = BigDecimal::of(0);
         $items = [];
@@ -106,7 +110,7 @@ class BalanceAssistant{
 
         $notApprovedReports = (function() use ($user, $timeBounds){
             //Where  ReportStatus::Submitted or ReportStatus::Rejected or ReportStatus::Draft:
-            $reports = Report::query()->where('user_id', $user->id)->where('status', '!=', ReportStatus::Approved)->where('status', '!=', ReportStatus::Restituted)->where('from_date', '>=', $timeBounds['start'])->where('to_date', '<=', $timeBounds['end'])->orderBy('from_date', 'asc')->get();
+            $reports = Report::query()->where('user_id', $user->id)->where('status', '!=', ReportStatus::Approved)->where('status', '!=', ReportStatus::Restituted)->where('from_date', '>=', $timeBounds['start'])->where('to_date', '<=', $timeBounds['end'])->orderBy('from_date', 'asc')->orderBy('id')->get();
 
 
             $totalInSoles = 0;
@@ -170,7 +174,7 @@ class BalanceAssistant{
 
         $pendingRestitution = (function() use ($user, $timeBounds){
             //Where ReportStatus::Approved
-            $reports = Report::query()->where('user_id', $user->id)->where('status', '=', ReportStatus::Approved)->where('from_date', '>=', $timeBounds['start'])->where('to_date', '<=', $timeBounds['end'])->orderBy('from_date', 'asc')->get();
+            $reports = Report::query()->where('user_id', $user->id)->where('status', '=', ReportStatus::Approved)->where('from_date', '>=', $timeBounds['start'])->where('to_date', '<=', $timeBounds['end'])->orderBy('from_date', 'asc')->orderBy('id')->get();
 
             $totalInSoles = 0;
             $totalInDollars = 0;
@@ -298,7 +302,7 @@ class BalanceAssistant{
             //Get list of ReportStatus enums, returning an array with: [ReportStatus::Approved, ReportStatus::Restituted, ReportStatus::Rejected, ReportStatus::Submitted, ReportStatus::Draft]:
             $reportStatuses = ReportStatus::cases();
             foreach ($reportStatuses as $reportStatus){
-                $reports = Report::query()->where('user_id', $user->id)->where('status', '=', $reportStatus)->where('from_date', '>=', $timeBounds['start'])->where('to_date', '<=', $timeBounds['end'])->orderBy('from_date', 'asc')->get();
+                $reports = Report::query()->where('user_id', $user->id)->where('status', '=', $reportStatus)->where('from_date', '>=', $timeBounds['start'])->where('to_date', '<=', $timeBounds['end'])->orderBy('from_date', 'asc')->orderBy('id')->get();
 
                 $byStatus[] = [
                     'status' => $reportStatus->name,

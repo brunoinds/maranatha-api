@@ -15,8 +15,10 @@ return new class extends Migration
             $table->id();
             $table->timestamps();
             $table->string('worker_dni', 100);
-            $table->timestamp('attendance_id');
-            $table->timestamp('date');
+            // Guarda a FK para attendances.id, nao uma data: timestamp() era erro de copy-paste.
+            $table->unsignedBigInteger('attendance_id');
+            // String ISO-8601 com offset ('2024-04-01T00:00:00-05:00'), que DATETIME nao aceita.
+            $table->string('date', 40);
             $table->string('status')->default('Present');
             $table->string('observations', 400)->nullable();
         });

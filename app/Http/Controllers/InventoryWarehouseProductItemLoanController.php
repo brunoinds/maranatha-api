@@ -69,7 +69,7 @@ class InventoryWarehouseProductItemLoanController extends Controller
         }
 
 
-        DataCache::clearRecord('warehouseStockList', [$validated['inventory_warehouse_id']]);
+        // DataCache::clearRecord('warehouseStockList', [$validated['inventory_warehouse_id']]);  // !!!TODO: Uncomment on production
 
 
         return response()->json(['message' => 'Préstamo de productos realizado con éxito', 'loans' => $loans], 201);
@@ -205,7 +205,7 @@ class InventoryWarehouseProductItemLoanController extends Controller
 
         $warehouseLoan->update($validated);
 
-        DataCache::clearRecord('warehouseStockList', [$warehouseLoan->inventory_warehouse_id]);
+        // DataCache::clearRecord('warehouseStockList', [$warehouseLoan->inventory_warehouse_id]);  // !!!TODO: Uncomment on production
 
 
         if (env('APP_ENV') !== 'local'){

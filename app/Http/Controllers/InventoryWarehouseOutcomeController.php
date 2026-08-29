@@ -229,7 +229,7 @@ class InventoryWarehouseOutcomeController extends Controller
             $inventoryWarehouseOutcomeRequest->changeStatus(InventoryWarehouseOutcomeRequestStatus::Dispatched);
         }
 
-        DataCache::clearRecord('warehouseStockList', [$validated['inventory_warehouse_id']]);
+        // DataCache::clearRecord('warehouseStockList', [$validated['inventory_warehouse_id']]);  // !!!TODO: Uncomment on production
 
         return response()->json(['message' => 'Inventory warehouse outcome created', 'outcome' => $inventoryWarehouseOutcome], 200);
     }
@@ -244,7 +244,7 @@ class InventoryWarehouseOutcomeController extends Controller
         $validated = $request->validated();
         $warehouseOutcome->update($validated);
 
-        DataCache::clearRecord('warehouseStockList', [$warehouseOutcome->inventory_warehouse_id]);
+        // DataCache::clearRecord('warehouseStockList', [$warehouseOutcome->inventory_warehouse_id]);  // !!!TODO: Uncomment on production
 
         return response()->json(['message' => 'Inventory warehouse outcome updated', 'outcome' => $warehouseOutcome], 200);
 
@@ -275,7 +275,7 @@ class InventoryWarehouseOutcomeController extends Controller
 
     public function destroy(InventoryWarehouseOutcome $warehouseOutcome)
     {
-        DataCache::clearRecord('warehouseStockList', [$warehouseOutcome->inventory_warehouse_id]);
+        // DataCache::clearRecord('warehouseStockList', [$warehouseOutcome->inventory_warehouse_id]);  // !!!TODO: Uncomment on production
 
         $warehouseOutcome->delete();
         return response()->json(['message' => 'Inventory warehouse outcome deleted'], 200);

@@ -20,10 +20,10 @@ return new class extends Migration
 
 
             $table->string('description')->nullable(true)->default(null);
-            $table->json('requested_products')->default('[]');
-            $table->json('received_products')->default('[]');
+            $table->longText('requested_products');
+            $table->longText('received_products');
 
-            $table->json('messages')->default('[]');
+            $table->longText('messages');
             $table->string('status')->default('Draft');
 
             $table->timestamp('requested_at')->nullable()->default(null);

@@ -39,9 +39,19 @@ class Report extends Model
         'status' => ReportStatus::class,
         'metadata' => 'array',
     ];
+
+    // MySQL nao aceita DEFAULT em coluna TEXT: os defaults do schema vivem aqui.
+    protected $attributes = [
+        'metadata' => '{}',
+    ];
+
     public function amount()
     {
-        return $this->invoices()->sum('amount');
+        // round(..., 6) elimina o ruido de acumulacao em ponto flutuante: o MySQL
+        // devolve 219.0000000000005 onde o SQLite devolve 219, e a diferenca chega
+        // ate' a resposta da API (invoices.amount tem no maximo 2 casas decimais,
+        // entao 6 casas nao descartam nenhuma precisao real).
+        return round($this->invoices()->sum('amount'), 6);
     }
 
     public function amountIn(MoneyType $currency)

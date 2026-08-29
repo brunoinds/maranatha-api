@@ -46,7 +46,18 @@ class RecordReportsByTime
     {
         //Get filtered reports data:
 
-        $reportsInSpan = Report::where('created_at', '>=', $this->startDate->format('c'))->where('created_at', '<=', $this->endDate->format('c'));
+        // reports.created_at e' a unica coluna DATETIME comparada com uma data neste
+        // projeto (as datas de negocio sao VARCHAR). format('c') produz
+        // '2024-12-31T00:00:00+00:00', e a comparacao muda de motor para motor:
+        //   SQLite compara como texto — ' ' (0x20) < 'T' (0x54) — e acaba incluindo o dia
+        //     inteiro, devolvendo 799 reports.
+        //   MySQL converte para DATETIME e corta em 00:00:00, devolvendo 796.
+        // Usar 'Y-m-d H:i:s' com o dia fechado da' 799 nos dois — preserva o resultado
+        // atual de producao e elimina a divergencia.
+        $inicio = $this->startDate->format('Y-m-d') . ' 00:00:00';
+        $fim = $this->endDate->format('Y-m-d') . ' 23:59:59';
+
+        $reportsInSpan = Report::where('created_at', '>=', $inicio)->where('created_at', '<=', $fim);
 
 
         if ($this->country !== null){

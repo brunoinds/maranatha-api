@@ -37,7 +37,7 @@ class AttendanceController extends Controller
     public function store(StoreAttendanceRequest $request)
     {
         $attendance = Attendance::create($request->validated());
-        RecordsCache::clearAll();
+        // RecordsCache::clearAll();  // !!!TODO: Uncomment on production
         return response()->json(['message' => 'Attendance created', 'attendance' => $attendance->toArray()]);
     }
 
@@ -50,7 +50,7 @@ class AttendanceController extends Controller
             $attendance->attachWorkerDni($worker_dni);
         }
         $workersCount = count($requestValidated['workers_dni']);
-        RecordsCache::clearAll();
+        // RecordsCache::clearAll();  // !!!TODO: Uncomment on production
         return response()->json(['message' => 'Attendance created with ' . $workersCount . ' workers.', 'attendance' => $attendance->toArray()]);
     }
     public function storeWorkersAttendances(StoreWorkersAttendancesRequest $request)
@@ -74,7 +74,7 @@ class AttendanceController extends Controller
         foreach ($updates as $status => $ids) {
             AttendanceDayWorker::whereIn('id', $ids)->update(['status' => $status]);
         }
-        RecordsCache::clearAll();
+        // RecordsCache::clearAll();  // !!!TODO: Uncomment on production
         return response()->json(['message' => 'Workers attendances updated']);
     }
 
@@ -109,7 +109,7 @@ class AttendanceController extends Controller
         if (isset($request->validated()['workers_dnis'])) {
             $attendance->updateWorkersDnis($request->validated()['workers_dnis']);
         }
-        RecordsCache::clearAll();
+        // RecordsCache::clearAll();  // !!!TODO: Uncomment on production
         return response()->json(['message' => 'Attendance updated', 'attendance' => $attendance->toArray()]);
     }
 

@@ -28,7 +28,7 @@ return new class extends Migration
 
             $table->integer('progress')->default(0);
 
-            $table->json('final_report')->nullable(true)->default(null);
+            $table->longText('final_report')->nullable();
         });
     }
 

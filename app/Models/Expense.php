@@ -19,4 +19,9 @@ class Expense extends Model
     protected $casts = [
         'uses' => 'array'
     ];
+
+    // MySQL nao aceita DEFAULT em coluna TEXT: os defaults do schema vivem aqui.
+    protected $attributes = [
+        'uses' => '["Reports", "Attendances"]',
+    ];
 }

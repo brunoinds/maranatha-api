@@ -119,7 +119,7 @@ class InvoiceController extends Controller
         $invoice = Invoice::create($validatedData);
         $invoice->report?->updateFromToDates();
 
-        RecordsCache::clearAll();
+        // RecordsCache::clearAll();  // !!!TODO: Uncomment on production
 
         return response()->json(['message' => 'Invoice created', 'invoice' => $invoice->toArray()]);
     }
@@ -225,7 +225,7 @@ class InvoiceController extends Controller
         $invoice->save();
 
         $invoice->report->updateFromToDates();
-        RecordsCache::clearAll();
+        // RecordsCache::clearAll();  // !!!TODO: Uncomment on production
         return response()->json(['message' => 'Invoice updated', 'invoice' => $invoice->toArray()]);
     }
 
@@ -234,7 +234,7 @@ class InvoiceController extends Controller
         $report = $invoice->report;
         $invoice->delete();
         $report->updateFromToDates();
-        RecordsCache::clearAll();
+        // RecordsCache::clearAll();  // !!!TODO: Uncomment on production
         return response()->json(['message' => 'Invoice deleted']);
     }
 

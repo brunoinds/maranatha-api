@@ -46,6 +46,11 @@ class InventoryProduct extends Model
         'inventory_warehouses_ids' => 'array'
     ];
 
+    // MySQL nao aceita DEFAULT em coluna TEXT: os defaults do schema vivem aqui.
+    protected $attributes = [
+        'inventory_warehouses_ids' => '[]',
+    ];
+
     public function warehouses()
     {
         return $this->hasMany(InventoryWarehouse::class, 'id', 'inventory_warehouses_ids');
@@ -74,7 +79,7 @@ class InventoryProduct extends Model
     public function clearStockCaches()
     {
         InventoryWarehouse::all()->each(function($warehouse){
-            DataCache::clearRecord('warehouseStockList', [$warehouse->id]);
+            // DataCache::clearRecord('warehouseStockList', [$warehouse->id]);  // !!!TODO: Uncomment on production
         });
     }
 

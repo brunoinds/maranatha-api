@@ -15,7 +15,8 @@ return new class extends Migration
             $table->id();
             $table->timestamps();
             $table->string('description')->nullable(true)->default(null);
-            $table->timestamp('date');
+            // String ISO-8601 com offset, que DATETIME nao aceita. Ver database/mysql-migration/README.md.
+            $table->string('date', 40);
 
 
             $table->integer('user_id')->nullable(true);

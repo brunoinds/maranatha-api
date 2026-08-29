@@ -21,7 +21,7 @@ return new class extends Migration
             $table->string('team');
             $table->string('country');
             $table->string('role');
-            $table->json('history')->default('[]');
+            $table->longText('history');
         });
     }
 

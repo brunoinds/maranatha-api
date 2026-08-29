@@ -16,13 +16,18 @@ return new class extends Migration
             $table->timestamps();
             $table->integer('report_id');
             $table->enum('type', ['Facture', 'Bill']);
-            $table->string('description', 100);
+            // 238 linhas de producao passam de 100 chars (max 158) -> ERROR 1406 no MySQL.
+            $table->string('description', 255);
             $table->string('ticket_number', 100);
             $table->string('commerce_number', 100);
-            $table->timestamp('date');
+            // Guarda a string ISO-8601 com offset ('2024-04-01T00:00:00.000-05:00'),
+            // que DATETIME/TIMESTAMP nao aceita. Ver database/mysql-migration/README.md.
+            $table->string('date', 40);
             $table->string('job_code', 100);
             $table->string('expense_code', 100);
-            $table->float(column: 'amount', total: 8, places: 2);
+            // double(8,2) (o que float() gera no MySQL) tem teto de 999999.99;
+            // invoices.amount chega a 221.137.500,00.
+            $table->double('amount');
             $table->string('qrcode_data', 1000)->nullable(true);
             $table->string('image', 100)->nullable(true)->default(null);
         });

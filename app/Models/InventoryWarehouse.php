@@ -30,6 +30,11 @@ class InventoryWarehouse extends Model
         'owners' => 'array'
     ];
 
+    // MySQL nao aceita DEFAULT em coluna TEXT: os defaults do schema vivem aqui.
+    protected $attributes = [
+        'owners' => '[]',
+    ];
+
     public function products()
     {
         return $this->hasMany(InventoryProductItem::class);

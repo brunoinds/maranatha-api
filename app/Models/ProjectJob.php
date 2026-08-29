@@ -47,6 +47,12 @@ class ProjectJob extends Model
         'area' => 'float',
     ];
 
+    // MySQL nao aceita DEFAULT em coluna TEXT: os defaults do schema vivem aqui.
+    protected $attributes = [
+        'admins_ids' => '[]',
+        'messages' => '[]',
+    ];
+
     public function job()
     {
         return $this->belongsTo(Job::class, 'job_code', 'code');

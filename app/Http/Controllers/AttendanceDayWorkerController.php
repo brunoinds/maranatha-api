@@ -25,14 +25,14 @@ class AttendanceDayWorkerController extends Controller
     public function store(StoreAttendanceDayWorkerRequest $request)
     {
         $attendance = AttendanceDayWorker::create($request->validated());
-        RecordsCache::clearAll();
+        // RecordsCache::clearAll();  // !!!TODO: Uncomment on production
         return response()->json(['message' => 'Attendance Day-Worker created', 'attendance' => $attendance->toArray()]);
     }
 
     public function update(UpdateAttendanceDayWorkerRequest $request, AttendanceDayWorker $attendanceDayWorker)
     {
         $attendanceDayWorker->update($request->validated());
-        RecordsCache::clearAll();
+        // RecordsCache::clearAll();  // !!!TODO: Uncomment on production
         return response()->json(['message' => 'Attendance Day-Worker updated', 'attendance' => $attendanceDayWorker->toArray()]);
     }
 

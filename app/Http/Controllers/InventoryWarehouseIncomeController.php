@@ -266,7 +266,7 @@ class InventoryWarehouseIncomeController extends Controller
             }
         }
 
-        DataCache::clearRecord('warehouseStockList', [$validated['inventory_warehouse_id']]);
+        // DataCache::clearRecord('warehouseStockList', [$validated['inventory_warehouse_id']]);  // !!!TODO: Uncomment on production
 
         return response()->json(['message' => 'Inventory warehouse income created', 'income' => $inventoryWarehouseIncome], 200);
     }
@@ -345,7 +345,7 @@ class InventoryWarehouseIncomeController extends Controller
             }
         }
 
-        DataCache::clearRecord('warehouseStockList', [$warehouseIncome->inventory_warehouse_id]);
+        // DataCache::clearRecord('warehouseStockList', [$warehouseIncome->inventory_warehouse_id]);  // !!!TODO: Uncomment on production
 
 
 
@@ -495,7 +495,12 @@ class InventoryWarehouseIncomeController extends Controller
                                     $outcomesDetails = $item->outcomes_details;
                                     unset($outcomesDetails[$outcomeId]);
                                     $item->outcomes_details = $outcomesDetails;
-                                    $item->inventory_warehouse_outcome_ids = array_diff($item->inventory_warehouse_outcome_ids, [$outcomeId]);
+                                    // array_values() e' obrigatorio: array_diff() preserva as
+                                    // chaves e um array com buracos vira OBJETO em json_encode.
+                                    // O MEMBER OF do MySQL so' enxerga arrays, entao o item
+                                    // sumiria da relacao uncountableItems().
+                                    $item->inventory_warehouse_outcome_ids = array_values(
+                                        array_diff($item->inventory_warehouse_outcome_ids, [$outcomeId]));
                                 }
 
                                 $item->quantity_inserted = $productChange['quantity'];
@@ -530,7 +535,7 @@ class InventoryWarehouseIncomeController extends Controller
 
     public function destroy(InventoryWarehouseIncome $warehouseIncome)
     {
-        DataCache::clearRecord('warehouseStockList', [$warehouseIncome->inventory_warehouse_id]);
+        // DataCache::clearRecord('warehouseStockList', [$warehouseIncome->inventory_warehouse_id]);  // !!!TODO: Uncomment on production
 
         $warehouseIncome->delete();
         return response()->json(['message' => 'Inventory warehouse income deleted'], 200);

@@ -59,11 +59,12 @@ class Excel{
         $sheet->append($output->toArray());
     }
     public static function getWorkersSheet():array{
-        $cachedValue = Cache::store('redis')->get('Maranatha/Spreadsheets/Workers');
-
-        if ($cachedValue !== null){
-            return $cachedValue;
-        }
+        // !!!TODO: Uncomment on production
+        // $cachedValue = Cache::store('redis')->get('Maranatha/Spreadsheets/Workers');
+        //
+        // if ($cachedValue !== null){
+        //     return $cachedValue;
+        // }
 
 
         $workers = null;
@@ -144,7 +145,7 @@ class Excel{
 
 
         //Store for 30 minutes:
-        Cache::store('redis')->put('Maranatha/Spreadsheets/Workers', $data, 30 * 60);
+        // Cache::store('redis')->put('Maranatha/Spreadsheets/Workers', $data, 30 * 60);  // !!!TODO: Uncomment on production
 
         return $data;
     }

@@ -16,15 +16,16 @@ return new class extends Migration
             $table->timestamps();
             $table->integer('user_id');
             $table->string('title', 100);
-            $table->timestamp('from_date');
-            $table->timestamp('to_date');
+            // Strings ISO-8601 com offset, que DATETIME nao aceita.
+            $table->string('from_date', 40);
+            $table->string('to_date', 40);
             $table->enum('type', ['Facture', 'Bill'])->defaut("Bill");
             $table->string('exported_pdf', 100)->nullable(true)->default(null);
             $table->string('status', 100)->default('Draft');
             $table->string('rejection_reason', 100)->nullable(true)->default(null)->create();
-            $table->timestamp('approved_at')->nullable(true)->default(null);
-            $table->timestamp('rejected_at')->nullable(true)->default(null);
-            $table->timestamp('submitted_at')->nullable(true)->default(null);
+            $table->string('approved_at', 40)->nullable()->default(null);
+            $table->string('rejected_at', 40)->nullable()->default(null);
+            $table->string('submitted_at', 40)->nullable()->default(null);
         });
     }
 

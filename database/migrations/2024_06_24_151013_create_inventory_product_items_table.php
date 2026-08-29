@@ -16,8 +16,9 @@ return new class extends Migration
             $table->timestamps();
             $table->integer('order');
             $table->string('batch')->nullable(true);
-            $table->float(column: 'buy_amount', total: 8, places: 2);
-            $table->float(column: 'sell_amount', total: 8, places: 2);
+            // 2.752 linhas tem mais de 2 casas decimais (ex.: 0.3333) e 9 passam de 1e6.
+            $table->double('buy_amount');
+            $table->double('sell_amount');
             $table->string('buy_currency');
             $table->string('sell_currency');
 

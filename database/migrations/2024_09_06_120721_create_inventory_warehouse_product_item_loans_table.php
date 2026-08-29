@@ -14,8 +14,9 @@ return new class extends Migration
         Schema::create('inventory_warehouse_product_item_loans', function (Blueprint $table) {
             $table->id();
             $table->timestamps();
-            $table->timestamp('loaned_to_user_id');
-            $table->timestamp('loaned_by_user_id');
+            // Guardam users.id, nao datas: timestamp() era erro de copy-paste.
+            $table->unsignedBigInteger('loaned_to_user_id');
+            $table->unsignedBigInteger('loaned_by_user_id');
 
             $table->timestamp('loaned_at')->nullable(true);
             $table->timestamp('received_at')->nullable(true);
@@ -25,8 +26,8 @@ return new class extends Migration
             $table->string('status')->default('SendingToLoan');
 
 
-            $table->json('movements')->default('[]');
-            $table->json('intercurrences')->default('[]');
+            $table->longText('movements');
+            $table->longText('intercurrences');
 
             $table->integer('inventory_product_item_id');
             $table->integer('inventory_warehouse_id');

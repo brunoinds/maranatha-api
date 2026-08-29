@@ -17,7 +17,7 @@ class WorkerController extends Controller
     public function store(StoreWorkerRequest $request)
     {
         $validated = $request->validated();
-        RecordsCache::clearAll();
+        // RecordsCache::clearAll();  // !!!TODO: Uncomment on production
         return Worker::create($validated);
     }
 
@@ -31,14 +31,14 @@ class WorkerController extends Controller
         $validated = $request->validated();
         $worker->createHistorySnapshot();
         $worker->update($validated);
-        RecordsCache::clearAll();
+        // RecordsCache::clearAll();  // !!!TODO: Uncomment on production
         return $worker;
     }
 
     public function destroy(Worker $worker)
     {
         $worker->delete();
-        RecordsCache::clearAll();
+        // RecordsCache::clearAll();  // !!!TODO: Uncomment on production
         return response()->noContent();
     }
 }

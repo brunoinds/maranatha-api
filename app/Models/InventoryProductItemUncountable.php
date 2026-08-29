@@ -55,6 +55,12 @@ class InventoryProductItemUncountable extends Model
         'outcomes_details' => 'array'
     ];
 
+    // MySQL nao aceita DEFAULT em coluna TEXT: os defaults do schema vivem aqui.
+    protected $attributes = [
+        'inventory_warehouse_outcome_ids' => '[]',
+        'outcomes_details' => '{}',
+    ];
+
 
 
     public function origin()
@@ -192,7 +198,7 @@ class InventoryProductItemUncountable extends Model
 
     public function delete()
     {
-        DataCache::clearRecord('warehouseStockList', [$this->inventory_warehouse_id]);
+        // DataCache::clearRecord('warehouseStockList', [$this->inventory_warehouse_id]);  // !!!TODO: Uncomment on production
         parent::delete();
     }
 }

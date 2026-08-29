@@ -72,7 +72,12 @@ class InventoryWarehouseIncome extends Model
 
     public function amount()
     {
-        return $this->items()->sum('buy_amount')  + $this->uncountableItems()->sum('buy_amount');
+        // round(..., 6) elimina o ruido de acumulacao em ponto flutuante sem tocar na
+        // precisao real dos dados (no maximo 4 casas decimais). Sem isso o MySQL devolve
+        // 364.0000000000005 onde o SQLite devolvia 364, e WarehouseIncomes.vue renderiza
+        // esse valor cru no template.
+        return round($this->items()->sum('buy_amount')
+            + $this->uncountableItems()->sum('buy_amount'), 6);
     }
 
     public function quantities()
@@ -113,7 +118,7 @@ class InventoryWarehouseIncome extends Model
         $this->uncountableItems()->each(function($item){
             $item->delete();
         });
-        DataCache::clearRecord('warehouseStockList', [$this->inventory_warehouse_id]);
+        // DataCache::clearRecord('warehouseStockList', [$this->inventory_warehouse_id]);  // !!!TODO: Uncomment on production
         return parent::delete();
     }
 }

@@ -14,7 +14,7 @@ return new class extends Migration
         //On reports table, add column called: money_type:
         Schema::table('reports', function (Blueprint $table) {
             $table->string('country', 100)->after('money_type')->default('PE');
-            $table->json('metadata')->after('country')->default('{}');
+            $table->longText('metadata')->after('country');
         });
     }
 

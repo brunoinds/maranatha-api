@@ -18,12 +18,13 @@ return new class extends Migration
             $table->string('batch')->nullable(true);
 
 
-            $table->float(column: 'quantity_inserted', total: 8, places: 2)->default(0);
-            $table->float(column: 'quantity_used', total: 8, places: 2)->default(0);
-            $table->float(column: 'quantity_remaining', total: 8, places: 2)->default(0);
+            $table->double('quantity_inserted')->default(0);
+            $table->double('quantity_used')->default(0);
+            $table->double('quantity_remaining')->default(0);
 
 
-            $table->float(column: 'buy_amount', total: 8, places: 2);
+            // buy_amount chega a 171.674.590,00 em producao.
+            $table->double('buy_amount');
             $table->string('buy_currency');
 
             $table->string('status')->default('InStock');
@@ -32,8 +33,8 @@ return new class extends Migration
             $table->integer('inventory_warehouse_id');
             $table->integer('inventory_warehouse_income_id');
 
-            $table->json('inventory_warehouse_outcome_ids')->default('[]');
-            $table->json('outcomes_details')->default('{}');
+            $table->longText('inventory_warehouse_outcome_ids');
+            $table->longText('outcomes_details');
             $table->integer('origin_inventory_product_item_uncountable_id')->nullable(true);
         });
     }

@@ -45,12 +45,13 @@ class ManagementRecordsController extends Controller
 
         $validatedData = array_merge($defaults, $validatedData);
 
-        if (RecordsCache::getRecord('attendancesByWorker', $validatedData)){
-            return response()->json([
-                ...RecordsCache::getRecord('attendancesByWorker', $validatedData),
-                'is_cached' => true
-            ]);
-        }
+        // !!!TODO: Uncomment on production
+        // if (RecordsCache::getRecord('attendancesByWorker', $validatedData)){
+            // return response()->json([
+                // ...RecordsCache::getRecord('attendancesByWorker', $validatedData),
+                // 'is_cached' => true
+            // ]);
+        // }
 
         $record = new RecordAttendancesByWorker([
             'startDate' => Carbon::parse(new DateTime($validatedData['start_date']))->startOfDay()->toDateTime(),
@@ -63,7 +64,7 @@ class ManagementRecordsController extends Controller
 
         $document = $record->generate();
 
-        RecordsCache::storeRecord('attendancesByWorker', $validatedData, $document);
+        // RecordsCache::storeRecord('attendancesByWorker', $validatedData, $document);  // !!!TODO: Uncomment on production
 
         return response()->json([
             ...$document,
@@ -89,12 +90,13 @@ class ManagementRecordsController extends Controller
 
         $validatedData = array_merge($defaults, $validatedData);
 
-        if (RecordsCache::getRecord('jobsByCosts', $validatedData)){
-            return response()->json([
-                ...RecordsCache::getRecord('jobsByCosts', $validatedData),
-                'is_cached' => true
-            ]);
-        }
+        // !!!TODO: Uncomment on production
+        // if (RecordsCache::getRecord('jobsByCosts', $validatedData)){
+            // return response()->json([
+                // ...RecordsCache::getRecord('jobsByCosts', $validatedData),
+                // 'is_cached' => true
+            // ]);
+        // }
 
         $record = new RecordJobsByCosts([
             'startDate' => new DateTime($validatedData['start_date']),
@@ -106,7 +108,7 @@ class ManagementRecordsController extends Controller
 
         $document = $record->generate();
 
-        RecordsCache::storeRecord('jobsByCosts', $validatedData, $document);
+        // RecordsCache::storeRecord('jobsByCosts', $validatedData, $document);  // !!!TODO: Uncomment on production
 
         return response()->json([
             ...$document,
@@ -138,12 +140,13 @@ class ManagementRecordsController extends Controller
 
         $validatedData = array_merge($defaults, $validatedData);
 
-        if (RecordsCache::getRecord('attendancesByJobs', $validatedData)){
-            return response()->json([
-                ...RecordsCache::getRecord('attendancesByJobs', $validatedData),
-                'is_cached' => true
-            ]);
-        }
+        // !!!TODO: Uncomment on production
+        // if (RecordsCache::getRecord('attendancesByJobs', $validatedData)){
+            // return response()->json([
+                // ...RecordsCache::getRecord('attendancesByJobs', $validatedData),
+                // 'is_cached' => true
+            // ]);
+        // }
 
         $record = new RecordAttendancesByJobs([
             'startDate' => new DateTime($validatedData['start_date']),
@@ -158,7 +161,7 @@ class ManagementRecordsController extends Controller
 
         $document = $record->generate();
 
-        RecordsCache::storeRecord('attendancesByJobs', $validatedData, $document);
+        // RecordsCache::storeRecord('attendancesByJobs', $validatedData, $document);  // !!!TODO: Uncomment on production
 
         return response()->json([
             ...$document,
@@ -190,12 +193,13 @@ class ManagementRecordsController extends Controller
 
         $validatedData = array_merge($defaults, $validatedData);
 
-        if (RecordsCache::getRecord('attendancesByJobsExpenses', $validatedData)){
-            return response()->json([
-                ...RecordsCache::getRecord('attendancesByJobsExpenses', $validatedData),
-                'is_cached' => true
-            ]);
-        }
+        // !!!TODO: Uncomment on production
+        // if (RecordsCache::getRecord('attendancesByJobsExpenses', $validatedData)){
+            // return response()->json([
+                // ...RecordsCache::getRecord('attendancesByJobsExpenses', $validatedData),
+                // 'is_cached' => true
+            // ]);
+        // }
 
         $record = new RecordAttendancesByJobsExpenses([
             'startDate' => new DateTime($validatedData['start_date']),
@@ -210,7 +214,7 @@ class ManagementRecordsController extends Controller
 
         $document = $record->generate();
 
-        RecordsCache::storeRecord('attendancesByJobsExpenses', $validatedData, $document);
+        // RecordsCache::storeRecord('attendancesByJobsExpenses', $validatedData, $document);  // !!!TODO: Uncomment on production
 
         return response()->json([
             ...$document,
@@ -242,12 +246,13 @@ class ManagementRecordsController extends Controller
 
         $validatedData = array_merge($defaults, $validatedData);
 
-        if (RecordsCache::getRecord('attendancesByWorkersJobsExpenses', $validatedData)){
-            return response()->json([
-                ...RecordsCache::getRecord('attendancesByWorkersJobsExpenses', $validatedData),
-                'is_cached' => true
-            ]);
-        }
+        // !!!TODO: Uncomment on production
+        // if (RecordsCache::getRecord('attendancesByWorkersJobsExpenses', $validatedData)){
+            // return response()->json([
+                // ...RecordsCache::getRecord('attendancesByWorkersJobsExpenses', $validatedData),
+                // 'is_cached' => true
+            // ]);
+        // }
 
         $record = new RecordAttendancesByWorkersJobsExpenses([
             'startDate' => new DateTime($validatedData['start_date']),
@@ -262,7 +267,7 @@ class ManagementRecordsController extends Controller
 
         $document = $record->generate();
 
-        RecordsCache::storeRecord('attendancesByWorkersJobsExpenses', $validatedData, $document);
+        // RecordsCache::storeRecord('attendancesByWorkersJobsExpenses', $validatedData, $document);  // !!!TODO: Uncomment on production
 
         return response()->json([
             ...$document,
@@ -294,12 +299,13 @@ class ManagementRecordsController extends Controller
 
         $validatedData = array_merge($defaults, $validatedData);
 
-        if (RecordsCache::getRecord('usersByCosts', $validatedData)){
-            return response()->json([
-                ...RecordsCache::getRecord('usersByCosts', $validatedData),
-                'is_cached' => true
-            ]);
-        }
+        // !!!TODO: Uncomment on production
+        // if (RecordsCache::getRecord('usersByCosts', $validatedData)){
+            // return response()->json([
+                // ...RecordsCache::getRecord('usersByCosts', $validatedData),
+                // 'is_cached' => true
+            // ]);
+        // }
 
         $record = new RecordUsersByCosts([
             'startDate' => new DateTime($validatedData['start_date']),
@@ -314,7 +320,7 @@ class ManagementRecordsController extends Controller
 
         $document = $record->generate();
 
-        RecordsCache::storeRecord('usersByCosts', $validatedData, $document);
+        // RecordsCache::storeRecord('usersByCosts', $validatedData, $document);  // !!!TODO: Uncomment on production
 
         return response()->json([
             ...$document,
@@ -341,12 +347,13 @@ class ManagementRecordsController extends Controller
 
         $validatedData = array_merge($defaults, $validatedData);
 
-        if (RecordsCache::getRecord('reportsByTime', $validatedData)){
-            return response()->json([
-                ...RecordsCache::getRecord('reportsByTime', $validatedData),
-                'is_cached' => true
-            ]);
-        }
+        // !!!TODO: Uncomment on production
+        // if (RecordsCache::getRecord('reportsByTime', $validatedData)){
+            // return response()->json([
+                // ...RecordsCache::getRecord('reportsByTime', $validatedData),
+                // 'is_cached' => true
+            // ]);
+        // }
 
         $record = new RecordReportsByTime([
             'startDate' => new DateTime($validatedData['start_date']),
@@ -358,7 +365,7 @@ class ManagementRecordsController extends Controller
 
         $document = $record->generate();
 
-        RecordsCache::storeRecord('reportsByTime', $validatedData, $document);
+        // RecordsCache::storeRecord('reportsByTime', $validatedData, $document);  // !!!TODO: Uncomment on production
 
         return response()->json([
             ...$document,
@@ -404,12 +411,13 @@ class ManagementRecordsController extends Controller
 
         $validatedData = array_merge($defaults, $validatedData);
 
-        if (RecordsCache::getRecord('invoicesByItems', $validatedData)){
-            return response()->json([
-                ...RecordsCache::getRecord('invoicesByItems', $validatedData),
-                'is_cached' => true
-            ]);
-        }
+        // !!!TODO: Uncomment on production
+        // if (RecordsCache::getRecord('invoicesByItems', $validatedData)){
+            // return response()->json([
+                // ...RecordsCache::getRecord('invoicesByItems', $validatedData),
+                // 'is_cached' => true
+            // ]);
+        // }
 
 
         $record = new RecordInvoicesByItems([
@@ -425,7 +433,7 @@ class ManagementRecordsController extends Controller
 
         $document = $record->generate();
 
-        RecordsCache::storeRecord('invoicesByItems', $validatedData, $document);
+        // RecordsCache::storeRecord('invoicesByItems', $validatedData, $document);  // !!!TODO: Uncomment on production
 
         return response()->json([
             ...$document,
@@ -450,12 +458,13 @@ class ManagementRecordsController extends Controller
 
         $validatedData = array_merge($defaults, $validatedData);
 
-        if (RecordsCache::getRecord('inventoryProducts', $validatedData)){
-            return response()->json([
-                ...RecordsCache::getRecord('inventoryProducts', $validatedData),
-                'is_cached' => true
-            ]);
-        }
+        // !!!TODO: Uncomment on production
+        // if (RecordsCache::getRecord('inventoryProducts', $validatedData)){
+            // return response()->json([
+                // ...RecordsCache::getRecord('inventoryProducts', $validatedData),
+                // 'is_cached' => true
+            // ]);
+        // }
 
         $record = new RecordInventoryProducts([
             'categories' => $validatedData['categories'],
@@ -464,7 +473,7 @@ class ManagementRecordsController extends Controller
 
         $document = $record->generate();
 
-        RecordsCache::storeRecord('inventoryProducts', $validatedData, $document);
+        // RecordsCache::storeRecord('inventoryProducts', $validatedData, $document);  // !!!TODO: Uncomment on production
 
         return response()->json([
             ...$document,
@@ -520,7 +529,7 @@ class ManagementRecordsController extends Controller
 
         $document = $record->generate();
 
-        RecordsCache::storeRecord('inventoryProductsKardex', $validatedData, $document);
+        // RecordsCache::storeRecord('inventoryProductsKardex', $validatedData, $document);  // !!!TODO: Uncomment on production
 
         return response()->json([
             ...$document,
@@ -577,7 +586,7 @@ class ManagementRecordsController extends Controller
 
         $document = $record->generate();
 
-        RecordsCache::storeRecord('inventoryProductsBalance', $validatedData, $document);
+        // RecordsCache::storeRecord('inventoryProductsBalance', $validatedData, $document);  // !!!TODO: Uncomment on production
 
         return response()->json([
             ...$document,
@@ -610,12 +619,13 @@ class ManagementRecordsController extends Controller
 
         $validatedData = array_merge($defaults, $validatedData);
 
-        if (RecordsCache::getRecord('inventoryProductsStock', $validatedData)){
-            return response()->json([
-                ...RecordsCache::getRecord('inventoryProductsStock', $validatedData),
-                'is_cached' => true
-            ]);
-        }
+        // !!!TODO: Uncomment on production
+        // if (RecordsCache::getRecord('inventoryProductsStock', $validatedData)){
+            // return response()->json([
+                // ...RecordsCache::getRecord('inventoryProductsStock', $validatedData),
+                // 'is_cached' => true
+            // ]);
+        // }
 
         $record = new RecordInventoryProductsStock([
             'warehouseIds' => $validatedData['warehouse_ids'],
@@ -628,7 +638,7 @@ class ManagementRecordsController extends Controller
 
         $document = $record->generate();
 
-        RecordsCache::storeRecord('inventoryProductsStock', $validatedData, $document);
+        // RecordsCache::storeRecord('inventoryProductsStock', $validatedData, $document);  // !!!TODO: Uncomment on production
 
         return response()->json([
             ...$document,
@@ -661,12 +671,13 @@ class ManagementRecordsController extends Controller
 
         $validatedData = array_merge($defaults, $validatedData);
 
-        if (RecordsCache::getRecord('inventoryProductsLoansKardex', $validatedData)){
-            return response()->json([
-                ...RecordsCache::getRecord('inventoryProductsLoansKardex', $validatedData),
-                'is_cached' => true
-            ]);
-        }
+        // !!!TODO: Uncomment on production
+        // if (RecordsCache::getRecord('inventoryProductsLoansKardex', $validatedData)){
+            // return response()->json([
+                // ...RecordsCache::getRecord('inventoryProductsLoansKardex', $validatedData),
+                // 'is_cached' => true
+            // ]);
+        // }
 
         $record = new RecordInventoryProductsLoansKardex([
             'warehouseIds' => $validatedData['warehouse_ids'],
@@ -679,7 +690,7 @@ class ManagementRecordsController extends Controller
 
         $document = $record->generate();
 
-        RecordsCache::storeRecord('inventoryProductsLoansKardex', $validatedData, $document);
+        // RecordsCache::storeRecord('inventoryProductsLoansKardex', $validatedData, $document);  // !!!TODO: Uncomment on production
 
         return response()->json([
             ...$document,
@@ -719,7 +730,7 @@ class ManagementRecordsController extends Controller
 
         $document = $record->generate();
 
-        RecordsCache::storeRecord('inventoryIncomesLoanables', $validatedData, $document);
+        // RecordsCache::storeRecord('inventoryIncomesLoanables', $validatedData, $document);  // !!!TODO: Uncomment on production
 
         return response()->json([
             ...$document,
@@ -754,12 +765,13 @@ class ManagementRecordsController extends Controller
 
         $validatedData = array_merge($defaults, $validatedData);
 
-        if (RecordsCache::getRecord('generalRecords', $validatedData)){
-            return response()->json([
-                ...RecordsCache::getRecord('generalRecords', $validatedData),
-                'is_cached' => true
-            ]);
-        }
+        // !!!TODO: Uncomment on production
+        // if (RecordsCache::getRecord('generalRecords', $validatedData)){
+            // return response()->json([
+                // ...RecordsCache::getRecord('generalRecords', $validatedData),
+                // 'is_cached' => true
+            // ]);
+        // }
 
         $record = new RecordGeneralRecords([
             'startDate' => ($validatedData['start_date']) ? new DateTime($validatedData['start_date']) : null,
@@ -774,7 +786,7 @@ class ManagementRecordsController extends Controller
 
         $document = $record->generate();
 
-        RecordsCache::storeRecord('generalRecords', $validatedData, $document);
+        // RecordsCache::storeRecord('generalRecords', $validatedData, $document);  // !!!TODO: Uncomment on production
 
         return response()->json([
             ...$document,

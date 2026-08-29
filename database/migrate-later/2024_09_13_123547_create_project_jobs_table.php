@@ -21,7 +21,7 @@ return new class extends Migration
             $table->float('width', 8, 2)->default(0);
             $table->float('length', 8, 2)->default(0);
             $table->float('area', 8, 2)->default(0);
-            $table->json('admins_ids')->default('[]');
+            $table->longText('admins_ids');
             $table->integer('supervisor_id');
             $table->string('event_type');
             $table->timestamp('scheduled_start_date');
@@ -29,9 +29,9 @@ return new class extends Migration
             $table->timestamp('started_at')->nullable(true)->default(null);
             $table->timestamp('ended_at')->nullable(true)->default(null);
             $table->string('status')->default('WaitingApproval');
-            $table->json('final_report')->nullable(true)->default(null);
-            $table->json('marketing_report')->nullable(true)->default(null);
-            $table->json('messages')->default('[]');
+            $table->longText('final_report')->nullable();
+            $table->longText('marketing_report')->nullable();
+            $table->longText('messages');
         });
     }
 

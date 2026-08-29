@@ -83,7 +83,8 @@ class RecordInvoicesByItems
 
 
         if ($this->country !== null){
-            $invoicesInSpan = $invoicesInSpan->where('job_country', '=', $this->country);
+            $invoicesInSpan = $invoicesInSpan->where('jobs.country', '=', $this->country);   // coluna real, nao o alias:
+                // o MySQL nao aceita alias do SELECT no WHERE (erro 1054); o SQLite aceita.
         }
 
         if ($this->moneyType !== null){
@@ -94,7 +95,11 @@ class RecordInvoicesByItems
             $invoicesInSpan = $invoicesInSpan->where('type', '=', $this->invoiceType);
         }
 
-        $invoicesInSpan = $invoicesInSpan->get();
+        // Ordem explicita e qualificada (ha' join com reports e jobs): sem ela o SQLite
+        // entrega por rowid e o InnoDB pela ordem do indice escolhido, mudando a ordem
+        // das linhas do relatorio — o groupBy() da Collection preserva a ordem de
+        // primeira aparicao das chaves.
+        $invoicesInSpan = $invoicesInSpan->orderBy('invoices.id')->get();
 
         return $invoicesInSpan;
     }

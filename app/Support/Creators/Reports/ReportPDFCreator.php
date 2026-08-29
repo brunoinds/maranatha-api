@@ -186,7 +186,7 @@ class ReportPDFCreator
     {
         $invoicesItemsHtml = '';
         $report = $this->report;
-        $this->report->invoices()->orderBy('date', 'asc')->each(function($invoice, $i) use (&$invoicesItemsHtml, $report){
+        $this->report->invoices()->orderBy('date', 'asc')->orderBy('id')->each(function($invoice, $i) use (&$invoicesItemsHtml, $report){
             $iteration = ($i + 1);
 
             $date = Carbon::create($invoice->date)->format('d/m/y');
@@ -241,7 +241,7 @@ class ReportPDFCreator
     {
         $listSrcs = [];
         $instance = $this;
-        $this->report->invoices()->orderBy('date', 'asc')->each(function($invoice, $i) use (&$listSrcs){
+        $this->report->invoices()->orderBy('date', 'asc')->orderBy('id')->each(function($invoice, $i) use (&$listSrcs){
             $imageId = $invoice->image;
             $pdfId = $invoice->pdf;
             if (!$imageId && !$pdfId){

@@ -31,6 +31,11 @@ class ProjectConstructionTask extends Model
         'daily_reports' => 'array',
     ];
 
+    // MySQL nao aceita DEFAULT em coluna TEXT: os defaults do schema vivem aqui.
+    protected $attributes = [
+        'daily_reports' => '[]',
+    ];
+
     public function projectJob()
     {
         return $this->belongsTo(ProjectJob::class);

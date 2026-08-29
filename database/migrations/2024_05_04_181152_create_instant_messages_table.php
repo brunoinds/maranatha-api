@@ -24,8 +24,8 @@ return new class extends Migration
             $table->timestamp('played_at')->nullable(true)->default(null);
             $table->string('type');
             $table->string('status')->default('Sent');
-            $table->json('attachment')->nullable(true);
-            $table->json('metadata');
+            $table->longText('attachment')->nullable();
+            $table->longText('metadata');
         });
     }
 

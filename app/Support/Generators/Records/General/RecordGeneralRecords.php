@@ -85,7 +85,8 @@ class RecordGeneralRecords
 
 
         if ($this->country !== null){
-            $invoicesInSpan = $invoicesInSpan->where('job_country', '=', $this->country);
+            $invoicesInSpan = $invoicesInSpan->where('jobs.country', '=', $this->country);   // coluna real, nao o alias:
+                // o MySQL nao aceita alias do SELECT no WHERE (erro 1054); o SQLite aceita.
         }
 
         if ($this->zone !== null){
@@ -96,7 +97,11 @@ class RecordGeneralRecords
             $invoicesInSpan = $invoicesInSpan->where('money_type', '=', $this->moneyType);
         }
 
-        $invoicesInSpan = $invoicesInSpan->get();
+        // Ordem explicita e qualificada (ha' join com reports e jobs): sem ela o SQLite
+        // entrega por rowid e o InnoDB pela ordem do indice escolhido, mudando a ordem
+        // das linhas do relatorio — o groupBy() da Collection preserva a ordem de
+        // primeira aparicao das chaves.
+        $invoicesInSpan = $invoicesInSpan->orderBy('invoices.id')->get();
 
 
         return collect($invoicesInSpan)->map(function($invoice){
@@ -340,7 +345,7 @@ class RecordGeneralRecords
                 });
             }
 
-            return $query->orderBy('date');
+            return $query->orderBy('date')->orderBy('id'); // desempate estavel: 'date' tem valores repetidos
         })();
 
 
@@ -349,6 +354,7 @@ class RecordGeneralRecords
             $productsIdsInIncome = $income->items()
                 ->groupBy('inventory_product_id')
                 ->select('inventory_product_id')
+                ->orderBy('inventory_product_id') // ordem estavel entre motores
                 ->pluck('inventory_product_id')
                 ->unique();
 
@@ -377,7 +383,7 @@ class RecordGeneralRecords
                         $query = $query->where('date', '<=', $options['endDate']);
                     }
 
-                    return $query->orderBy('date')->get();
+                    return $query->orderBy('date')->orderBy('id')->get(); // desempate estavel: 'date' tem valores repetidos
                 })();
 
                 $outcomes->each((function($outcome) use ($income, &$list, &$balance, $product){

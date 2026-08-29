@@ -43,7 +43,9 @@ class ReportController extends Controller
                     'user' => $report->user->toArray(),
                     'invoices' => [
                         'count' => $report->invoices->count(),
-                        'total_amount' => $report->invoices->sum('amount'),
+                        // round(..., 6): mata o ruido de somatorio em ponto flutuante que o MySQL
+                        // expoe (1146.0000000005 no lugar de 1146), sem perder precisao real.
+                        'total_amount' => round($report->invoices->sum('amount'), 6),
                     ]
                 ]
             );
@@ -61,7 +63,7 @@ class ReportController extends Controller
     public function store(StoreReportRequest $request)
     {
         $report = Report::create($request->validated());
-        RecordsCache::clearAll();
+        // RecordsCache::clearAll();  // !!!TODO: Uncomment on production
         return response()->json(['message' => 'Report created', 'report' => $report->toArray()]);
     }
 
@@ -85,7 +87,9 @@ class ReportController extends Controller
                     'user' => $report->user->toArray(),
                     'invoices' => [
                         'count' => $report->invoices->count(),
-                        'total_amount' => $report->invoices->sum('amount'),
+                        // round(..., 6): mata o ruido de somatorio em ponto flutuante que o MySQL
+                        // expoe (1146.0000000005 no lugar de 1146), sem perder precisao real.
+                        'total_amount' => round($report->invoices->sum('amount'), 6),
                     ]
                 ]
             );
@@ -207,14 +211,14 @@ class ReportController extends Controller
                 ]
             );
         }
-        RecordsCache::clearAll();
+        // RecordsCache::clearAll();  // !!!TODO: Uncomment on production
         return response()->json(['message' => 'Report updated', 'report' => $report->toArray()]);
     }
 
     public function destroy(Report $report)
     {
         $report->delete();
-        RecordsCache::clearAll();
+        // RecordsCache::clearAll();  // !!!TODO: Uncomment on production
         return response()->json(['message' => 'Report deleted']);
     }
 

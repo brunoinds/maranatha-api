@@ -171,8 +171,11 @@ class RecordInventoryProductsKardex
 
                     if ($product->unitNature() === 'Integer') {
                         //Countable products:
+                        // inventory_product_items nao tem coluna `date`; o recorte de
+                        // periodo ja' foi aplicado em $incomes acima. No SQLite o filtro
+                        // era um no-op silencioso (identificador desconhecido entre aspas
+                        // duplas vira string literal), no MySQL seria erro 1054.
                         $products = $income->items()->where('inventory_product_id', $product->id)
-                            ->where('date', '>=', $this->startDate)
                             ->where('buy_currency', $options['moneyType'])
                             ->get();
                         $line['quantity'] = $products->count();
@@ -190,8 +193,8 @@ class RecordInventoryProductsKardex
                         }
                     } else {
                         //Uncountable products:
+                        // Sem coluna `date` nesta tabela — ver comentario acima.
                         $products = $income->uncountableItems()->where('inventory_product_id', $product->id)
-                            ->where('date', '>=', $this->startDate)
                             ->where('buy_currency', $options['moneyType'])
                             ->get();
 
@@ -238,8 +241,8 @@ class RecordInventoryProductsKardex
 
                     if ($product->unitNature() === 'Integer') {
                         // Countable products: group by sell_amount and create one line per distinct price
+                        // Sem coluna `date` nesta tabela — ver comentario acima.
                         $products = $outcome->items()->where('inventory_product_id', $product->id)
-                            ->where('date', '>=', $this->startDate)
                             ->where('buy_currency', $options['moneyType'])
                             ->get();
 
@@ -271,9 +274,9 @@ class RecordInventoryProductsKardex
                     } else {
                         // Uncountable products: aggregate by unit price (like items_aggregated), one line per distinct price
                         $aggregatedByUnitPrice = [];
+                        // Sem coluna `date` nesta tabela — ver comentario acima.
                         $outcome->uncountableItems()
                             ->where('inventory_product_id', $product->id)
-                            ->where('date', '>=', $this->startDate)
                             ->where('buy_currency', $options['moneyType'])
                             ->each(function ($uncountableItem) use ($outcome, &$aggregatedByUnitPrice) {
                                 if (!isset($uncountableItem->outcomes_details[$outcome->id])) {

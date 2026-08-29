@@ -27,6 +27,11 @@ class WorkerPayment extends Model
         'divisions' => 'array'
     ];
 
+    // MySQL nao aceita DEFAULT em coluna TEXT: os defaults do schema vivem aqui.
+    protected $attributes = [
+        'divisions' => '[]',
+    ];
+
     public function worker(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
         return $this->belongsTo(Worker::class);

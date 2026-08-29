@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('inventory_products', function (Blueprint $table) {
-            $table->json('inventory_warehouses_ids')->default('[]');
+            $table->longText('inventory_warehouses_ids');
         });
     }
 

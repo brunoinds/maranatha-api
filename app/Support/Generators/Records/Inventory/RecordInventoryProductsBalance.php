@@ -85,8 +85,20 @@ class RecordInventoryProductsBalance
 
 
             $items = [];
-            $query->groupBy(['inventory_product_id', 'inventory_warehouse_id'])
-                ->select()->each(function ($item) use (&$options, &$items, $instance) {
+            // buy_currency e' lido no corpo do closure, entao precisa entrar no GROUP BY
+            // e no SELECT: com ONLY_FULL_GROUP_BY (padrao do MySQL 8) um SELECT * sobre
+            // colunas nao agregadas e' erro 1055. Nao altera o resultado — nenhuma
+            // combinacao produto+almacen tem mais de uma moeda nesta base.
+            $query->groupBy(['inventory_product_id', 'inventory_warehouse_id', 'buy_currency'])
+                ->select(['inventory_product_id', 'inventory_warehouse_id', 'buy_currency'])
+                // Ordenacao explicita pelas proprias colunas do GROUP BY. Sem ela,
+                // each() -> chunk() injeta "order by id", que o ONLY_FULL_GROUP_BY
+                // rejeita (erro 1055) — e alem disso deixaria a ordem dos grupos
+                // dependente de qual linha o motor escolhe dentro de cada grupo.
+                ->orderBy('inventory_product_id')
+                ->orderBy('inventory_warehouse_id')
+                ->orderBy('buy_currency')
+                ->each(function ($item) use (&$options, &$items, $instance) {
                     $query = InventoryProductItem::query();
 
                     $productItems = $query->where('inventory_product_id', $item->inventory_product_id)
@@ -182,8 +194,17 @@ class RecordInventoryProductsBalance
 
 
             $items = [];
-            $query->groupBy(['inventory_product_id', 'inventory_warehouse_id'])
-                ->select()->each(function ($item) use (&$options, &$items, $instance) {
+            // Mesmo motivo do bloco de itens contaveis: ONLY_FULL_GROUP_BY.
+            $query->groupBy(['inventory_product_id', 'inventory_warehouse_id', 'buy_currency'])
+                ->select(['inventory_product_id', 'inventory_warehouse_id', 'buy_currency'])
+                // Ordenacao explicita pelas proprias colunas do GROUP BY. Sem ela,
+                // each() -> chunk() injeta "order by id", que o ONLY_FULL_GROUP_BY
+                // rejeita (erro 1055) — e alem disso deixaria a ordem dos grupos
+                // dependente de qual linha o motor escolhe dentro de cada grupo.
+                ->orderBy('inventory_product_id')
+                ->orderBy('inventory_warehouse_id')
+                ->orderBy('buy_currency')
+                ->each(function ($item) use (&$options, &$items, $instance) {
                     $query = InventoryProductItemUncountable::query();
 
                     $productItems = $query->where('inventory_product_id', $item->inventory_product_id)

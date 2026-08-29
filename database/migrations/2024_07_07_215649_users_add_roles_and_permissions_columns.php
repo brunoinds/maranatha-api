@@ -12,8 +12,8 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('users', function (Blueprint $table) {
-            $table->json('roles')->default('[]');
-            $table->json('permissions')->default('[]');
+            $table->longText('roles');
+            $table->longText('permissions');
         });
 
         DB::table('users')->where('username', 'admin')->update([

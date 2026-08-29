@@ -29,7 +29,7 @@ return new class extends Migration
             $table->integer('count_workers')->default(0);
 
             $table->integer('progress')->default(0);
-            $table->json('daily_reports')->default('[]');
+            $table->longText('daily_reports');
         });
     }
 

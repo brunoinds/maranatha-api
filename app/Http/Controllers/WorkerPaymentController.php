@@ -19,7 +19,7 @@ class WorkerPaymentController extends Controller
     public function store(StoreWorkerPaymentRequest $request)
     {
         $validated = $request->validated();
-        RecordsCache::clearAll();
+        // RecordsCache::clearAll();  // !!!TODO: Uncomment on production
         return WorkerPayment::create($validated);
     }
 
@@ -49,7 +49,7 @@ class WorkerPaymentController extends Controller
             }
         }
 
-        RecordsCache::clearAll();
+        // RecordsCache::clearAll();  // !!!TODO: Uncomment on production
         return  response()->json(['message' => 'Worker payments created successfully']);
     }
 
@@ -62,14 +62,14 @@ class WorkerPaymentController extends Controller
     {
         $validated = $request->validated();
         $workerPayment->update($validated);
-        RecordsCache::clearAll();
+        // RecordsCache::clearAll();  // !!!TODO: Uncomment on production
         return response()->json(['message' => 'Worker payment updated successfully']);
     }
 
     public function destroy(WorkerPayment $workerPayment)
     {
         $workerPayment->delete();
-        RecordsCache::clearAll();
+        // RecordsCache::clearAll();  // !!!TODO: Uncomment on production
         return response()->noContent();
     }
 }

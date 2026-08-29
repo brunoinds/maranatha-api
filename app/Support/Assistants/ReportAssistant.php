@@ -9,7 +9,7 @@ use App\Models\Job;
 
 class ReportAssistant{
     public static function generateExcelDocument(Report $report): Excel{
-        $invoices = $report->invoices()->orderBy('date', 'asc')->get();
+        $invoices = $report->invoices()->orderBy('date', 'asc')->orderBy('id')->get(); // desempate estavel: 'date' tem valores repetidos
 
         $user = $report->user()->get()->first();
 

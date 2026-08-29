@@ -18,6 +18,11 @@ class InventoryProductsPack extends Model
         'products' => 'array'
     ];
 
+    // MySQL nao aceita DEFAULT em coluna TEXT: os defaults do schema vivem aqui.
+    protected $attributes = [
+        'products' => '[]',
+    ];
+
     public function products()
     {
         return $this->hasMany(InventoryProduct::class, 'id', 'products.product_id');

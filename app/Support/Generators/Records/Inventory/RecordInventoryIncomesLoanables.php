@@ -56,7 +56,8 @@ class RecordInventoryIncomesLoanables
                     $query->select(['id', 'inventory_warehouse_income_id', 'inventory_product_id', 'buy_amount', 'buy_currency'])
                         ->whereHas('product', function($productQuery) {
                             $productQuery->where('is_loanable', true);
-                        });
+                        })
+                        ->orderBy('id');
                 },
                 'items.product' => function($query) {
                     $query->select(['id', 'name', 'is_loanable']);
@@ -65,12 +66,17 @@ class RecordInventoryIncomesLoanables
                     $query->select(['id', 'inventory_warehouse_income_id', 'inventory_product_id', 'buy_amount', 'buy_currency'])
                         ->whereHas('product', function($productQuery) {
                             $productQuery->where('is_loanable', true);
-                        });
+                        })
+                        ->orderBy('id');
                 },
                 'uncountableItems.product' => function($query) {
                     $query->select(['id', 'name', 'is_loanable']);
                 }
             ])
+            // Ordenacao explicita: sem ela o SQLite devolvia na ordem de rowid (= id)
+            // e o InnoDB devolve na ordem do indice de inventory_warehouse_id, mudando
+            // a ordem das linhas do relatorio. orderBy('id') reproduz o comportamento atual.
+            ->orderBy('id')
             ->get();
 
         $incomes->each(function($income) use (&$lines) {

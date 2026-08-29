@@ -28,6 +28,11 @@ class Worker extends Model
         'history' => 'array'
     ];
 
+    // MySQL nao aceita DEFAULT em coluna TEXT: os defaults do schema vivem aqui.
+    protected $attributes = [
+        'history' => '[]',
+    ];
+
 
     public function attendanceDays(): \Illuminate\Database\Eloquent\Relations\HasMany
     {

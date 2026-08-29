@@ -12,11 +12,13 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('inventory_warehouse_incomes', function (Blueprint $table) {
-            $table->json('origin_inventory_warehouse_income_id')->nullable(true)->default(null);
+            // Guarda um id inteiro, nao JSON: json() aqui era um engano de tipo.
+            $table->unsignedBigInteger('origin_inventory_warehouse_income_id')->nullable();
         });
 
         Schema::table('inventory_product_items', function (Blueprint $table) {
-            $table->json('origin_inventory_product_item_id')->nullable(true)->default(null);
+            // Guarda um id inteiro, nao JSON: json() aqui era um engano de tipo.
+            $table->unsignedBigInteger('origin_inventory_product_item_id')->nullable();
         });
     }
 

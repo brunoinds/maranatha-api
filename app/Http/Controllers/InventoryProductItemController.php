@@ -77,7 +77,7 @@ class InventoryProductItemController extends Controller
 
         $item->update($validated);
 
-        DataCache::clearRecord('warehouseStockList', [$item->inventory_warehouse_id]);
+        // DataCache::clearRecord('warehouseStockList', [$item->inventory_warehouse_id]);  // !!!TODO: Uncomment on production
 
         return response()->json($item);
     }

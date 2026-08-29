@@ -78,7 +78,7 @@ class InventoryProductItem extends Model
 
     public function delete()
     {
-        DataCache::clearRecord('warehouseStockList', [$this->inventory_warehouse_id]);
+        // DataCache::clearRecord('warehouseStockList', [$this->inventory_warehouse_id]);  // !!!TODO: Uncomment on production
         $this->loans()->each(function($loan){
             $loan->delete();
         });

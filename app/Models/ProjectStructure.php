@@ -30,4 +30,9 @@ class ProjectStructure extends Model
         'stringers_count' => 'integer',
         'facades_count' => 'integer',
     ];
+
+    // MySQL nao aceita DEFAULT em coluna TEXT: os defaults do schema vivem aqui.
+    protected $attributes = [
+        'default_phases' => '{"construction": [], "studio": []}',
+    ];
 }

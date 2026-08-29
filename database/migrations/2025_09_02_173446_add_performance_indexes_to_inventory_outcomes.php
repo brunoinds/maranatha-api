@@ -15,7 +15,7 @@ return new class extends Migration
             $table->index('inventory_warehouse_id'); // Foreign key index
             $table->index('user_id'); // Foreign key index
             $table->index('date'); // For date-based queries and ordering
-            $table->index(['inventory_warehouse_id', 'date']); // Composite index for common queries
+            $table->index(['inventory_warehouse_id', 'date'], 'iwo_warehouse_id_date_index');
         });
 
         Schema::table('inventory_product_items', function (Blueprint $table) {
@@ -32,7 +32,7 @@ return new class extends Migration
             $table->dropIndex(['inventory_warehouse_id']);
             $table->dropIndex(['user_id']);
             $table->dropIndex(['date']);
-            $table->dropIndex(['inventory_warehouse_id', 'date']);
+            $table->dropIndex('iwo_warehouse_id_date_index');
         });
 
         Schema::table('inventory_product_items', function (Blueprint $table) {

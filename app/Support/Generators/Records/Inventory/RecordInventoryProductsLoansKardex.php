@@ -65,7 +65,7 @@ class RecordInventoryProductsLoansKardex
 
 
 
-        $loans = $query->orderBy('loaned_at')->get();
+        $loans = $query->orderBy('loaned_at')->orderBy('id')->get(); // desempate estavel: 'date' tem valores repetidos
 
         $productsLoans = $loans->groupBy('inventory_product_item_id')->map(function($productLoans) use ($options){
 

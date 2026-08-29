@@ -15,8 +15,9 @@ return new class extends Migration
             $table->id();
             $table->timestamps();
             $table->string('user_id');
-            $table->timestamp('from_date');
-            $table->timestamp('to_date');
+            // Strings ISO-8601 com offset, que DATETIME nao aceita.
+            $table->string('from_date', 40);
+            $table->string('to_date', 40);
             $table->string('job_code', 100);
             $table->string('expense_code', 100);
             $table->string('description', 400)->nullable();

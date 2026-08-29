@@ -144,7 +144,9 @@ class InventoryWarehouseController extends Controller
     }
     public function listIncomes(InventoryWarehouse $warehouse)
     {
-        $incomes = $warehouse->incomes;
+        // Ordem explicita: o SQLite entregava por rowid e o InnoDB entrega pela ordem
+        // do indice de inventory_warehouse_id, mudando a sequencia da resposta.
+        $incomes = $warehouse->incomes()->orderBy('id')->get();
 
         //Do not include ->items from eager loading:
         $incomes->makeHidden('items');
@@ -161,7 +163,9 @@ class InventoryWarehouseController extends Controller
 
     public function listOutcomes(InventoryWarehouse $warehouse)
     {
-        $outcomes = $warehouse->outcomes;
+        // Ordem explicita: o SQLite entregava por rowid e o InnoDB entrega pela ordem
+        // do indice de inventory_warehouse_id, mudando a sequencia da resposta.
+        $outcomes = $warehouse->outcomes()->orderBy('id')->get();
         //Do not include ->items from eager loading:
         $outcomes->makeHidden('items');
 
@@ -180,11 +184,18 @@ class InventoryWarehouseController extends Controller
     public function listLoans(InventoryWarehouse $warehouse)
     {
         $loans = $warehouse->loans()->with([
-            'productItem:id,inventory_product_id,status,batch,amount,currency',
+            // inventory_product_items nao tem colunas `amount` nem `currency` — sao
+            // buy_amount/sell_amount e buy_currency/sell_currency. O SQLite devolvia as
+            // strings literais 'amount' e 'currency' (identificador desconhecido entre
+            // aspas duplas vira literal); o MySQL da' erro 1054. O frontend nao le esses
+            // campos em WarehouseProductItemLoans.vue.
+            'productItem:id,inventory_product_id,status,batch',
             'productItem.product:id,name,description,category,brand,unit',
             'loanedBy:id,name,username,email',
             'loanedTo:id,name,username,email'
-        ])->get();
+        // Ordem explicita: sem ela o SQLite entrega por rowid e o InnoDB pela ordem
+        // do indice, mudando a sequencia dos emprestimos na resposta.
+        ])->orderBy('id')->get();
 
         return response()->json($loans->toArray());
     }
@@ -192,11 +203,18 @@ class InventoryWarehouseController extends Controller
     public function listLoansByUsers(InventoryWarehouse $warehouse)
     {
         $loans = $warehouse->loans()->with([
-            'productItem:id,inventory_product_id,status,batch,amount,currency',
+            // inventory_product_items nao tem colunas `amount` nem `currency` — sao
+            // buy_amount/sell_amount e buy_currency/sell_currency. O SQLite devolvia as
+            // strings literais 'amount' e 'currency' (identificador desconhecido entre
+            // aspas duplas vira literal); o MySQL da' erro 1054. O frontend nao le esses
+            // campos em WarehouseProductItemLoans.vue.
+            'productItem:id,inventory_product_id,status,batch',
             'productItem.product:id,name,description,category,brand,unit',
             'loanedBy:id,name,username,email',
             'loanedTo:id,name,username,email'
-        ])->get();
+        // Ordem explicita: sem ela o SQLite entrega por rowid e o InnoDB pela ordem
+        // do indice, mudando a sequencia dos emprestimos na resposta.
+        ])->orderBy('id')->get();
 
         $groupedLoans = $loans->groupBy('loaned_to_user_id')->map(function ($userLoans) {
             return [
@@ -235,7 +253,7 @@ class InventoryWarehouseController extends Controller
 
         $stock = $warehouse->stock();
 
-        DataCache::storeRecord('warehouseStockList', [$warehouse->id], $stock);
+        // DataCache::storeRecord('warehouseStockList', [$warehouse->id], $stock);  // !!!TODO: Uncomment on production
 
         return response()->json([
             'items' => $stock,
@@ -547,7 +565,7 @@ class InventoryWarehouseController extends Controller
         $validated = $request->validated();
         $warehouse = InventoryWarehouse::create($validated);
 
-        DataCache::clearRecord('warehouseStockList', [$warehouse->id]);
+        // DataCache::clearRecord('warehouseStockList', [$warehouse->id]);  // !!!TODO: Uncomment on production
         return response()->json(['message' => 'Warehouse created', 'warehouse' => $warehouse->toArray()]);
     }
 
@@ -576,7 +594,7 @@ class InventoryWarehouseController extends Controller
      */
     public function destroy(InventoryWarehouse $warehouse)
     {
-        DataCache::clearRecord('warehouseStockList', [$warehouse->id]);
+        // DataCache::clearRecord('warehouseStockList', [$warehouse->id]);  // !!!TODO: Uncomment on production
         $warehouse->delete();
         return response()->json(['message' => 'Warehouse deleted successfully']);
     }

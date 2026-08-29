@@ -41,6 +41,12 @@ class InventoryWarehouseProductItemLoan extends Model
         'intercurrences' => 'array',
     ];
 
+    // MySQL nao aceita DEFAULT em coluna TEXT: os defaults do schema vivem aqui.
+    protected $attributes = [
+        'movements' => '[]',
+        'intercurrences' => '[]',
+    ];
+
     public function productItem()
     {
         return $this->belongsTo(InventoryProductItem::class, 'inventory_product_item_id');
@@ -76,7 +82,7 @@ class InventoryWarehouseProductItemLoan extends Model
         }
         $this->status = InventoryWarehouseProductItemLoanStatus::SendingToLoan;
         $this->save();
-        DataCache::clearRecord('warehouseStockList', [$this->inventory_warehouse_id]);
+        // DataCache::clearRecord('warehouseStockList', [$this->inventory_warehouse_id]);  // !!!TODO: Uncomment on production
     }
 
     public function doReceivedFromWarehouse()
@@ -86,7 +92,7 @@ class InventoryWarehouseProductItemLoan extends Model
         $this->returned_at = null;
         $this->confirm_returned_at = null;
         $this->save();
-        DataCache::clearRecord('warehouseStockList', [$this->inventory_warehouse_id]);
+        // DataCache::clearRecord('warehouseStockList', [$this->inventory_warehouse_id]);  // !!!TODO: Uncomment on production
     }
 
     public function undoReceivedFromWarehouse()
@@ -94,7 +100,7 @@ class InventoryWarehouseProductItemLoan extends Model
         $this->status = InventoryWarehouseProductItemLoanStatus::SendingToLoan;
         $this->received_at = null;
         $this->save();
-        DataCache::clearRecord('warehouseStockList', [$this->inventory_warehouse_id]);
+        // DataCache::clearRecord('warehouseStockList', [$this->inventory_warehouse_id]);  // !!!TODO: Uncomment on production
     }
 
     public function doReturnToWarehouse()
@@ -103,7 +109,7 @@ class InventoryWarehouseProductItemLoan extends Model
         $this->returned_at = now();
         $this->confirm_returned_at = null;
         $this->save();
-        DataCache::clearRecord('warehouseStockList', [$this->inventory_warehouse_id]);
+        // DataCache::clearRecord('warehouseStockList', [$this->inventory_warehouse_id]);  // !!!TODO: Uncomment on production
     }
 
     public function undoReturnToWarehouse()
@@ -111,7 +117,7 @@ class InventoryWarehouseProductItemLoan extends Model
         $this->status = InventoryWarehouseProductItemLoanStatus::OnLoan;
         $this->returned_at = null;
         $this->save();
-        DataCache::clearRecord('warehouseStockList', [$this->inventory_warehouse_id]);
+        // DataCache::clearRecord('warehouseStockList', [$this->inventory_warehouse_id]);  // !!!TODO: Uncomment on production
     }
 
     public function doConfirmReturnedToWarehouse()
@@ -124,7 +130,7 @@ class InventoryWarehouseProductItemLoan extends Model
         $this->status = InventoryWarehouseProductItemLoanStatus::Returned;
         $this->confirm_returned_at = now();
         $this->save();
-        DataCache::clearRecord('warehouseStockList', [$this->inventory_warehouse_id]);
+        // DataCache::clearRecord('warehouseStockList', [$this->inventory_warehouse_id]);  // !!!TODO: Uncomment on production
     }
 
     public function undoConfirmReturnedToWarehouse()
@@ -135,7 +141,7 @@ class InventoryWarehouseProductItemLoan extends Model
         $this->status = InventoryWarehouseProductItemLoanStatus::OnLoan;
         $this->confirm_returned_at = null;
         $this->save();
-        DataCache::clearRecord('warehouseStockList', [$this->inventory_warehouse_id]);
+        // DataCache::clearRecord('warehouseStockList', [$this->inventory_warehouse_id]);  // !!!TODO: Uncomment on production
     }
 
     public function delete()
@@ -144,7 +150,7 @@ class InventoryWarehouseProductItemLoan extends Model
             $this->productItem->status = InventoryProductItemStatus::InStock;
             $this->productItem->save();
         }
-        DataCache::clearRecord('warehouseStockList', [$this->inventory_warehouse_id]);
+        // DataCache::clearRecord('warehouseStockList', [$this->inventory_warehouse_id]);  // !!!TODO: Uncomment on production
 
         parent::delete();
     }
