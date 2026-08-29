@@ -1,0 +1,58 @@
+{
+  "fill" : {
+    "automatic-gradient" : "srgb:0.50980,0.12941,0.54510,1.00000"
+  },
+  "groups" : [
+    {
+      "layers" : [
+        {
+          "image-name" : "Hand.png",
+          "name" : "Hand",
+          "position" : {
+            "scale" : 0.08,
+            "translation-in-points" : [
+              0,
+              317.5925218605237
+            ]
+          }
+        },
+        {
+          "image-name" : "Money.png",
+          "name" : "Money",
+          "position" : {
+            "scale" : 0.105,
+            "translation-in-points" : [
+              0,
+              46.567486762333374
+            ]
+          }
+        },
+        {
+          "image-name" : "Capel.png",
+          "name" : "Capel",
+          "position" : {
+            "scale" : 0.085,
+            "translation-in-points" : [
+              0,
+              -217.60759928954843
+            ]
+          }
+        }
+      ],
+      "shadow" : {
+        "kind" : "neutral",
+        "opacity" : 0.5
+      },
+      "translucency" : {
+        "enabled" : true,
+        "value" : 0.5
+      }
+    }
+  ],
+  "supported-platforms" : {
+    "circles" : [
+      "watchOS"
+    ],
+    "squares" : "shared"
+  }
+}

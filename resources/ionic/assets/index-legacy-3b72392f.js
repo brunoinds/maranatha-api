@@ -1,0 +1,1 @@
+System.register(["./index-legacy-2890f168.js"],(function(e,n){"use strict";var t;return{setters:[e=>{t=e.cs}],execute:function(){var n,i;!function(e){e.Dark="DARK",e.Light="LIGHT",e.Default="DEFAULT"}(n||(n={})),e("a",i),function(e){e.Body="body",e.Ionic="ionic",e.Native="native",e.None="none"}(i||e("a",i={})),e("K",t("Keyboard"))}}}));
