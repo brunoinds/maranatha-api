@@ -2,7 +2,7 @@
     "private": true,
     "type": "module",
     "scripts": {
-        "build": "cd ionic; ionic build"
+        "build": ""
     },
     "devDependencies": {
         "@inertiajs/vue3": "^1.0.0",
