@@ -3,7 +3,7 @@ name: Deploy (Kamal → VPS)
 on:
   push:
     branches:
-      - prolux-vps
+      - main
   workflow_dispatch:
 
 concurrency:
