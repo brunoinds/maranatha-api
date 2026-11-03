@@ -33,8 +33,14 @@ class BackupSyncRemote extends Command
 
     private function loadFiles()
     {
-        $this->localFiles = Storage::disk('backup')->files(env('APP_NAME'));
-        $this->remoteFiles = Storage::disk('google')->files(env('APP_NAME'));
+        // Pasta vazia listaria a raiz do Drive, e o sync apagaria tudo o que não é backup
+        $folder = config('backup.backup.name');
+        if (empty($folder)) {
+            throw new \RuntimeException('backup.backup.name is empty: refusing to sync the Drive root');
+        }
+
+        $this->localFiles = Storage::disk('backup')->files($folder);
+        $this->remoteFiles = Storage::disk('google')->files($folder);
     }
 
     private function getLocalAndRemoteFilesDifference()

@@ -11,6 +11,9 @@ servers:
         # Migrations e caches (config/route/view/event) na subida do container web
         AUTORUN_ENABLED: "true"
         AUTORUN_LARAVEL_STORAGE_LINK: "false"
+        # Sem config:cache: o código chama env() direto (APP_PRIVATE_KEY, APP_WEB_URL, chaves de API...),
+        # e com a config em cache o env() volta null
+        AUTORUN_LARAVEL_CONFIG_CACHE: "false"
   # Scheduler (backups no Drive e push do OneSignal): nunca rodar junto com o cron do cPanel antigo,
   # dois schedulers mandam notificação em dobro e mexem nos mesmos backups do Drive.
   scheduler:
