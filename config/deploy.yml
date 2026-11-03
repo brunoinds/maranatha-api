@@ -11,17 +11,23 @@ servers:
         # Migrations e caches (config/route/view/event) na subida do container web
         AUTORUN_ENABLED: "true"
         AUTORUN_LARAVEL_STORAGE_LINK: "false"
-  # Scheduler (backups no Drive e push do OneSignal) só liga na virada do DNS:
-  # dois schedulers ao mesmo tempo mandam notificação em dobro e mexem nos mesmos backups do Drive.
-  # scheduler:
-  #   hosts:
-  #     - <%= ENV.fetch("KAMAL_HOST", "prolux-vps") %>
-  #   cmd: php /var/www/html/artisan schedule:work
-  #   proxy: false
+  # Scheduler (backups no Drive e push do OneSignal): nunca rodar junto com o cron do cPanel antigo,
+  # dois schedulers mandam notificação em dobro e mexem nos mesmos backups do Drive.
+  scheduler:
+    hosts:
+      - <%= ENV.fetch("KAMAL_HOST", "prolux-vps") %>
+    cmd: php /var/www/html/artisan schedule:work
+    proxy: false
 
+# maranatha.top fica atrás do proxy do Cloudflare (SSL Full strict): o certificado é de origem do Cloudflare,
+# 15 anos, e a chave só existe na VPS (/etc/ssl/cloudflare-origin). Ver .kamal/secrets.
 proxy:
-  host: maranatha.srv2123141.hstgr.cloud
-  ssl: true
+  hosts:
+    - maranatha.top
+    - www.maranatha.top
+  ssl:
+    certificate_pem: CF_ORIGIN_CERT_PEM
+    private_key_pem: CF_ORIGIN_KEY_PEM
   app_port: 8080
   healthcheck:
     path: /api/cd/check
