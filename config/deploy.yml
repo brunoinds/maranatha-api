@@ -18,6 +18,9 @@ servers:
       - <%= ENV.fetch("KAMAL_HOST", "prolux-vps") %>
     cmd: php /var/www/html/artisan schedule:work
     proxy: false
+    # O healthcheck padrão da imagem é HTTP (porta 8080), que este container não serve
+    options:
+      health-cmd: healthcheck-schedule
 
 # maranatha.top fica atrás do proxy do Cloudflare (SSL Full strict): o certificado é de origem do Cloudflare,
 # 15 anos, e a chave só existe na VPS (/etc/ssl/cloudflare-origin). Ver .kamal/secrets.
