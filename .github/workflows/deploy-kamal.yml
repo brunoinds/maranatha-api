@@ -44,8 +44,9 @@ jobs:
       - name: 🔐 Tailscale (tag:ci, só SSH na VPS)
         uses: tailscale/github-action@v4
         with:
-          oauth-client-id: ${{ secrets.TS_OAUTH_CLIENT_ID }}
-          audience: ${{ secrets.TS_AUDIENCE }}
+          # Credencial OIDC do Tailscale (sem segredo): só repo:brunoinds/maranatha-*, só gera chaves tag:ci
+          oauth-client-id: TBERsbsTsB11CNTRL-kXDtT6kwp621CNTRL
+          audience: api.tailscale.com/TBERsbsTsB11CNTRL-kXDtT6kwp621CNTRL
           tags: tag:ci
 
       - name: 🔑 Chave SSH do usuário deploy
