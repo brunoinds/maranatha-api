@@ -200,7 +200,8 @@ class Invoice extends Model
 
         $wasSuccessfull = Storage::disk('public')->put($path, $imageEncoded);
 
-        $this->pdf = null;
+        // Boleta que era PDF e virou foto: o arquivo do PDF não serve mais
+        $this->deletePdf();
         $this->pdf_size = null;
 
         $this->image = $imageId;
@@ -219,7 +220,8 @@ class Invoice extends Model
 
         $wasSuccessfull = Storage::disk('public')->put($path, $pdfEncoded);
 
-        $this->image = null;
+        // Boleta que era foto e virou PDF: o arquivo da foto não serve mais
+        $this->deleteImage();
         $this->image_size = null;
 
         $this->pdf = $pdfId;
