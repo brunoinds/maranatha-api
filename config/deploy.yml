@@ -58,6 +58,8 @@ ssh:
 env:
   clear:
     APP_ENV: production
+    # Só aceita tráfego vindo do Cloudflare: o IP da VPS não serve a API direto
+    ONLY_CLOUDFLARE: "true"
     DB_CONNECTION: sqlite
     DB_DATABASE: /var/www/html/database/data/database.sqlite
     REDIS_HOST: redis

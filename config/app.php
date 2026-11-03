@@ -31,6 +31,9 @@ return [
 
     'env' => env('APP_ENV', 'production'),
 
+    // Recusa acesso que não veio pelo Cloudflare (ver App\Http\Middleware\OnlyThroughCloudflare)
+    'only_cloudflare' => (bool) env('ONLY_CLOUDFLARE', false),
+
     /*
     |--------------------------------------------------------------------------
     | Application Debug Mode
