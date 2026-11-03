@@ -91,7 +91,21 @@ class InvoiceController extends Controller
             //Avoid corrupted PDF or PDF version 1.5 or higher, transform it into a PDF version 1.4:
             $pdfTempFilePath = TPdf::transformPdfBase64IntoTemporarilyFile($base64Pdf);
             if (TPdf::checkIfPdfNeedsRepair($pdfTempFilePath)){
-                $base64Pdf = TPdf::transformPdfFileIntoBase64(TPdf::repairPdf($pdfTempFilePath));
+                try {
+                    $repairedPdfPath = TPdf::repairPdf($pdfTempFilePath);
+                } catch (\Throwable $e) {
+                    report($e);
+                    $repairedPdfPath = null;
+                }
+                if (!$repairedPdfPath || !TPdf::isCompatible($repairedPdfPath)){
+                    return response()->json([
+                        'error' => [
+                            'message' => 'Este PDF no es compatible y no podrá incluirse en el PDF del reporte. Suba una foto de la boleta o el PDF original descargado del emisor.',
+                            'code' => 'IncompatiblePdf',
+                        ]
+                    ], 422);
+                }
+                $base64Pdf = TPdf::transformPdfFileIntoBase64($repairedPdfPath);
             }
 
             $pdfEncoded = base64_decode($base64Pdf);
@@ -121,6 +135,29 @@ class InvoiceController extends Controller
         RecordsCache::clearAll();
 
         return response()->json(['message' => 'Invoice created', 'invoice' => $invoice->toArray()]);
+    }
+
+    // O app chama ao escolher o PDF da boleta, antes de salvar: o upload acontece depois, em segundo plano
+    public function checkPdf(Request $request)
+    {
+        $validated = $request->validate([
+            'pdf' => 'required|string',
+        ]);
+
+        $pdfTempFilePath = TPdf::transformPdfBase64IntoTemporarilyFile($validated['pdf']);
+        if (TPdf::isCompatible($pdfTempFilePath)){
+            return response()->json(['compatible' => true]);
+        }
+
+        try {
+            $repairedPdfPath = TPdf::repairPdf($pdfTempFilePath);
+        } catch (\Throwable $e) {
+            report($e);
+            return response()->json(['compatible' => false]);
+        }
+
+        // O upload repara de novo do mesmo jeito: aqui só se confirma que o reparo resolve
+        return response()->json(['compatible' => TPdf::isCompatible($repairedPdfPath)]);
     }
 
     public function checkTicketNumber(Request $request)
@@ -198,7 +235,21 @@ class InvoiceController extends Controller
             //Avoid corrupted PDF or PDF version 1.5 or higher, transform it into a PDF version 1.4:
             $pdfTempFilePath = TPdf::transformPdfBase64IntoTemporarilyFile($base64Pdf);
             if (TPdf::checkIfPdfNeedsRepair($pdfTempFilePath)){
-                $base64Pdf = TPdf::transformPdfFileIntoBase64(TPdf::repairPdf($pdfTempFilePath));
+                try {
+                    $repairedPdfPath = TPdf::repairPdf($pdfTempFilePath);
+                } catch (\Throwable $e) {
+                    report($e);
+                    $repairedPdfPath = null;
+                }
+                if (!$repairedPdfPath || !TPdf::isCompatible($repairedPdfPath)){
+                    return response()->json([
+                        'error' => [
+                            'message' => 'Este PDF no es compatible y no podrá incluirse en el PDF del reporte. Suba una foto de la boleta o el PDF original descargado del emisor.',
+                            'code' => 'IncompatiblePdf',
+                        ]
+                    ], 422);
+                }
+                $base64Pdf = TPdf::transformPdfFileIntoBase64($repairedPdfPath);
             }
 
             try{

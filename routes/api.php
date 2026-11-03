@@ -112,6 +112,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
     //Invoice group:
     Route::group([], function(){
         Route::get('invoices/ticket-number/check', InvoiceController::class . '@checkTicketNumber');
+        Route::post('invoices/pdf/check', [InvoiceController::class, 'checkPdf']);
         Route::get('/invoices/{invoice}/image', [
             InvoiceController::class, 'showImage'
         ]);

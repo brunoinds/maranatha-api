@@ -18,6 +18,7 @@ use App\Support\Assistants\BalanceAssistant;
 use Spatie\TemporaryDirectory\TemporaryDirectory;
 use DateTime;
 use App\Support\Creators\Reports\ReportPDFCreator;
+use App\Support\Creators\Reports\ReportInvoicePdfException;
 use Illuminate\Support\Facades\Response;
 use Illuminate\Support\Facades\Cache;
 use App\Support\Cache\RecordsCache;
@@ -244,8 +245,15 @@ class ReportController extends Controller
         }
 
 
-        $pdf = ReportPDFCreator::new($report);
-        $content = $pdf->create($options);
+        try {
+            $content = ReportPDFCreator::new($report)->create($options);
+        } catch (ReportInvoicePdfException $e) {
+            report($e);
+            return response()->json([
+                'message' => $e->getMessage(),
+                'invoice_id' => $e->invoice->id,
+            ], 422);
+        }
 
         $documentName = Str::slug($report->title, '-') . '.pdf';
 

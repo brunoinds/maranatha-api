@@ -10,13 +10,25 @@ use Illuminate\Support\Str;
 
 class TPdf{
     public static function checkIfPdfNeedsRepair(string $pdfPath){
-        $pdf = new Fpdi();
-        $pdf->SetDisplayMode(100);
+        return !self::isCompatible($pdfPath);
+    }
+
+    // O PDF do reporte importa todas as páginas de cada boleta com o FPDI: testa exatamente isso
+    public static function isCompatible(string $pdfPath): bool{
         try {
-            $pages = @$pdf->setSourceFile($pdfPath);
-            return false;
-        } catch (\setasign\Fpdi\PdfParser\CrossReference\CrossReferenceException $ex){
+            $pdf = new Fpdi();
+            $pageCount = $pdf->setSourceFile($pdfPath);
+            if ($pageCount < 1){
+                return false;
+            }
+            for ($pageNo = 1; $pageNo <= $pageCount; $pageNo++) {
+                $pdf->AddPage();
+                $pdf->useTemplate($pdf->importPage($pageNo));
+            }
+            $pdf->Output('S');
             return true;
+        } catch (\Throwable $e){
+            return false;
         }
     }
     public static function repairPdf(string $pdfPath){

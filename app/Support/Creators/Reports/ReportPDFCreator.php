@@ -350,73 +350,10 @@ class ReportPDFCreator
                 $newPdf->useTemplate($tplIdx);
                 $currentPage++;
             }else{
-                $otherPdf = $mergeData['src'];
-                $otherPageCount = $newPdf->setSourceFile($otherPdf);
-                for ($otherPageNo = 1; $otherPageNo <= $otherPageCount; $otherPageNo++) {
-                    $newPdf->AddPage();
-                    $tplIdx = $newPdf->importPage($otherPageNo);
-                    $templateSize = $newPdf->getTemplateSize($tplIdx);
-
-
-                    if ($templateSize['orientation'] === 'L'){
-                        $newPdf->useTemplate(tpl: $tplIdx, adjustPageSize: true);
-                    }else{
-                        //Add into page without adjust, but make it centered, so we need to calculate the position:
-                        $x = 0;
-                        $y = 0;
-                        $w = $templateSize['width'];
-                        $h = $templateSize['height'];
-
-
-
-                        $x = ($newPdf->GetPageWidth() - $w) / 2;
-                        $y = ($newPdf->GetPageHeight() - $h) / 2;
-
-                        if ($newPdf->GetPageHeight() < $h){
-                            //If the old page height is bigger than the default new pdf page, we should adjust the height of the new pdf page to maximum height of the old page:
-                            $y = 0;
-                            $newPdf->setPageFormat([
-                                'width' => $newPdf->GetPageWidth(),
-                                'height' => $h,
-                                0 => $newPdf->GetPageWidth(),
-                                1 => $h,
-                                'orientation' => 'P'
-                            ], 'P');
-                        }
-
-                        $newPdf->useTemplate(tpl: $tplIdx, x: $x, y: $y, width: $w, height: $h);
-                    }
-
-
-
-
-
-                    $newPdf->SetFont('Helvetica');
-                    $newPdf->SetFont('Helvetica', 'B', 9);
-                    $newPdf->SetTextColor(255, 0, 0);
-
-                    collect(explode("\n", $mergeData['text']))->each(function($line, $i) use ($newPdf){
-                        $newPdf->SetXY(10, 10 + ($i * 3.4));
-
-                        $line = iconv('UTF-8', 'cp1250', $line);
-
-                        $newPdf->Write(0, $line);
-                    });
-
-                    $textSize = $newPdf->GetStringWidth($mergeData['text']);
-                    $textSizeHeight = 3.4 * count(explode("\n", $mergeData['text']));
-                    $newPdf->SetAlpha(0.8);
-                    $newPdf->SetFillColor(255,255,255);
-                    $newPdf->SetDrawColor(255,255,255);
-                    $newPdf->RoundedRect(10, 7.6, $textSize, $textSizeHeight + 2, 2, '1234', 'DF');
-                    $newPdf->SetAlpha(1);
-
-                    collect(explode("\n", $mergeData['text']))->each(function($line, $i) use ($newPdf){
-                        $newPdf->SetXY(10, 10 + ($i * 3.4));
-                        $line = iconv('UTF-8', 'cp1250', $line);
-                        $newPdf->Write(0, $line);
-                    });
-                    $currentPage++;
+                try {
+                    $this->mergeInvoicePdf($newPdf, $mergeData);
+                } catch (\Throwable $e) {
+                    throw new ReportInvoicePdfException($mergeData['invoice'], $e);
                 }
             }
 
@@ -426,6 +363,84 @@ class ReportPDFCreator
         $newPdf->Output($temporaryPdfPath, 'F');
 
         return $temporaryPdfPath;
+    }
+
+    private function mergeInvoicePdf(CustomPDF $newPdf, array $mergeData)
+    {
+        $otherPdf = $mergeData['src'];
+        $otherPageCount = $newPdf->setSourceFile($otherPdf);
+        for ($otherPageNo = 1; $otherPageNo <= $otherPageCount; $otherPageNo++) {
+            $newPdf->AddPage();
+            $tplIdx = $newPdf->importPage($otherPageNo);
+            $templateSize = $newPdf->getTemplateSize($tplIdx);
+
+
+            if ($templateSize['orientation'] === 'L'){
+                $newPdf->useTemplate(tpl: $tplIdx, adjustPageSize: true);
+            }else{
+                //Add into page without adjust, but make it centered, so we need to calculate the position:
+                $x = 0;
+                $y = 0;
+                $w = $templateSize['width'];
+                $h = $templateSize['height'];
+
+
+
+                $x = ($newPdf->GetPageWidth() - $w) / 2;
+                $y = ($newPdf->GetPageHeight() - $h) / 2;
+
+                if ($newPdf->GetPageHeight() < $h){
+                    //If the old page height is bigger than the default new pdf page, we should adjust the height of the new pdf page to maximum height of the old page:
+                    $y = 0;
+                    $newPdf->setPageFormat([
+                        'width' => $newPdf->GetPageWidth(),
+                        'height' => $h,
+                        0 => $newPdf->GetPageWidth(),
+                        1 => $h,
+                        'orientation' => 'P'
+                    ], 'P');
+                }
+
+                $newPdf->useTemplate(tpl: $tplIdx, x: $x, y: $y, width: $w, height: $h);
+            }
+
+
+
+
+
+            $newPdf->SetFont('Helvetica');
+            $newPdf->SetFont('Helvetica', 'B', 9);
+            $newPdf->SetTextColor(255, 0, 0);
+
+            collect(explode("\n", $mergeData['text']))->each(function($line, $i) use ($newPdf){
+                $newPdf->SetXY(10, 10 + ($i * 3.4));
+
+                $line = self::encodeStampText($line);
+
+                $newPdf->Write(0, $line);
+            });
+
+            $textSize = $newPdf->GetStringWidth(self::encodeStampText($mergeData['text']));
+            $textSizeHeight = 3.4 * count(explode("\n", $mergeData['text']));
+            $newPdf->SetAlpha(0.8);
+            $newPdf->SetFillColor(255,255,255);
+            $newPdf->SetDrawColor(255,255,255);
+            $newPdf->RoundedRect(10, 7.6, $textSize, $textSizeHeight + 2, 2, '1234', 'DF');
+            $newPdf->SetAlpha(1);
+
+            collect(explode("\n", $mergeData['text']))->each(function($line, $i) use ($newPdf){
+                $newPdf->SetXY(10, 10 + ($i * 3.4));
+                $line = self::encodeStampText($line);
+                $newPdf->Write(0, $line);
+            });
+        }
+    }
+
+    // As fontes padrão do FPDF usam Windows-1252; ñ, ¿ e aspas curvas não existem em cp1250 e o iconv falhava.
+    // mb_convert_encoding troca o que não cabe por "?" em vez de lançar erro.
+    private static function encodeStampText(string $text): string
+    {
+        return mb_convert_encoding($text, 'Windows-1252', 'UTF-8');
     }
 
 
