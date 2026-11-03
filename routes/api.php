@@ -11,7 +11,6 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\JobController;
 use App\Http\Controllers\ExpenseController;
 use App\Support\Assistants\WorkersAssistant;
-use mikehaertl\shellcommand\Command;
 use App\Http\Controllers\ManagementRecordsController;
 use App\Http\Controllers\ManagementBalancesController;
 use App\Http\Controllers\ApplicationNativeController;
@@ -26,7 +25,6 @@ use App\Http\Controllers\InventoryWarehouseIncomeController;
 use App\Http\Controllers\InventoryWarehouseOutcomeController;
 use App\Http\Controllers\InventoryWarehouseOutcomeRequestController;
 use App\Http\Controllers\InventoryWarehouseProductItemLoanController;
-use App\Http\Controllers\ApplicationAdapterController;
 use App\Http\Controllers\ProjectJobController;
 use App\Http\Controllers\ProjectStructureController;
 use App\Http\Controllers\ProjectConstructionPhaseController;
@@ -46,87 +44,9 @@ use App\Http\Controllers\ProjectConstructionTaskController;
 */
 
 Route::group(['prefix' => 'cd'], function () {
-    Route::get('config-cache', function(){
-        $commandLine = 'cd .. && php artisan config:clear && php artisan cache:clear';
-
-        $result = [
-            'message' => null,
-            'exitCode' => null,
-            'wasSuccessful' => false,
-        ];
-        $command = new Command($commandLine);
-        if ($command->execute()) {
-            $result['message'] = $command->getOutput();
-            $result['wasSuccessful'] = true;
-            $result['exitCode'] = $command->getExitCode();
-        } else {
-            $result['message'] = $command->getError();
-            $result['exitCode'] = $command->getExitCode();
-        }
-
-        if (!$result['wasSuccessful']){
-            return response()->json([
-                'message' => 'Failed to resolve config cache',
-                'command' => [
-                    'instruction' => $commandLine,
-                    'output' => $result['message'],
-                    'exitCode' => $result['exitCode'],
-                ]
-            ], 500);
-        }
-
-        return response()->json([
-            'message' => 'Cache updated successfully',
-            'command' => [
-                'instruction' => $commandLine,
-                'output' => $result['message'],
-                'exitCode' => $result['exitCode'],
-            ]
-        ], 200);
-    });
-    Route::get('migrate', function(){
-        $commandLine = 'cd .. && php artisan migrate --force';
-
-
-        $result = [
-            'message' => null,
-            'exitCode' => null,
-            'wasSuccessful' => false,
-        ];
-        $command = new Command($commandLine);
-        if ($command->execute()) {
-            $result['message'] = $command->getOutput();
-            $result['wasSuccessful'] = true;
-            $result['exitCode'] = $command->getExitCode();
-        } else {
-            $result['message'] = $command->getError();
-            $result['exitCode'] = $command->getExitCode();
-        }
-
-        if (!$result['wasSuccessful']){
-            return response()->json([
-                'message' => 'Failed to migrate',
-                'command' => [
-                    'instruction' => $commandLine,
-                    'output' => $result['message'],
-                    'exitCode' => $result['exitCode'],
-                ]
-            ], 500);
-        }
-
-        return response()->json([
-            'message' => 'Migrated successfully',
-            'command' => [
-                'instruction' => $commandLine,
-                'output' => $result['message'],
-                'exitCode' => $result['exitCode'],
-            ]
-        ], 200);
-    });
     Route::get("check", function(){
         return response()->json(["message" => "API is working!"], 200);
     });
-    Route::get("backup", [ApplicationAdapterController::class, 'backup']);
 });
 
 

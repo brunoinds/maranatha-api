@@ -12,7 +12,6 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use App\Support\Assistants\ReportAssistant;
 use App\Support\Generators\ReportGenerator;
-use App\Support\GoogleSheets\Excel;
 use OneSignal;
 use App\Models\User;
 use App\Support\Assistants\BalanceAssistant;
@@ -150,10 +149,6 @@ class ReportController extends Controller
 
         $report->save();
 
-        /* if ($previousStatus !== $report->status && env('APP_ENV') === 'production'){
-            $excelOutput = ReportGenerator::generateExcelOutput();
-            Excel::updateDBSheet($excelOutput);
-        } */
         if ($previousStatus === ReportStatus::Draft && $report->status === ReportStatus::Submitted){
             //Send notification
             $user = $report->user()->get()->first();

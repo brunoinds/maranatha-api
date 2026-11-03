@@ -8,7 +8,7 @@ use App\Models\ProjectJob;
 use App\Helpers\Toolbox;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
-use Intervention\Image\Facades\Image;
+use App\Support\Images\PngImage;
 class ProjectJobController extends Controller
 {
     /**
@@ -91,8 +91,7 @@ class ProjectJobController extends Controller
                     ], 400);
                 }
 
-                $imageResource = Image::make($validated['image']['data']);
-                $imageEncoded = $imageResource->encode('png')->getEncoded();
+                $imageEncoded = PngImage::encode($validated['image']['data']);
 
                 $imageId = Str::uuid();
                 $path = 'projects-chat/' . $imageId;

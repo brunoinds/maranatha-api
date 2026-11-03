@@ -11,7 +11,7 @@ use App\Models\Job;
 use App\Models\Expense;
 use App\Helpers\Enums\MoneyType;
 use Illuminate\Support\Facades\Storage;
-use Intervention\Image\Facades\Image;
+use App\Support\Images\PngImage;
 use App\Models\InventoryProduct;
 use App\Support\Cache\DataCache;
 
@@ -82,8 +82,7 @@ class InventoryWarehouseIncome extends Model
 
     public function setImageFromBase64(string $base64Image):bool
     {
-        $imageResource = Image::make($base64Image);
-        $imageEncoded = $imageResource->encode('png')->getEncoded();
+        $imageEncoded = PngImage::encode($base64Image);
 
         $imageId = $this->id;
         $path = 'warehouse-incomes/' . $imageId;

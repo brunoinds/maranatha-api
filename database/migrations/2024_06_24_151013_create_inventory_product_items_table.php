@@ -16,8 +16,8 @@ return new class extends Migration
             $table->timestamps();
             $table->integer('order');
             $table->string('batch')->nullable(true);
-            $table->float(column: 'buy_amount', total: 8, places: 2);
-            $table->float(column: 'sell_amount', total: 8, places: 2);
+            $table->float('buy_amount');
+            $table->float('sell_amount');
             $table->string('buy_currency');
             $table->string('sell_currency');
 

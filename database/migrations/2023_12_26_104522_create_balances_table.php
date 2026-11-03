@@ -21,7 +21,7 @@ return new class extends Migration
             $table->timestamp('date');
             $table->string('model', 100)->default('Direct');
             $table->enum('type', ['Credit', 'Debit'])->default('Credit');
-            $table->float(column: 'amount', total: 8, places: 2);
+            $table->float('amount');
         });
     }
 

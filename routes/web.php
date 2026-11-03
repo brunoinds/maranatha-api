@@ -1,9 +1,6 @@
 <?php
 
-use App\Http\Controllers\ProfileController;
-use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
-use Inertia\Inertia;
 
 use Illuminate\Http\Testing\MimeType;
 use Illuminate\Support\Facades\Response;

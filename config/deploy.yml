@@ -1,0 +1,70 @@
+# Kamal 2: deploy da API na VPS Hostinger (prolux-vps). O GitHub Actions entra pelo Tailscale (host "prolux-vps").
+service: maranatha-api
+image: brunoinds/maranatha-api
+
+servers:
+  web:
+    hosts:
+      - <%= ENV.fetch("KAMAL_HOST", "prolux-vps") %>
+    env:
+      clear:
+        # Migrations e caches (config/route/view/event) na subida do container web
+        AUTORUN_ENABLED: "true"
+        AUTORUN_LARAVEL_STORAGE_LINK: "false"
+  # Scheduler (backups no Drive e push do OneSignal) só liga na virada do DNS:
+  # dois schedulers ao mesmo tempo mandam notificação em dobro e mexem nos mesmos backups do Drive.
+  # scheduler:
+  #   hosts:
+  #     - <%= ENV.fetch("KAMAL_HOST", "prolux-vps") %>
+  #   cmd: php /var/www/html/artisan schedule:work
+  #   proxy: false
+
+proxy:
+  host: maranatha.srv2123141.hstgr.cloud
+  ssl: true
+  app_port: 8080
+  healthcheck:
+    path: /api/cd/check
+    interval: 3
+    timeout: 5
+
+registry:
+  server: ghcr.io
+  username: brunoinds
+  password:
+    - KAMAL_REGISTRY_PASSWORD
+
+builder:
+  arch: amd64
+  cache:
+    type: gha
+    options: mode=max
+
+ssh:
+  user: deploy
+
+env:
+  clear:
+    APP_ENV: production
+    DB_CONNECTION: sqlite
+    DB_DATABASE: /var/www/html/database/data/database.sqlite
+    REDIS_HOST: redis
+    REDIS_PORT: "6379"
+    REDIS_PREFIX: "maranatha_"
+    LOG_LEVEL: warning
+    LOG_CHANNEL: daily
+
+# Segredos: o .env de produção fica só no servidor (/srv/apps/maranatha/.env, root:www-data 640)
+volumes:
+  - /srv/apps/maranatha/.env:/var/www/html/.env:ro
+  - /srv/apps/maranatha/storage:/var/www/html/storage
+  - /srv/apps/maranatha/database:/var/www/html/database/data
+  - /srv/apps/maranatha/ionic:/var/www/html/resources/ionic
+
+deploy_timeout: 120
+retain_containers: 3
+
+aliases:
+  console: app exec --interactive --reuse "php artisan tinker"
+  shell: app exec --interactive --reuse "bash"
+  artisan: app exec --reuse "php artisan"

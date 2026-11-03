@@ -18,12 +18,12 @@ return new class extends Migration
             $table->string('batch')->nullable(true);
 
 
-            $table->float(column: 'quantity_inserted', total: 8, places: 2)->default(0);
-            $table->float(column: 'quantity_used', total: 8, places: 2)->default(0);
-            $table->float(column: 'quantity_remaining', total: 8, places: 2)->default(0);
+            $table->float('quantity_inserted')->default(0);
+            $table->float('quantity_used')->default(0);
+            $table->float('quantity_remaining')->default(0);
 
 
-            $table->float(column: 'buy_amount', total: 8, places: 2);
+            $table->float('buy_amount');
             $table->string('buy_currency');
 
             $table->string('status')->default('InStock');

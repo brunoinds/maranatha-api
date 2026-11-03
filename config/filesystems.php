@@ -59,22 +59,14 @@ return [
             'clientId' => env('GOOGLE_DRIVE_CLIENT_ID'),
             'clientSecret' => env('GOOGLE_DRIVE_CLIENT_SECRET'),
             'refreshToken' => env('GOOGLE_DRIVE_REFRESH_TOKEN'),
-            'folder' => env('GOOGLE_DRIVE_FOLDER_ID'),
+            // O pacote antigo (yaza) sobrescrevia esta chave com GOOGLE_DRIVE_FOLDER, que não existe no .env:
+            // os backups sempre foram para a raiz do Drive. Mantido assim para o backup:sync-remote achar os arquivos.
+            'folder' => env('GOOGLE_DRIVE_FOLDER'),
         ],
         'backup' => [
             'driver' => 'local',
             'root' => storage_path('backup'),
             'throw' => false,
-        ],
-        'gcs' => [
-            'driver' => 'gcs',
-            'key_file_path' => storage_path('credentials/imedicine-gcs/credentials.json'),
-            'bucket' => env('GOOGLE_CLOUD_STORAGE_BUCKET', 'maranathainvoices-backup-api'),
-            'storage_api_uri' => env('GOOGLE_CLOUD_STORAGE_API_URI', null),
-            'api_endpoint' => env('GOOGLE_CLOUD_STORAGE_API_ENDPOINT', null),
-            'visibility' => 'private',
-            'visibility_handler' =>\League\Flysystem\GoogleCloudStorage\UniformBucketLevelAccessVisibility::class,
-            'metadata' => ['cacheControl' => 'public,max-age=86400']
         ],
     ],
 

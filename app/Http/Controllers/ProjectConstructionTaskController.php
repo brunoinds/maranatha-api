@@ -10,7 +10,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Illuminate\Support\Carbon;
-use Intervention\Image\Facades\Image;
+use App\Support\Images\PngImage;
 use App\Helpers\Enums\ProjectConstructionTaskStatus;
 
 class ProjectConstructionTaskController extends Controller
@@ -72,8 +72,7 @@ class ProjectConstructionTaskController extends Controller
         $attachmentsIds = [];
         foreach ($validated['attachments_base64'] as $attachmentBase64){
             try{
-                $imageResource = Image::make($attachmentBase64);
-                $imageEncoded = $imageResource->encode('png')->getEncoded();
+                $imageEncoded = PngImage::encode($attachmentBase64);
             } catch(\Exception $e){
                 return response()->json([
                     'error' => [

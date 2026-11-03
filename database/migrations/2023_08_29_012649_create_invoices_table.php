@@ -22,7 +22,7 @@ return new class extends Migration
             $table->timestamp('date');
             $table->string('job_code', 100);
             $table->string('expense_code', 100);
-            $table->float(column: 'amount', total: 8, places: 2);
+            $table->float('amount');
             $table->string('qrcode_data', 1000)->nullable(true);
             $table->string('image', 100)->nullable(true)->default(null);
         });

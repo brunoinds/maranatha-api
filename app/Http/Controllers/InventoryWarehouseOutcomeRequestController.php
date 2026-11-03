@@ -9,7 +9,7 @@ use App\Helpers\Enums\InventoryWarehouseOutcomeRequestStatus;
 use Illuminate\Support\Str;
 use App\Helpers\Toolbox;
 use Illuminate\Support\Facades\Storage;
-use Intervention\Image\Facades\Image;
+use App\Support\Images\PngImage;
 use OneSignal;
 use Spatie\TemporaryDirectory\TemporaryDirectory;
 use App\Models\InventoryWarehouse;
@@ -116,8 +116,7 @@ class InventoryWarehouseOutcomeRequestController extends Controller
                     ], 400);
                 }
 
-                $imageResource = Image::make($validated['image']['data']);
-                $imageEncoded = $imageResource->encode('png')->getEncoded();
+                $imageEncoded = PngImage::encode($validated['image']['data']);
 
                 $imageId = Str::uuid();
                 $path = 'warehouse-chat/' . $imageId;

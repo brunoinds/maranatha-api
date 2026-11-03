@@ -11,7 +11,7 @@ use App\Helpers\Toolbox;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Illuminate\Support\Carbon;
-use Intervention\Image\Facades\Image;
+use App\Support\Images\PngImage;
 
 
 class ProjectConstructionPhaseController extends Controller
@@ -90,8 +90,7 @@ class ProjectConstructionPhaseController extends Controller
             //Upload all attachments:
             foreach ($validated['final_report']['attachments_base64'] as $attachmentBase64){
                 try{
-                    $imageResource = Image::make($attachmentBase64);
-                    $imageEncoded = $imageResource->encode('png')->getEncoded();
+                    $imageEncoded = PngImage::encode($attachmentBase64);
                 } catch(\Exception $e){
                     return response()->json([
                         'error' => [

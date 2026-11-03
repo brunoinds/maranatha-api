@@ -10,9 +10,12 @@ class TrustProxies extends Middleware
     /**
      * The trusted proxies for this application.
      *
+     * O container só recebe tráfego do kamal-proxy (atrás do Cloudflare), então confia em todos:
+     * sem isso o Laravel vê http e gera URLs (como as dos bundles) sem https.
+     *
      * @var array<int, string>|string|null
      */
-    protected $proxies;
+    protected $proxies = '*';
 
     /**
      * The headers that should be used to detect proxies.

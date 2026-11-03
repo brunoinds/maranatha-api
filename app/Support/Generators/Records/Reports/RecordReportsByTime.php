@@ -96,21 +96,21 @@ class RecordReportsByTime
         $reports->each(function($item) use (&$indicators){
             if ($item->submitted_at !== null){
                 $indicators['average_between_created_and_submitted']['count']++;
-                $indicators['average_between_created_and_submitted']['total'] += Carbon::createFromDate(new DateTime($item->created_at))->diffInHours(Carbon::createFromDate(new DateTime($item->submitted_at)));
+                $indicators['average_between_created_and_submitted']['total'] += (int) Carbon::createFromDate(new DateTime($item->created_at))->diffInHours(Carbon::createFromDate(new DateTime($item->submitted_at)), true);
                 $indicators['average_between_created_and_submitted']['average'] = $indicators['average_between_created_and_submitted']['total'] / $indicators['average_between_created_and_submitted']['count'];
             }
             if ($item->approved_at !== null){
                 $indicators['average_between_submitted_and_approved']['count']++;
-                $indicators['average_between_submitted_and_approved']['total'] += Carbon::createFromDate(new DateTime($item->submitted_at))->diffInHours(Carbon::createFromDate(new DateTime($item->approved_at)));
+                $indicators['average_between_submitted_and_approved']['total'] += (int) Carbon::createFromDate(new DateTime($item->submitted_at))->diffInHours(Carbon::createFromDate(new DateTime($item->approved_at)), true);
                 $indicators['average_between_submitted_and_approved']['average'] = $indicators['average_between_submitted_and_approved']['total'] / $indicators['average_between_submitted_and_approved']['count'];
             }
             if ($item->restituted_at !== null){
                 $indicators['average_between_approved_and_restituted']['count']++;
-                $indicators['average_between_approved_and_restituted']['total'] += Carbon::createFromDate(new DateTime($item->approved_at))->diffInHours(Carbon::createFromDate(new DateTime($item->restituted_at)));
+                $indicators['average_between_approved_and_restituted']['total'] += (int) Carbon::createFromDate(new DateTime($item->approved_at))->diffInHours(Carbon::createFromDate(new DateTime($item->restituted_at)), true);
                 $indicators['average_between_approved_and_restituted']['average'] = $indicators['average_between_approved_and_restituted']['total'] / $indicators['average_between_approved_and_restituted']['count'];
 
                 $indicators['average_between_submitted_and_restituted']['count']++;
-                $indicators['average_between_submitted_and_restituted']['total'] += Carbon::createFromDate(new DateTime($item->submitted_at))->diffInHours(Carbon::createFromDate(new DateTime($item->restituted_at)));
+                $indicators['average_between_submitted_and_restituted']['total'] += (int) Carbon::createFromDate(new DateTime($item->submitted_at))->diffInHours(Carbon::createFromDate(new DateTime($item->restituted_at)), true);
                 $indicators['average_between_submitted_and_restituted']['average'] = $indicators['average_between_submitted_and_restituted']['total'] / $indicators['average_between_submitted_and_restituted']['count'];
             }
         });

@@ -6,7 +6,6 @@ use App\Helpers\Enums\BalanceModel;
 use App\Helpers\Enums\BalanceType;
 use App\Models\AttendanceDayWorker;
 use App\Models\Balance;
-use App\Support\GoogleSheets\Excel;
 use Carbon\Carbon;
 use Illuminate\Support\Collection;
 use App\Models\Attendance;
@@ -311,33 +310,4 @@ class WorkersAssistant{
 
 
 
-    public static function getListWorkersLegacy():array
-    {
-        $workers = collect(Excel::getWorkersSheet())->map(function($item){
-            return [
-                'dni' => $item['dni'],
-                'name' => $item['name'],
-                'team' => $item['team'],
-                'supervisor' => $item['supervisor'],
-                'function' => $item['function'],
-                'is_active' => $item['is_active'],
-            ];
-        });
-        return $workers->toArray();
-    }
-    public static function getListWorkersWithPaymentsLegacy():array
-    {
-        $workers = collect(Excel::getWorkersSheet())->map(function($item){
-            return [
-                'dni' => $item['dni'],
-                'name' => $item['name'],
-                'team' => $item['team'],
-                'supervisor' => $item['supervisor'],
-                'function' => $item['function'],
-                'payments' => $item['payments'],
-                'is_active' => $item['is_active'],
-            ];
-        });
-        return $workers->toArray();
-    }
 }

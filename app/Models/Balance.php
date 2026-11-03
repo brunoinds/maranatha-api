@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use App\Models\Report;
 use Illuminate\Support\Facades\Storage;
-use Intervention\Image\Facades\Image;
+use App\Support\Images\PngImage;
 
 class Balance extends Model
 {
@@ -35,8 +35,7 @@ class Balance extends Model
     }
 
     public function setReceiptImageFromBase64(string $base64Image):bool{
-        $imageResource = Image::make($base64Image);
-        $imageEncoded = $imageResource->encode('png')->getEncoded();
+        $imageEncoded = PngImage::encode($base64Image);
 
         $imageId = $this->id;
         $path = 'balances/' . $imageId;

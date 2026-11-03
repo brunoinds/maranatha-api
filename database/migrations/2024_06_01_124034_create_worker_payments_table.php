@@ -17,7 +17,7 @@ return new class extends Migration
             $table->integer('worker_id');
             $table->integer('month');
             $table->integer('year');
-            $table->float(column: 'amount', total: 8, places: 2);
+            $table->float('amount');
             $table->string('currency');
             $table->string('description', 400)->nullable();
         });

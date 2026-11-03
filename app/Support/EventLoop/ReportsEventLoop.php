@@ -83,7 +83,7 @@ class ReportsEventLoop{
         $reports = Report::where('status', ReportStatus::Submitted->value)->get();
 
         $reports = $reports->filter(function($item) {
-            $timeSpanInHours = Carbon::createFromDate(new DateTime($item->submitted_at))->diffInHours(Carbon::now());
+            $timeSpanInHours = (int) Carbon::createFromDate(new DateTime($item->submitted_at))->diffInHours(Carbon::now(), true);
             return $timeSpanInHours >= self::MAXIMUM_WAITING_HOURS_APPROVAL;
         });
 
@@ -95,7 +95,7 @@ class ReportsEventLoop{
         $reports = Report::where('status', ReportStatus::Approved->value)->get();
 
         $reports = $reports->filter(function($item) {
-            $timeSpanInHours = Carbon::createFromDate(new DateTime($item->approved_at))->diffInHours(Carbon::now());
+            $timeSpanInHours = (int) Carbon::createFromDate(new DateTime($item->approved_at))->diffInHours(Carbon::now(), true);
             return $timeSpanInHours >= self::MAXIMUM_WAITING_HOURS_RESTITUTION;
         });
 
@@ -107,7 +107,7 @@ class ReportsEventLoop{
         $reports = Report::where('status', ReportStatus::Rejected->value)->get();
 
         $reports = $reports->filter(function($item) {
-            $timeSpanInHours = Carbon::createFromDate(new DateTime($item->rejected_at))->diffInHours(Carbon::now());
+            $timeSpanInHours = (int) Carbon::createFromDate(new DateTime($item->rejected_at))->diffInHours(Carbon::now(), true);
             return $timeSpanInHours >= self::MAXIMUM_WAITING_HOURS_FIX_REJECTED;
         });
 

@@ -9,7 +9,7 @@ use DateTime;
 use App\Helpers\Enums\MoneyType;
 use App\Support\Exchange\Exchanger;
 use Illuminate\Support\Facades\Storage;
-use Intervention\Image\Facades\Image;
+use App\Support\Images\PngImage;
 use Illuminate\Support\Str;
 use App\Models\Job;
 use App\Models\Expense;
@@ -193,8 +193,7 @@ class Invoice extends Model
     {
         $this->deleteImage();
 
-        $imageResource = Image::make($base64Image);
-        $imageEncoded = $imageResource->encode('png')->getEncoded();
+        $imageEncoded = PngImage::encode($base64Image);
 
         $imageId = Str::random(40);
         $path = 'invoices/' . $imageId;

@@ -8,7 +8,7 @@ use App\Models\Invoice;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
-use Intervention\Image\Facades\Image;
+use App\Support\Images\PngImage;
 use App\Support\Toolbox\TString;
 use App\Support\Cache\RecordsCache;
 use App\Support\Toolbox\TPdf;
@@ -44,8 +44,7 @@ class InvoiceController extends Controller
 
 
             try{
-                $imageResource = Image::make($base64Image);
-                $imageEncoded = $imageResource->encode('png')->getEncoded();
+                $imageEncoded = PngImage::encode($base64Image);
             } catch(\Exception $e){
                 return response()->json([
                     'error' => [
