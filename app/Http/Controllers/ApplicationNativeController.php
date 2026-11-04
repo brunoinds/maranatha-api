@@ -25,6 +25,8 @@ class ApplicationNativeController extends Controller
                     'minimalVersion' => $bundleFile->minimalVersion,
                     'size' => $bundleFile->size,
                     'url' => $bundleFile->url,
+                    // O updater do Capacitor 8 recusa o download sem o SHA-256 do zip
+                    'checksum' => hash_file('sha256', $bundleFile->path),
                 ]
             ]
         ], 200);
