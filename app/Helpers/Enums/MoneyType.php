@@ -9,6 +9,7 @@ enum MoneyType: string
     case BRL = 'BRL';
     case USD = 'USD';
     case PYG = 'PYG';
+    case COP = 'COP';
 
     public static function toArray():array
     {

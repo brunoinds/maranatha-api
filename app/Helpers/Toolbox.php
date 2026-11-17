@@ -17,6 +17,8 @@ class Toolbox{
                 return "R$";
             case 'PYG':
                 return "Gs.";
+            case 'COP':
+                return "COL$";
             default:
                 return "S/.";
         }
@@ -100,6 +102,8 @@ class Toolbox{
             return 'Peru';
         }elseif ($countryCode === 'PY'){
             return 'Paraguay';
+        }elseif ($countryCode === 'CO'){
+            return 'Colombia';
         }elseif ($countryCode === 'US'){
             return 'United States';
         }else{

@@ -157,7 +157,7 @@ class RecordAttendancesByJobsExpenses
             foreach ($amountInCurrencies as $currency => $amount){
                 $amount = number_format($amount, 2, '.', '');
 
-                if ($currency === MoneyType::PYG){
+                if (in_array($currency, [MoneyType::PYG->value, MoneyType::COP->value], true)){
                     $amount = round($amount, 0);
                 }
 

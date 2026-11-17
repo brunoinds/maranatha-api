@@ -6,6 +6,7 @@ use DateTime;
 use App\Support\Exchange\Currencies\BRL;
 use App\Support\Exchange\Currencies\PYG;
 use App\Support\Exchange\Currencies\PEN;
+use App\Support\Exchange\Currencies\COP;
 use App\Helpers\Enums\MoneyType;
 
 
@@ -46,6 +47,8 @@ class ExchangeDate{
             return BRL::convertToDollar($this->date, $amount);
         }elseif ($from === MoneyType::PYG){
             return PYG::convertToDollar($this->date, $amount);
+        }elseif ($from === MoneyType::COP){
+            return COP::convertToDollar($this->date, $amount);
         }
     }
     private function convertFromDollar(float $amount, MoneyType $to): float{
@@ -55,6 +58,8 @@ class ExchangeDate{
             return BRL::convertFromDollar($this->date, $amount);
         }elseif ($to === MoneyType::PYG){
             return PYG::convertFromDollar($this->date, $amount);
+        }elseif ($to === MoneyType::COP){
+            return COP::convertFromDollar($this->date, $amount);
         }elseif ($to === MoneyType::USD){
             return $amount;
         }

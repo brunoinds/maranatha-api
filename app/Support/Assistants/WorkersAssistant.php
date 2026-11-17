@@ -160,7 +160,7 @@ class WorkersAssistant{
                         $amountPerDayInMonthYear = $payment['amount'] / $countDaysPresent;
                         $amountPerDayInOriginalCurrencyInMonthYear = $payment['amount_data']['original']['amount'] / $countDaysPresent;
 
-                        if ($payment['amount_data']['original']['money_type'] === MoneyType::PYG->value){
+                        if (in_array($payment['amount_data']['original']['money_type'], [MoneyType::PYG->value, MoneyType::COP->value], true)){
                             $amountPerDayInOriginalCurrencyInMonthYear = round($amountPerDayInOriginalCurrencyInMonthYear, 0);
                         }
 

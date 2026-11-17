@@ -1,0 +1,35 @@
+<?php
+
+namespace App\Support\Exchange\Adapters;
+
+use SoftinkLab\LaravelKeyvalueStorage\Facades\KVOption;
+
+
+class COPAdapter{
+    private static $db = [
+        'name' => 'Brunoinds\CurrencyGetGetApiLaravel\COP',
+        'value' => null,
+    ];
+    public function get()
+    {
+        if (self::$db['value'] !== null) {
+            return self::$db['value'];
+        }
+
+        self::$db['value'] = KVOption::get(self::$db['name']);
+        return self::$db['value'];
+    }
+
+    public function set(string $value)
+    {
+        KVOption::set(self::$db['name'], $value);
+        self::$db['value'] = $value;
+    }
+
+    public static function getStore(): \Brunoinds\CurrencyGetGetApiLaravel\Store\Store
+    {
+        $adapter = new self();
+        $store = \Brunoinds\CurrencyGetGetApiLaravel\Store\Store::newFromAdapter($adapter);
+        return $store;
+    }
+}
