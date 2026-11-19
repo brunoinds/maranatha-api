@@ -1,5 +1,5 @@
 # Imagem única da API: papel web (nginx + php-fpm) e scheduler (mesmo código, outro comando no Kamal)
-FROM serversideup/php:8.5.12-fpm-nginx-trixie
+FROM serversideup/php:8.5.13-fpm-nginx-trixie
 
 USER root
 
